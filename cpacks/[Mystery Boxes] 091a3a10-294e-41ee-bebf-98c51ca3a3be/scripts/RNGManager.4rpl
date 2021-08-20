@@ -49,8 +49,8 @@ endif
 	
 	#########
 	# <Good> outcomes start here
-								 "WEIGHT" 100.0,	"TYPE" "ern",	"SPECIAL" TableN("CountMin" 5 "CountMax" 10, 2) 3 TableN
-	"Airship" @IsRegistered   if "WEIGHT" 100.0,	"TYPE" <-G_tCustomGUIDs{"Airship"},  "REQUIRED" TRUE,	3 TableN	endif
+								 "WEIGHT" 75.0,	"TYPE" "ern",	"SPECIAL" TableN("CountMin" 5 "CountMax" 10, 2) 3 TableN
+	"Airship" @IsRegistered   if "WEIGHT" 80.0,	"TYPE" <-G_tCustomGUIDs{"Airship"},  "REQUIRED" TRUE,	3 TableN	endif
 	"Bertha" @IsRegistered    if "WEIGHT" 100.0,	"TYPE" <-G_tCustomGUIDs{"Bertha"},	 "REQUIRED" TRUE, "SPECIAL" TableN("Count" 4, 1) 4 TableN endif
 	"Sweeper" @IsRegistered   if "WEIGHT" 50.0,		"TYPE" <-G_tCustomGUIDs{"Sweeper"},	 "REQUIRED" TRUE, 3 TableN endif
 	"Wallis" @IsRegistered    if "WEIGHT" 80.0,		"TYPE" <-G_tCustomGUIDs{"Wallis"},	 "REQUIRED" TRUE, 3 TableN endif

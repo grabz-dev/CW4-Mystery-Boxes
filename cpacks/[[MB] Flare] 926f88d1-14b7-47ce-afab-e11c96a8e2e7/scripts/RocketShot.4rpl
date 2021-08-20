@@ -1,0 +1,94 @@
+# --RocketShot-- 11/18/2020 12:59:08 PM
+#Created by Alophox
+#everything is based off of the invasion map Berthas, with no 4RPL documentation available
+#as such, many errors are bound to be here
+#variable names are NOT changed overly much so as to maintain consistency, when appropriate, for clarity when reading either script.
+
+#this is a safeguard, in case I reload the script
+#<-counter 1 + ->counter
+#if(<-counter 300 gte)
+if(<-targeting eq0)
+	DestroyUnit(self false false true) #i don't know what the bools are for yet
+endif
+
+if(<-phase eq0) #phase 0, or no more phases; aka go down, but straight
+	#do no changes to t
+else if(<-phase 1 eq) #phase 1: go up
+	<-t 1 + ->t
+	@CalcNormalizedVelocity #puts result into ->normalizedVelocity
+	if(<-t <-tMultiplier * 1 gte)
+		2 ->phase
+		1 <-tMultiplier / ->t
+		@CalcNormalizedVelocity #puts result into ->normalizedVelocity
+	endif
+else if(<-phase 2 eq) #phase 2: go up, but straight
+	GetUnitPosition(self) ->currentPos
+	#determine when to turn to hit target
+	if(<-currentPos.y -(<-target.y) <-projSpeed 15 * + gte(sqrt(<-currentPos.x -(<-target.x) pow(2) +(<-currentPos.z -(<-target.z) pow(2))) ))
+		3 ->phase
+		<-t 1 + ->t
+	endif
+else if(<-phase 3 eq) #phase 3: go down
+	<-t 1 + ->t
+	@CalcNormalizedVelocity #puts result into ->normalizedVelocity
+	if(<-t <-tMultiplier * 3 gte)
+		0 ->phase
+		3 <-tMultiplier / ->t
+		@CalcNormalizedVelocity #puts result into ->normalizedVelocity
+	endif
+endif endif endif endif
+
+#and i scale it to the desired speed, whatever thtat may be, because the vector is a magnitude of 1
+<-projSpeed <-normalizedVelocity * ->velocity
+#then I apply that to the unit
+SetUnitForward(self <-velocity)
+self GetUnitPosition(self) <-velocity + SetUnitPosition
+
+GetUnitPosition(self) ->currentPos
+if(<-currentPos.y GetExactTerrain(<-currentPos.X <-currentPos.Z false) lte)
+	@Kaboom
+endif
+
+#calculates normalized velocity and puts it into ->normalizedVelocity
+:CalcNormalizedVelocity
+#this uses the properties of spherical coordinates, in a unit sphere
+#first, I get my desired y velocity. it's a VERY complicated formula, sin(t). just, you know, split because of the switch above
+sin(HALFPI <-t * <-tMultiplier *) dup abs div ->negY #literally just if its negative or not, cause i can't sqrt negative numbers
+sin(HALFPI <-t * <-tMultiplier *) <-projSpeedY <-projSpeed / * abs sqrt <-negY mul ->yMultiplier
+#next, I get the corresponding horizantal velocity(1^2 = y^2 + r^2). This will be split into x and z components later
+1 <-yMultiplier 2 pow - sqrt ->radiusMultiplier
+#radius multiplier is split, and everything put into a vector3- this is the xyz of a coord on the unit sphere
+V3(cos(<-launchAngle) <-radiusMultiplier *, <-yMultiplier, sin(<-launchAngle) <-radiusMultiplier *) ->normalizedVelocity
+
+:Kaboom
+	DamageCreeper(<-currentPos.X <-currentPos.Z 9999 <-DAMAGE_DIST <-DAMAGE_DEPTH false) #the 9999 is probably the damage number, dealt to creeper in the ovaloid
+	DamageMesh(<-currentPos.X <-currentPos.Z <-DAMAGE_DIST <-DAMAGE_MESH)
+	DestroyUnit(self false false false)
+
+:Once
+	#Gets called once and only once when unit is created -KC
+	#as a note, it is also called on recompile
+	1 ->phase
+	#tMultiplier scales how long I want the turns to be. less, the more time per turn
+	.1 ->tMultiplier
+	-1 ->t
+	<-projSpeed .5 * ->projSpeedY
+
+	#offset, cause who wants perfectly accurate rockets
+	GetUnitPosition(self) ->currentPos
+	<-target V3(RandInt(-4, 5), 0, RandInt(-4, 5)) + ->target
+	<-target.z <-currentPos.z - <-target.x <-currentPos.x - atan2 ->launchAngle
+	
+	#starting direction
+	#@CalcNormalizedVelocity
+	#SetUnitForward(self <-normalizedVelocity)
+	
+	CreateTrail(self "" 1 4) #unit, trail type, time
+	#trail types: 0 = mortar/bomber, 1 = missile/bertha/thor cannon
+	
+	#if above target, immediately go down
+	if(<-currentPos.y -(<-target.y) <-projSpeed 15 * + gte(sqrt(<-currentPos.x -(<-target.x) pow(2) +(<-currentPos.z -(<-target.z) pow(2))) ))
+		3 ->phase
+		1.5 <-tMultiplier / ->t
+	endif
+

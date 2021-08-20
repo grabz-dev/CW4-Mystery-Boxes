@@ -1,0 +1,224 @@
+# --Thor-- Oct/27/2020 1:19:49 PM
+# Updates for maintainHeight and fix for LOS Refresh: Regallion Jan 20, 2021
+
+$rotSpeed:1
+$moveSpeed:0.1
+$verticalMoveSpeed:0.5
+$glideHeight:30
+$maintainHeight:1
+$minHeight:15
+
+$gunFireCost:1
+$gunFireDelay:60
+
+$missileFireCost:1
+$missileFireDelay:15
+
+$sniperFireCost:1
+$sniperFireDelay:15
+
+
+$fireVel:1
+$DAMAGE_DIST:7
+$DAMAGE_DEPTH:10
+$DAMAGE_MESH:0.52
+$thorShotGUID:"14d0f231-d6cf-4561-84a2-50af3ec81a9f"
+
+
+if (GetUnitConstructing(self) !)
+	@Operate
+endif
+
+:BUILDCOMPLETE
+	SetObjActive(self "buildframe" false)
+	PlaySoundAtPosition("Sci Fi Explosion 03", 1, GetUnitPosition(self))
+
+	Table("color" V3(1 0.8 0.8) 
+		 "color2" V3(0.2 0 0)
+		 "birthtime" 40 
+		 "fadetime" 20 
+		 "direction" V3(0 5 0) 
+		 "startradius" 0.5
+		 "endradius" 3	) ->mistData
+	do(30 0)
+		CreateMist(GetUnitPosition(self) V3(RandFloat 7 * 3.5 -, 0, RandFloat 11 * 5.5 -) +, <-mistData)
+	loop
+	Self GetUnitCell ->cellZ ->cellX 
+	GetUnitSpecifiedTarget(self) ->st
+	if (<-st.x -1 ==)
+		Self V3(<-cellX 0 <-cellZ) SetUnitSpecifiedTarget
+	endif		
+	SetUnitDestroyUnevenLand(self false)
+	SetUnitOccupiesLand(self false)
+	SetUnitDamagedByCreeper(self false)
+	SetUnitLOSEnabled(self true)
+	SetUnitOutlineEnabled(self true)
+
+:Operate
+
+if (@CheckDamage)
+	DamageUnit(self 0.01)
+endif
+
+if (GetUnitAmmo(self) 3 <=)
+	if (<-showingNeed !)
+		true ->showingNeed
+		SetUnitDebugText(self "Needs LIFTIC!
+CONNECT TO NETWORK")
+	endif	
+else	
+	if (<-showingNeed)
+		false ->showingNeed
+		SetUnitDebugText(self "")
+	endif	
+endif
+
+SetUnitPacketRequestRate(self 5)
+
+GetUnitSpecifiedTarget(self) ->target
+
+
+GetUnitPosition(self) ->pos
+
+if (<-target.x gte0)
+	if (<-glideHeight <-pos.y - 1 lt <-maintainHeight or)
+		RotateUnitTowardsCell(self <-target.X <-target.Z <-rotSpeed)
+		#GetUnitForward(self) ->for
+		#GetObjFacingAngleCell(self "" <-target.X <-target.Z) ->facingAngle
+		#if (<-facingAngle 1 lt)
+		#endif
+		<-maintainHeight not if
+			SetUnitPosition(self MoveTowards(<-pos V3(<-target.x <-pos.y <-target.z) <-moveSpeed) )
+		else		
+			SetUnitPosition(self MoveTowardsAndAvoid(<-pos V3(<-target.x <-target.x <-target.z GetTerrain <-minHeight add <-target.z) <-moveSpeed <-minHeight 3 0 0 0) )
+		endif		
+	endif	
+endif
+GetUnitPosition(self) ->pos
+<-maintainHeight not if
+	SetUnitPosition(self MoveTowards(<-pos V3(<-pos.x <-glideHeight <-pos.z) <-verticalMoveSpeed) )
+endif
+GetUnitPosition(self) ->pos
+if (<-pos.x <-lastCellX != <-pos.z <-lastCellZ != ||)
+	<-pos.x ->lastCellX
+	<-pos.z ->lastCellZ
+	RefreshUnitLOSCache(self)
+endif
+
+if (GetUnitEnabled(self) GetUnitArmed(self) &&)
+	#Fire gun
+	if (GetUnitUIState(self 0) !)
+		if (<-gunFireCounter gt0)
+			<-gunFireCounter 1 - ->gunFireCounter
+		else 
+			GetUnitAmmo(self) ->ammo
+			if (<-ammo <-gunFireCost >=)
+				FindUnitEnemy(self GetUnitUIState(self 3) ! 0) ->enemyZ ->enemyX
+				if (<-enemyX -1 !=)
+					@FireProjectile(V3(<-enemyX GetTerrain(<-enemyX <-enemyZ) <-enemyZ)) 
+					<-ammo <-gunFireCost - ->ammo
+					SetUnitAmmo(self <-ammo)
+					<-gunFireDelay ->gunFireCounter
+				endif
+			endif	
+		endif
+	endif	
+
+
+	if (GetUnitUIState(self 1) !)
+		#FireMissile
+		if (<-missileFireCounter gt0)
+			<-missileFireCounter 1 - ->missileFireCounter
+		else 
+			GetUnitAmmo(self) ->ammo
+			if (<-ammo <-missileFireCost >=)
+				GetNearestAirSac(GetUnitPosition(self) GetUnitRange(self) 2 * true) ->airSac
+				if (<-airSac -1 !=)
+					@FireMissile(<-airSac) 
+					<-ammo <-missileFireCost - ->ammo
+					<-missileFireDelay ->missileFireCounter
+				else	
+					GetNearestSpore(GetUnitPosition(self) GetUnitRange(self) 2 * true) ->spore
+					#Debugallsp("nearest spore" <-spore)
+					if (<-spore -1 !=)
+						@FireMissile(<-spore) 
+						<-ammo <-missileFireCost - ->ammo
+						SetUnitAmmo(self <-ammo)
+						<-missileFireDelay ->missileFireCounter
+					endif	
+				endif
+				
+				
+			endif	
+		endif
+	endif	
+
+	if (GetUnitUIState(self 2) !)
+		#Fire sniper
+		if (<-sniperFireCounter gt0)
+			<-sniperFireCounter 1 - ->sniperFireCounter
+		else 
+			GetUnitAmmo(self) ->ammo
+			if (<-ammo <-sniperFireCost >=)
+				GetNearestSniperTarget(GetUnitPosition(self) GetUnitRange(self) 2 * true true true true true true) ->sniperTarget
+				if (<-sniperTarget -1 !=)
+					@FireSniper(<-sniperTarget) 
+					<-ammo <-gunFireCost - ->ammo
+					SetUnitAmmo(self <-ammo)
+					<-sniperFireDelay ->sniperFireCounter
+				endif
+			endif	
+		endif
+	endif	
+endif
+
+:CheckDamage
+	GetUnitPosition(self) ->pos
+	GetExactCreeperHeight(<-pos.x <-pos.z false true) ->height ->surfaceNormal ->hasCreeper ->hasAC	
+	if (<-hasCreeper)
+		if (<-height <-pos.y 1 - >)
+			true
+			return
+		endif
+	endif
+	false
+
+:FireSniper
+	->sniperTarget
+	GetUnitPosition(self) ->unitPos
+	if (<-sniperTarget.y <-unitPos.y lte)
+		CreateSniperShot(GetObjPosition(self "snipergunbottom" true) <-sniperTarget)
+	else
+		CreateSniperShot(GetObjPosition(self "sniperguntop" true) <-sniperTarget)
+	endif
+	PlaySoundAtPosition("SniperFire", 1, GetUnitPosition(self))
+
+
+:FireMissile
+	->targetUnit
+	CreateMissile(GetObjPosition(self "missilelauncher" true) V3(-90 0 0) <-targetUnit) ->missile
+	PlaySoundAtPosition("Sci Fi Explosion 12", 1, GetUnitPosition(self))
+
+
+:FireProjectile	
+	->target
+	RotateObjTowards(self "gun" <-target 999)
+	
+	
+	CreateTable ->initParams
+	<-fireVel ->initParams{"fireVel"}
+	<-DAMAGE_DIST ->initParams{"DAMAGE_DIST"}
+	<-DAMAGE_DEPTH ->initParams{"DAMAGE_DEPTH"}
+	<-DAMAGE_MESH ->initParams{"DAMAGE_MESH"}
+	<-target ->initParams{"target"}
+
+	GetObjPosition(self "gun" true) ->gunPos
+	CreateUnit(<-thorShotGUID <-gunPos <-initParams) ->shotUnit
+	
+	#Tag the damage map with the damage this shot will do. When the shot is destroyed, the damage will
+	#be automatically cleaned up (because we specified '<-shotUnit' as the unit to associate with the damage map call).
+	ApplyToDamageMap(<-shotUnit <-target.X <-target.Z <-DAMAGE_DIST <-DAMAGE_DEPTH 1000000 * false)
+	PlaySoundAtPosition("Sci Fi Explosion 12", 1, GetUnitPosition(self))
+	
+:awake
+	SetUnitSpecifiedTargetPathHeight(self 0)	

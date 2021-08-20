@@ -1,0 +1,35 @@
+# --BerthaShot-- 11/22/2019 1:46:15 PM
+
+<-counter 1 + ->counter
+if (<-gravity eq0)
+	@Kaboom
+	return
+endif
+
+BallisticArcPos(<-startPos <-fireVel <-gravity <-counter <-speedMultiple *) ->newPos
+GetUnitPosition(self) ->currentPos
+SetUnitForward(self <-newPos <-currentPos -)
+
+GetExactTerrain(<-newPos.X <-newPos.Z false) ->exactTerrainHeight
+
+#Calculate the minimum distance between the target point and the line made from the last and the current position.
+#This is used to make sure the shot doesn't go through the target when the target is at the edge of a cliff
+#At the edge of a cliff the shot might never collide with the terrain
+DistancePointLine(<-target <-currentPos <-newPos) ->distanceToTarget
+
+if (<-newPos.Y <-exactTerrainHeight lt <-distanceToTarget 0.1 lt ||)
+	SetUnitPosition(self V3(<-newPos.X <-exactTerrainHeight <-newPos.Z))
+	@Kaboom
+else
+	SetUnitPosition(self <-newPos)
+endif
+
+
+:Kaboom
+	DamageCreeper(<-newPos.X <-newPos.Z 9999 <-DAMAGE_DIST <-DAMAGE_DEPTH false)
+	DestroyUnit(self false false true)
+
+:Once
+	GetUnitPosition(self) ->startPos
+	CreateTrail(self "" 1 3)
+	

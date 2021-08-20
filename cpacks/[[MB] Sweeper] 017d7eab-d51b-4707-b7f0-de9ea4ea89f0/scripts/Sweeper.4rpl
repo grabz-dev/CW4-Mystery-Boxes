@@ -1,0 +1,159 @@
+# --Sweeper-- 11/4/2019 3:17:49 PM
+# Updated for inclusion in the game on jan 25, 2021
+# Added stunned support. Fixed bug with sphere rotation.
+#=====INIT VARS====================================
+$ROTATE_RATE:1.5 #degrees per second
+$AMMO_CONSUMPTION:0.1 #Ammo consumed per frame when firing
+#==================================================
+
+
+#-----MAIN BODY------------------------------------
+@Init
+
+#If we are building, disabled, or disarmed then abort early
+if (GetUnitConstructing(self)) 
+	return
+endif	
+
+if (GetUnitEnabled(self) ! GetUnitArmed(self) !  GetUnitStunCount(self) gt0 || ||)
+	#We need to turn off the beam if they are on
+	if (<-active)
+		@Activate(false)
+	endif
+	return
+endif
+
+#Get the current ammo we hold
+GetUnitAmmo(self) ->ammo
+
+#Check to see if we have enough ammo to fire.  We wait till we have max ammo on hand before activating.
+#Once active, we stay active till the ammo is empty.
+#This system keeps the beams from toggling on and off as each packet arrives in a starvation situation.
+if (<-active)
+	if (<-ammo lt (<-AMMO_CONSUMPTION))
+		@Activate(false)
+	endif	
+else
+	if (<-ammo gte (GetUnitMaxAmmo(self)))
+		@Activate(true)
+	endif	
+endif
+
+#If the unit is active, fire the beams, rotate the sphere, move the angle, and consume ammo.
+if (<-active)
+	@FireBeam(<-beam0 <-angle)
+	@FireBeam(<-beam1 <-angle HALFPI +)
+	@FireBeam(<-beam2 <-angle PI +)
+	@FireBeam(<-beam3 <-angle THREEHALVESPI +)
+	
+	#Rotate the sphere along with the beams.
+	#Rotation is about the y axis and this API expects degrees.
+	#The coordinate system (inherited from unity, is left handed), therefore we need to negate the angle.
+	SetObjRotation(self "Sphere" V3(0 <-angle neg Rad2Deg *  0) true)
+
+	@RotateAngle
+	
+	<-ammo <-AMMO_CONSUMPTION - ->ammo
+	SetUnitAmmo(self <-ammo)
+endif
+#--------------------------------------------------
+
+#--------------------------------------------------
+:Init
+	#So we only want to do the following once ever for this unit because beams are persistent.
+	once
+
+		#We need to know the fire height from the unit settings.
+		#The UnitFireOffset comes from the unit settings in the cpack unit manager.
+		GetUnitFireOffset(self) ->fireOffset
+
+		#Create 4 beams and attach them to ourselves.
+		#When attached the start position for a beam is relative to the unit, hence the fireOffset start position.
+		CreateBeam("green" 2.5 3) ->beam0 AttachBeam(<-beam0 self "Crystal")
+		CreateBeam("green" 2.5 3) ->beam1 AttachBeam(<-beam1 self "Crystal")
+		CreateBeam("green" 2.5 3) ->beam2 AttachBeam(<-beam2 self "Crystal")
+		CreateBeam("green" 2.5 3) ->beam3 AttachBeam(<-beam3 self "Crystal")
+		SetBeamStart(<-beam0 <-fireOffset)
+		SetBeamStart(<-beam1 <-fireOffset)
+		SetBeamStart(<-beam2 <-fireOffset)
+		SetBeamStart(<-beam3 <-fireOffset)
+		
+		SetBeamVisible(<-beam0 false)
+		SetBeamVisible(<-beam1 false)
+		SetBeamVisible(<-beam2 false)
+		SetBeamVisible(<-beam3 false)
+	endonce	
+#--------------------------------------------------
+
+
+#--------------------------------------------------
+:Activate
+	#Set the active status
+	->active
+
+	#Make all the beams visible/invisible based on active status
+	SetBeamVisible(<-beam0 <-active)
+	SetBeamVisible(<-beam1 <-active)
+	SetBeamVisible(<-beam2 <-active)
+	SetBeamVisible(<-beam3 <-active)
+	
+	if (<-active)
+		PlaySoundLoop("hum4" 0.6 self)
+	else
+		StopSoundLoop(self)
+	endif
+#--------------------------------------------------
+
+:BuildComplete
+#--------------------------------------------------
+	#This unit is hungry. The normal packet request rate is a 15 frame interval.  We cut that to 5 so the unit can stay suppplied.
+	SetUnitPacketRequestRate(self 5)
+#--------------------------------------------------
+
+#--------------------------------------------------
+:RotateAngle
+	#Convert the rotation rate from degress per second to radians per frame
+	<-ROTATE_RATE Deg2Rad * 30.0 / ->radRate
+
+	#Rotate the angle round and round
+	#Subtracting the radRate makes the angle spin clockwise.
+	<-angle <-radRate - TWOPI % ->angle
+#--------------------------------------------------
+
+
+#--------------------------------------------------
+:FireBeam
+	#Fire a beam at an angle out to a great distance.
+	#We want to  show the beam going to beyond visual range.
+	#The actual creeper clipping stops at the maps edge. That part is handled by the game.
+	->_angle
+	->_beam
+
+	#Where are we on the map.  The beam is relative to our unit since it is attached.
+	#But ClipCreeperLine needs to know where to start.
+	GetUnitPosition(self) <-fireOffset + ->start
+	
+	#Calculate the X,Z position at a great distance based on the current angle
+	#We store them in a vector with 0 in the Y position
+	V3(cos(<-_angle) 10000 *    0    sin(<-_angle) 10000 *) ->delta
+
+	#The end position for the beam and for ClipCreeperLine.
+	#It is calculated by taking the unit's position on the map and then adding the great X,Z distance calculated above.
+	<-start <-delta + ->end
+
+	#Now we have start and end coordinates on the map.
+	#The beams are always parallel to the plane of the map, so the end Y coordinate is the same as the start.Y coordinate.
+	#Note that beams don't have to be parallel. They can have different start and end heights.  For this unit, we just want horizonal beams.
+	
+	#Check for a collision with the terrain. If the beam hits terrain, then that becomes the new end point for the beam.
+	#Otherwise the endpoint is at a great distance.
+	GetTerrainLOS(<-start <-end true) ->hit
+	if (<-hit.X gte0) 
+		SetBeamEnd(<-_beam <-hit)
+		ClipCreeperLine(<-start <-hit 0 true false)
+	else
+		SetBeamEnd(<-_beam <-end)
+		ClipCreeperLine(<-start <-end 0 true false)
+	endif
+#--------------------------------------------------
+	

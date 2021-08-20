@@ -1,0 +1,144 @@
+# --Bertha-- 11/19/2019 1:20:01 PM
+
+$projSpeed:1.5
+$projMaxHeight:50
+$rotSpeed:1
+$fireCost:40
+$rechargeTime:180
+$DAMAGE_DIST:7
+$DAMAGE_DEPTH:10
+$$berthaShotGUID:"2978b013-5bc0-4867-bf29-c54c943b90c3"
+
+#UI 0: Flip; Auto Fire Mode (0=manual 1 = auto)
+
+if (GetUnitConstructing(self))
+	return
+endif	
+
+GetUnitUIState(self 0) ->autoFireMode
+if (<-autoFireMode <-autoTargetX lt0 && @CanAutoAim &&)
+	GetMaxCreeperCellWithDamage ->autoTargetZ ->autoTargetX
+	SetUnitSpecifiedTarget(self V3(<-autoTargetX 0 <-autoTargetZ))
+	SetUnitSpecifiedTargetShowPath(self true)
+	
+	#Tag the damage map with the damage this shot will do. When the shot is fire we will clean up the damage map, and let each shot set its own damage map data.
+	#We apply this to ourselves in case we get destroyed before we shoot
+	ApplyToDamageMap(self <-autoTargetX <-autoTargetZ <-DAMAGE_DIST <-DAMAGE_DEPTH 1000000 * false)	
+	30 ->fadeTime
+else	
+	if (GetUnitSelected(self))
+		SetUnitSpecifiedTargetShowPath(self true)
+	else
+		if (<-fadeTime lte0)
+			SetUnitSpecifiedTargetShowPath(self false)
+		endif	
+	endif
+	if (<-fadeTime gt0)
+		<-fadeTime 1 - ->fadeTime
+	endif
+endif
+
+
+GetUnitSpecifiedTarget(self) ->target
+if (<-target <-lastTarget neq)
+	<-target ->lastTarget
+	GetObjPosition(self "Arm" true) ->armPos
+	
+	@CalculateBallistics
+endif
+
+if (<-target.x gte0)
+	RotateObjTowardsCell(self "Arm" <-nearPos.X <-nearPos.Z <-rotSpeed)
+	GetObjForward(self "Arm") ->for
+	<-nearPos.Y <-armPos.Y - <-nearDist / <-armPos.Y + ->tY
+	<-for <-armPos + ->rPos
+	<-tY ->rPos.y
+	RotateObjTowards(self "Arm" <-rPos 99999)
+	GetObjFacingAngleCell(self "Arm" <-nearPos.X <-nearPos.Z) ->facingAngle
+	if (<-facingAngle 1 lt)
+		@Fire
+	endif
+endif
+
+if (<-fireCount gt0)
+	<-fireCount 1 - ->fireCount
+endif
+
+:CalculateBallistics
+	BallisticArcLateral(<-armPos <-projSpeed <-target <-projMaxHeight) ->travelTime ->gravity ->fireVel
+	BallisticArcPos(<-armPos <-fireVel <-gravity 0.1) ->nearPos
+	Magnitude(<-nearPos <-armPos -) ->nearDist
+	
+	#Calculate a speed adjuster.  The lateral ballistic arc assumes a constant lateral travel speed.  Makes a nice arc, but means that a shot made near the unit
+	#will arc up and down really fast (since the lateral distance is so small). So we calculate a speed multiplier that will slow things down when close.
+	#It is based on the idea that the projectile approximately travels a triangle's distance, not just the lateral distance.  So for near shots that factors in the 
+	#up and down the projectile must travel.
+	magnitude(<-target <-armPos -) ->d
+	<-d 2 / ->halfTT
+	<-projMaxHeight <-projMaxHeight * <-halfTT <-halfTT * + sqrt 2 * ->speedDivisor
+	<-d <-speedDivisor / ->speedMultiple
+
+:CanFire
+	<-fireCount eq0 GetUnitAmmo(self) <-fireCost gte && GetUnitArmed(self) &&
+
+:CanAutoAim
+	<-fireCount eq0 GetUnitAmmo(self) 3 + <-fireCost gte &&
+
+:Fire
+	if (@CanFire)
+		<-rechargeTime RandInt(-2 3) + ->fireCount
+		CreateTable ->initParams
+
+		#Remove any damage map that was set by auto targeting.
+		#Each shot will set its own damage map data
+		RemoveUnitDamageMap(self)
+
+		if (GetUnitERNState(self))
+			<-target ->originalTarget
+			do(3 0)
+				<-originalTarget.x RandInt(-10 11) + ->newX
+				<-originalTarget.z RandInt(-10 11) + ->newZ
+				V3(<-newX GetTerrain(<-newX <-newZ) <-newZ) ->target
+				@CalculateBallistics
+				@FireProjectile
+			loop	
+		else
+			@FireProjectile
+		endif	
+
+		SetUnitAmmo(self GetUnitAmmo(self) <-fireCost - )
+		
+		-1 ->autoTargetX
+		-1 ->autoTargetZ
+		
+		PlaySoundAtPosition("BerthaFire" 1 GetUnitPosition(self))		
+	endif
+	
+:FireProjectile	
+	<-fireVel ->initParams{"fireVel"}
+	<-gravity ->initParams{"gravity"}
+	<-speedMultiple ->initParams{"speedMultiple"}
+	<-DAMAGE_DIST ->initParams{"DAMAGE_DIST"}
+	<-DAMAGE_DEPTH ->initParams{"DAMAGE_DEPTH"}
+	<-target ->initParams{"TARGET"}
+
+	CreateUnit(<-berthaShotGUID <-armPos <-initParams) ->shotUnit
+	
+	#Tag the damage map with the damage this shot will do. When the shot is destroyed, the damage will will
+	#be automatically cleaned up (because we specified '<-shotUnit' as the unit to associate with the damage map call).
+	ApplyToDamageMap(<-shotUnit <-target.X <-target.Z <-DAMAGE_DIST <-DAMAGE_DEPTH 1000000 * false)
+
+:_UICALLBACK
+	<-_DATA ->uiSlot
+	if (<-uiSlot 1 eq)
+		#Clear Target
+		ClearUnitSpecifiedTarget(self)
+	endif
+
+:Once
+	#Gets called once and only once when unit is created
+	GetObjPosition(self "Arm" false) ->armPos
+	SetUnitSpecifiedTargetPathSourceOffset(self <-armPos)
+	SetUnitSpecifiedTargetPathHeight(self <-projMaxHeight)
+	-1 ->autoTargetX
+	

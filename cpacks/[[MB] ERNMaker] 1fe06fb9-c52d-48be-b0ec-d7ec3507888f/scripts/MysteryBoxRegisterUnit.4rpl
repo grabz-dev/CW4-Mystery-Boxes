@@ -1,0 +1,19 @@
+# --MysteryBoxRegisterUnit-- 8/20/2021 4:32:19 PM
+$Registered_As:""
+
+:awake
+	once
+		"MB_tRegisteredCPACKUnits" GetGlobalTable IsNull if
+			"MB_tRegisteredCPACKUnits" CreateTable SetGlobalTable
+		endif
+		
+		<-Registered_As StringLength 0 gt if
+			"MB_tRegisteredCPACKUnits" GetGlobalTable <-Registered_As TRUE SetTableElement
+			"Registered custom unit " <-Registered_As concat Debug
+		else
+			"Failed to register unit - name not set" Debug
+		endif
+	endonce
+:once
+	@awake
+	

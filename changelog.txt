@@ -1,3 +1,6 @@
+Mystery Boxes 2 dev3.cpack
+  - Altered Titan chances
+  - Airship now uses Liftic instead of Energy
 Mystery Boxes 2 dev2.cpack
   - Slightly rebalanced Wallis device and Flare
   - Wallis device balls now explode into AC after a minute of being alive

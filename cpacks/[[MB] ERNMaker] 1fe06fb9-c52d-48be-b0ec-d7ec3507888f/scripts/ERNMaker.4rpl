@@ -1,0 +1,13 @@
+# --ERNMaker-- 10/15/2020 11:08:32 AM
+if (GetUnitAmmo(self) GetUnitMaxAmmo(self) gte)
+	@MakeERN
+	SetUnitAmmo(self, 0)
+endif
+
+:MakeERN
+	CreateUnit("ern", GetUnitPosition(self) V3(0 3 0) + , 0)
+	
+:Awake	
+	SetUnitPopupEnabled(self, true)
+	SetUnitPopupText0(self, "ERN Forge")
+	SetUnitPopupText1(self, "[Makes ERNS from ARG]")	

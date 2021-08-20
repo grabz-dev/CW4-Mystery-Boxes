@@ -1,0 +1,52 @@
+# --Wallis-- 8/4/2020 10:33:55 AM
+
+$$wallisBombGUID:"b49f93fd-c7d1-4bc9-a9a2-5c5918919ecb"
+$$MAX_WALLIS:10
+$$AMMO_USE:10
+$$FIRE_TIME:60
+
+if (<-mapInd neq0)
+	if (GetGameUpdateCount 600 eq)
+		DestroyUnit(<-mapInd true false true)
+		0 ->mapInd
+	endif	
+endif
+
+if (<-coolDown lte0 GetUnitArmed(self) && GetUnitEnabled(self) &&)
+	if (<-wallisCount lt(<-MAX_WALLIS))
+		GetUnitAmmo(self) ->ammo
+		if (<-ammo <-AMMO_USE gte)
+			@Fire
+			SetUnitAmmo(self <-ammo <-AMMO_USE -)
+			<-FIRE_TIME ->coolDown
+		endif
+	endif
+endif	
+if (<-cooldown gt0)
+	<-coolDown 1 - ->coolDown
+endif	
+
+:Fire
+	self ->initParams{"base"}
+	V3(RandFloat 0.5 - 0.1 *, 0.3, RandFloat 0.5 - 0.1 *) ->initParams{"fireVel"}
+	CreateUnit(<-wallisBombGUID, GetUnitPosition(self) V3(0 4.5 0) +, <-initParams) ->shotUnit
+	<-wallisCount 1 + ->wallisCount
+	@CreateMist
+	PlaySoundAtPosition("Sci Fi Explosion 10" 0.6 GetUnitPosition(self))
+	
+	
+:CreateMist
+	do(30 0)
+		CreateMist(GetUnitPosition(self) V3(0 4.5 0) +, <-mistData)
+	loop
+	
+:Once
+	SetUnitPacketRequestRate(self 4)
+	CreateTable ->initParams
+	Table("color" V3(1 0.8 0.8) 
+		 "color2" V3(0.2 0 0)
+		 "birthtime" 40 
+		 "fadetime" 20 
+		 "direction" V3(0 5 0) 
+		 "startradius" 0.5
+		 "endradius" 3	) ->mistData
