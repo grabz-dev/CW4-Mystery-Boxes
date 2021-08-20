@@ -1,0 +1,41 @@
+# --OrbVolcano-- 8/18/2021 9:47:13 PM
+
+$$POSX:0
+$$POSZ:0
+$$AMT:100
+$$orbsErupting:30
+$$Type:"egg"
+
+if (<-orbsErupting 0 gt)
+	@OrbsErupt
+else
+	Self TRUE TRUE TRUE DestroyUnit
+endif
+
+:OrbsErupt
+	Self GetUnitPosition ->pos
+	<-Type "egg" eq if
+		<-pos ToCell GetTerrain 25 add ->height
+		CreateEgg(V3(<-pos.x randint(-1 2) + <-height <-pos.z randint(-1 2) +) <-initData) pop
+	else <-Type "orb" eq if
+		<-pos ToCell GetTerrain 25 add ->height
+		V3(RandFloat 0.5 - 1 * 2 RandFloat 0.5 - 1 *) ->initData{"velocity"}
+		CreateOrb(V3(<-pos.x randint(-1 2) + <-height <-pos.z randint(-1 2) +) <-initData) pop
+	endif endif
+	
+	<-orbsErupting 1 - ->orbsErupting
+:once
+	<-Type "egg" eq if
+		Table(	"payload" <-AMT 
+				"velocity" 0 10 0 V3 
+				"moveTo" 0 10 0 V3  
+				"showPathLine" FALSE 
+				"showPathLineColor" 0 0 0 0 V4) ->initData
+	else <-Type "orb" eq if
+		Table(	"payload" <-AMT 
+				"bounce" true 
+				"creeperdamps" false 
+				"destroywhenstill" false 
+				"destroywhendrytime" 60 
+				"releaseondestroy" false) ->initData
+	endif endif

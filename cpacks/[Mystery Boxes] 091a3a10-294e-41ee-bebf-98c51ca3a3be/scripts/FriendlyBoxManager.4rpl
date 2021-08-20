@@ -1,0 +1,14 @@
+# --FriendlyBoxManager-- 8/18/2021 4:07:34 PM
+		
+:awake
+	once
+		#If script has been recompiled, delete our global vars that determine cost.
+		<-G_bScriptCompiled not if
+			--*MB_iFriendlyAmmoNextRaise
+			--*MB_iFriendlyAmmoCost
+		endif
+		TRUE ->G_bScriptCompiled
+	endonce
+:once
+	@awake
+	

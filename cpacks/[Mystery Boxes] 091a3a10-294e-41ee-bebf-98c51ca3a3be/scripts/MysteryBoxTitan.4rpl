@@ -1,0 +1,12 @@
+# --MysteryBoxTitan-- 8/18/2021 11:26:40 PM
+
+
+:awake
+   once
+      Self 1 SetUnitPacketRequestRate
+	  Self "MysteryBoxRegular.4rpl" "Explosion_Scale" 1.2 SetScriptVar
+   endonce
+:once
+   @awake
+  
+  

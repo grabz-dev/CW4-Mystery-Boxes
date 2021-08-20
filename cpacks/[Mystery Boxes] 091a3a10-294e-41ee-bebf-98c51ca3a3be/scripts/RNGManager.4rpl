@@ -1,0 +1,613 @@
+# --RNGManager-- 8/16/2021 11:05:48 PM
+
+#Config
+once
+	CreateTable ->G_tttltConf
+
+	#########
+	# TITAN_MYSTERY_BOX
+	CreateTable ->G_tttltConf{"TITAN_MYSTERY_BOX"}
+	<-G_tttltConf{"TITAN_MYSTERY_BOX"} "Types"				"Good" CreateList 	"Bad" CreateList 	2 TableN SetTableElement
+	<-G_tttltConf{"TITAN_MYSTERY_BOX"} "TypeWeights" 		"Good" 30.0 		"Bad" 70.0 			2 TableN SetTableElement
+	<-G_tttltConf{"TITAN_MYSTERY_BOX"} "CombinedLootList"	CreateList										 SetTableElement
+	<-G_tttltConf{"TITAN_MYSTERY_BOX"} "AdjustedProb" 		CreateList									   	 SetTableElement
+	<-G_tttltConf{"TITAN_MYSTERY_BOX"} "Aliases" 			CreateList										 SetTableElement
+	<-G_tttltConf{"TITAN_MYSTERY_BOX"} "NothingChancePrc" 	0.0										 		 SetTableElement
+	<-G_tttltConf{"TITAN_MYSTERY_BOX"} "TotalItems" 		0												 SetTableElement
+	<-G_tttltConf{"TITAN_MYSTERY_BOX"} "Seed" 				0												 SetTableElement
+	
+	
+	
+	#########
+	# <Good> outcomes start here
+	"WEIGHT" 100.0,	"TYPE" "b2d47782-ebe0-4508-ace3-6ae4503b62fc"	"SPECIAL" TableN("Count" 4, 1) 3 TableN #Bertha
+	"WEIGHT" 100.0,	"TYPE" "ca8dfbe4-a3ca-4223-b8c4-070de8877b26", 	2 TableN #Airship
+	"WEIGHT" 100.0,	"TYPE" "ern",				"SPECIAL" TableN("CountMin" 5 "CountMax" 10, 2) 3 TableN 
+	"WEIGHT" 50.0,	"TYPE" "c5b44bd0-1518-4091-9f15-36c919bc37c7"	2 TableN #Sweeper
+		<-G_tttltConf{"TITAN_MYSTERY_BOX"}{"Types"}{"Good"} AppendStackToList
+		
+	#########
+	# <Bad> outcomes start here
+	"WEIGHT" 100.0,	"STYPE" "orb_rain", "SPECIAL" TableN("Type" "orb", "Payload" 100, "Count" 200, "VeryScary" TRUE, 4)	3 TableN
+	"WEIGHT" 100.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 40000, "VeryScary" TRUE, 2)	3 TableN
+		<-G_tttltConf{"TITAN_MYSTERY_BOX"}{"Types"}{"Bad"} AppendStackToList
+		
+		
+	
+	#########
+	# FRIENDLY_MYSTERY_BOX
+	CreateTable ->G_tttltConf{"FRIENDLY_MYSTERY_BOX"}
+	<-G_tttltConf{"FRIENDLY_MYSTERY_BOX"} "Types"				"Good" CreateList 	1 TableN 	SetTableElement
+	<-G_tttltConf{"FRIENDLY_MYSTERY_BOX"} "TypeWeights" 		"Good" 1 			1 TableN 	SetTableElement
+	<-G_tttltConf{"FRIENDLY_MYSTERY_BOX"} "CombinedLootList" 	CreateList						SetTableElement
+	<-G_tttltConf{"FRIENDLY_MYSTERY_BOX"} "AdjustedProb" 		CreateList					   	SetTableElement
+	<-G_tttltConf{"FRIENDLY_MYSTERY_BOX"} "Aliases" 			CreateList						SetTableElement
+	<-G_tttltConf{"FRIENDLY_MYSTERY_BOX"} "NothingChancePrc" 	0.0								SetTableElement
+	<-G_tttltConf{"FRIENDLY_MYSTERY_BOX"} "TotalItems" 			0								SetTableElement
+	<-G_tttltConf{"FRIENDLY_MYSTERY_BOX"} "Seed" 				0								SetTableElement
+	
+	#########
+	# <Good> outcomes start here
+	"WEIGHT" 100.0,	"TYPE" "cannon",			2 TableN
+	"WEIGHT" 100.0,	"TYPE" "mortar",			2 TableN
+	"WEIGHT" 35.0,	"TYPE" "sniper",			2 TableN
+	"WEIGHT" 35.0,	"TYPE" "missilelauncher",	2 TableN
+	"WEIGHT" 50.0,	"TYPE" "sprayer",			2 TableN
+	"WEIGHT" 40.0,	"TYPE" "miner",				"SPECIAL" TableN("Coverage" 50.0, 1) 3 TableN
+	"WEIGHT" 30.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 60, 1), 	3 TableN
+	"WEIGHT" 40.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 60, 1), 	3 TableN
+	"WEIGHT" 4.4,	"TYPE" "ern",				2 TableN
+		<-G_tttltConf{"FRIENDLY_MYSTERY_BOX"}{"Types"}{"Good"} AppendStackToList
+	
+	
+	
+	
+	
+	#########
+	# REGULAR_MYSTERY_BOX
+	CreateTable ->G_tttltConf{"REGULAR_MYSTERY_BOX"}
+	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "Types"			"Good" CreateList 	"Bad" CreateList 	2 TableN SetTableElement
+	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "TypeWeights" 		"Good" 50.0 		"Bad" 50.0 			2 TableN SetTableElement
+	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "CombinedLootList" 	CreateList									 SetTableElement
+	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "AdjustedProb" 		CreateList									 SetTableElement
+	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "Aliases" 				CreateList									 SetTableElement
+	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "NothingChancePrc" 	0.0										 	 SetTableElement
+	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "TotalItems" 			0											 SetTableElement
+	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "Seed" 				0											 SetTableElement
+	
+	#########
+	# <Good> outcomes start here
+	"WEIGHT" 150.0,	"TYPE" "cannon",			"SPECIAL" TableN("CountMin" 1, "CountMax" 4, 2) 3 TableN
+	"WEIGHT" 150.0,	"TYPE" "mortar",			"SPECIAL" TableN("CountMin" 1, "CountMax" 4, 2) 3 TableN
+	"WEIGHT" 100.0,	"TYPE" "sniper",			"SPECIAL" TableN("CountMin" 1, "CountMax" 2, 2) 3 TableN
+	"WEIGHT" 100.0,	"TYPE" "missilelauncher",	"SPECIAL" TableN("CountMin" 1, "CountMax" 2, 2) 3 TableN
+	"WEIGHT" 100.0,	"TYPE" "shield",			"SPECIAL" TableN("CountMin" 1, "CountMax" 4, 2) 3 TableN
+	"WEIGHT" 75.0,	"TYPE" "sprayer",			"SPECIAL" TableN("CountMin" 1, "CountMax" 4, 2) 3 TableN
+	"WEIGHT" 50.0,	"TYPE" "pylon",				"SPECIAL" TableN("CountMin" 1, "CountMax" 4, 2) 3 TableN
+	"WEIGHT" 50.0,	"TYPE" "terp",				"SPECIAL" TableN("CountMin" 1, "CountMax" 4, 2) 3 TableN
+	"WEIGHT" 25.0,	"TYPE" "beacon",			2 TableN
+	
+	#-----------
+	
+	"WEIGHT" 100.0,	"TYPE" "miner", 			"SPECIAL" TableN("CountMin" 1, "CountMax" 2, "Coverage" 100.0, 3) 3 TableN
+	"WEIGHT" 125.0,	"TYPE" "greenarrefinery", 	"SPECIAL" TableN("CountMin" 1, "CountMax" 2, 2) 3 TableN
+	"WEIGHT" 125.0,	"TYPE" "collectorpanel3",	"SPECIAL" TableN("CountMin" 1, "CountMax" 2, 2) 3 TableN
+	
+	#-----------
+	
+	"WEIGHT" 100.0,	"TYPE" "collectorpanel5",	2 TableN
+	"WEIGHT" 100.0,	"TYPE" "porter",			2 TableN
+	"WEIGHT" 50.0,	"TYPE" "rocketpad",			2 TableN
+	"WEIGHT" 50.0,	"TYPE" "microrift",			2 TableN
+	"WEIGHT" 50.0,	"TYPE" "ultrac",			2 TableN
+	
+	#-----------
+	
+	"WEIGHT" 50.0,	"TYPE" "ern",				"SPECIAL" TableN("CountMin" 1, "CountMax" 2, 2) 3 TableN
+	"WEIGHT" 20.0,	"TYPE" "pterosaur",			"SPECIAL" TableN("CountMin" 1, "CountMax" 3, 2) 3 TableN
+	
+	#-----------
+	
+	"WEIGHT" 10.0,	"STYPE" "crazonium",		2 TableN
+	"WEIGHT" 10.0,	"STYPE" "wall",				2 TableN
+	
+	#-----------
+	
+	"WEIGHT" 20.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 20, 1), 	3 TableN
+	"WEIGHT" 15.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 12, 1), 	3 TableN
+	"WEIGHT" 5.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 7.5,  1), 	3 TableN
+	
+	"WEIGHT" 20.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 20, 1), 	3 TableN
+	"WEIGHT" 15.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 12, 1), 	3 TableN
+	"WEIGHT" 5.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 7.5,  1), 	3 TableN
+	
+	"WEIGHT" 20.0,	"TYPE" "greenarmother",	"SETTINGS" TableN("Interval" 240, 1), 	3 TableN
+	"WEIGHT" 15.0,	"TYPE" "greenarmother",	"SETTINGS" TableN("Interval" 80, 1), 	3 TableN
+	"WEIGHT" 5.0,	"TYPE" "greenarmother",	"SETTINGS" TableN("Interval" 20, 1), 	3 TableN
+	
+	#-----------
+	
+	
+	"WEIGHT" 100.0,	"TYPE" "84555524-9060-4de3-8db1-ce1769cfe715",		"SPECIAL" TableN("Count" 4, 1), 	3 TableN
+	"WEIGHT" 7.5,	"TYPE" "emitter",		"SETTINGS" TableN("Start" 0, 	"Interval" 20, 	"Payload" -5, 3), 	3 TableN
+	"WEIGHT" 100.0,	"STYPE" "creeper", 		"SPECIAL" TableN("Payload" -500, 1),	3 TableN
+		<-G_tttltConf{"REGULAR_MYSTERY_BOX"}{"Types"}{"Good"} AppendStackToList
+	
+	
+	
+	#########
+	# <Bad> outcomes start here
+	"WEIGHT" 7.5,	"TYPE" "darktower",	"SETTINGS" TableN("Width" 12, 	"Depth" 12,  2),	"SPECIAL" TableN("VeryScary" TRUE, 1), 	4 TableN
+	
+	"WEIGHT" 15.0,	"TYPE" "crystal",	2 TableN
+	"WEIGHT" 5.0,	"TYPE" "crystal", 	"SPECIAL" TableN("CountMin" 2, "CountMax" 4, 2)	3 TableN
+	
+	"WEIGHT" 75.0,	"TYPE" "skimmer",	"SETTINGS" TableN("Target" 0, 	"Payload" 0, 	"LifeTime" 30, 3),	"SPECIAL" TableN("CountMin" 2, "CountMax" 4, 	"Height" 7, 3), 	4 TableN
+	"WEIGHT" 25.0,	"TYPE" "skimmer",	"SETTINGS" TableN("Target" 0, 	"Payload" 0, 	"LifeTime" 30, 3), 	"SPECIAL" TableN("CountMin" 5, "CountMax" 8, 	"Height" 14, 3), 	4 TableN
+	"WEIGHT" 5.0,	"TYPE" "skimmer",	"SETTINGS" TableN("Target" 0, 	"Payload" 0, 	"LifeTime" 210, 3), "SPECIAL" TableN("CountMin" 12, "CountMax" 36, 	"Height" 400, "VeryScary" TRUE 4), 	4 TableN
+	
+	"WEIGHT" 75.0,	"TYPE" "airsac",	"SETTINGS" TableN("Target" 0, 	"Payload" 20, 2),	"SPECIAL" TableN("Count" 1, 	"Height" 37, 2), 	4 TableN
+	"WEIGHT" 25.0,	"TYPE" "airsac",	"SETTINGS" TableN("Target" 0, 	"Payload" 75, 2),	"SPECIAL" TableN("Count" 2, 	"Height" 37, 2), 	4 TableN
+	"WEIGHT" 5.0,	"TYPE" "airsac",	"SETTINGS" TableN("Target" 0, 	"Payload" 150, 2),	"SPECIAL" TableN("Count" 3, 	"Height" 37, "VeryScary" TRUE, 3), 	4 TableN
+	
+	"WEIGHT" 50.0,	"TYPE" "emitter",	"SETTINGS" 	TableN("Start" 300, 	"Interval" 60, 	"Payload" 25, 3), 	3 TableN
+	"WEIGHT" 17.5,	"TYPE" "emitter",	"SETTINGS" 	TableN("Start" 300, 	"Interval" 60, 	"Payload" 75, 3), 	3 TableN
+	"WEIGHT" 2.5,	"TYPE" "emitter",	"SETTINGS" 	TableN("Start" 300, 	"Interval" 60, 	"Payload" 200, 3), "SPECIAL" TableN("VeryScary" TRUE, 1) 	4 TableN
+	
+	"WEIGHT" 75.0,	"TYPE" "spore",		"SETTINGS" 	TableN("Target" 0, "Payload" 200, 2), 	"SPECIAL" TableN("CountMin" 4, "CountMax" 8, "Height" 0, 3)	4 TableN
+	"WEIGHT" 25.0,	"TYPE" "spore",		"SETTINGS" 	TableN("Target" 0, "Payload" 500, 2), 	"SPECIAL" TableN("CountMin" 8, "CountMax" 12, "Height" 0, 3)	4 TableN
+	"WEIGHT" 5.0,	"TYPE" "spore",		"SETTINGS" 	TableN("Target" 0, "Payload" 1500, 2), 	"SPECIAL" TableN("CountMin" 12, "CountMax" 20, "Height" 0, "VeryScary" TRUE, 4)	4 TableN
+	
+	"WEIGHT" 75.0,	"TYPE" "blob",		"SETTINGS" 	TableN("Target" 0, "Payload" 300, 2), 	"SPECIAL" TableN("CountMin" 4, "CountMax" 6, "Height" 0, 3)	4 TableN
+	"WEIGHT" 25.0,	"TYPE" "blob",		"SETTINGS" 	TableN("Target" 0, "Payload" 500, 2), 	"SPECIAL" TableN("CountMin" 6, "CountMax" 8, "Height" 0, 3)	4 TableN
+	"WEIGHT" 5.0,	"TYPE" "blob",		"SETTINGS" 	TableN("Target" 0, "Payload" 1500, 2),	"SPECIAL" TableN("CountMin" 13, "CountMax" 20, "Height" 0, "VeryScary" TRUE, 4)	4 TableN
+	
+	"WEIGHT" 75.0,	"TYPE" "forb",		"SPECIAL" TableN("CountMin" 2, "CountMax" 4, "Height" 0, 3)	3 TableN
+	"WEIGHT" 25.0,	"TYPE" "forb",		"SPECIAL" TableN("CountMin" 5, "CountMax" 7, "Height" 0, 3)	3 TableN
+	"WEIGHT" 5.0,	"TYPE" "forb",		"SPECIAL" TableN("CountMin" 10, "CountMax" 14, "Height" 0, "VeryScary" TRUE, 4)	3 TableN
+	
+	"WEIGHT" 75.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 1500, 1)	3 TableN
+	"WEIGHT" 25.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 2000, 1)	3 TableN
+	"WEIGHT" 5.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 3000, "VeryScary" TRUE, 2)	3 TableN
+	
+		<-G_tttltConf{"REGULAR_MYSTERY_BOX"}{"Types"}{"Bad"} AppendStackToList
+endonce
+
+once
+	@InitializeLootData 
+endonce
+
+#Generate weight totals and seed
+#once
+	#Iterate over root table keys e.g. "REGULAR_MYSTERY_BOX", "FRIENDLY_MYSTERY_BOX"
+	#<-G_tttltConf GetTableKeys ->lKeysRoot
+	#<-lKeysRoot 0 do
+		#<-G_tttltConf{<-lKeysRoot[I]} ->ttltConfRoot
+		
+		#Iterate over this config's types e.g. "Good", "Bad"
+		#<-ttltConfRoot{"Types"} GetTableKeys ->lKeysTypes
+		#<-lKeysTypes 0 do
+			#<-lKeysTypes[I] ->sKeyType
+			
+			#Iterate over the config and sum up weights.
+			#0.0 ->fTotal
+			#<-ttltConfRoot{"Types"}{<-sKeyType} ->ltEntries
+			#<-ltEntries 0 do
+				#<-ltEntries[I] ->tEntry
+				#<-fTotal <-tEntry{"WEIGHT"} add ->fTotal
+			#loop
+			
+			#Set the weight total for this config.
+			#<-ttltConfRoot{"WeightTotals"} <-sKeyType <-fTotal SetTableElement
+			
+			#Iterate over the type weights and sum them up.
+			#0.0 ->fTotal
+			#<-ttltConfRoot{"TypeWeights"} GetTableValues ->lfTypeWeights
+			#<-lfTypeWeights 0 do
+				#<-fTotal <-lfTypeWeights[I] add ->fTotal
+			#loop
+			
+			#Set the type weight total for this config.
+			#<-fTotal ->ttltConfRoot{"TypeWeightsTotal"}
+		#loop
+		
+		#Seed built-in RNG.
+		#ElapsedTime 1000 mod 0 do
+			#RandFloat pop 
+		#loop
+		
+		#Generate seeds for configs.
+		#1 100000 RandInt ->ttltConfRoot{"Seed"}
+	#loop
+#endonce
+
+
+
+
+
+:awake
+	once
+		"MB_MysteryBoxOpened" "OnMysteryBoxOpened" RegisterForMsg
+	endonce
+:once
+	@awake
+	
+:InitializeLootData
+	CreateList ->ild_smallWorklist #worklists for sorting items later
+	CreateList ->ild_largeWorklist 
+	<-G_tttltConf GetTableKeys ->ild_lKeysRoot #object containing list of all boxes
+	<-ild_lKeysRoot 0 do
+		<-G_tttltConf{<-ild_lKeysRoot[I]} ->ild_currentBox #reference to current box
+		<-ild_currentBox{"Types"} GetTableKeys ->ild_currentTypes #list of types for current box
+		0.0 ->ild_totalTypeWeight #total of type weight for all types in this box
+		0.0 ->ild_totalItemWeight #total of item weight for all types in this box
+		0 ->ild_totalItemCount
+		CreateList ->ild_typeWeightTotals #total of item weight in each individual type
+		CreateList ->ild_scalingConstants #cached values used to scale probability of all items
+		CreateList ->ild_combinedLoot #list of all loot for this box from all types
+		
+		<-ild_currentTypes 0 do
+			<-ild_currentTypes[I] ->ild_currentType #string naming the current type
+			0.0 ->ild_currentWeightTotal #current weight total for this type
+			<-ild_currentBox{"Types"}{<-ild_currentType} ->ild_currentTypeLoot #reference to loot list for this type
+			<-ild_currentBox{"TypeWeights"}{<-ild_currentType} <-ild_totalTypeWeight add ->ild_totalTypeWeight
+			<-ild_currentTypeLoot 0 do
+				<-ild_currentTypeLoot[I]{"WEIGHT"} <-ild_currentWeightTotal add ->ild_currentWeightTotal
+				<-ild_totalItemCount 1 add ->ild_totalItemCount
+			loop
+			<-ild_currentWeightTotal dup <-ild_totalItemWeight add ->ild_totalItemWeight #dup value carried to next line
+			<-ild_typeWeightTotals[I] add ->ild_typeWeightTotals[I]
+		loop
+		
+		#need to do another iteration since the weight total is needed for this part
+		<-ild_currentTypes 0 do
+			<-ild_currentTypes[I] ->ild_currentType #string naming the current type
+			<-ild_currentBox{"TypeWeights"}{<-ild_currentType} <-ild_totalItemCount mul 
+			<-ild_totalTypeWeight <-ild_typeWeightTotals[I] mul div ->ild_currentScalingConstant
+			<-ild_currentBox{"Types"}{<-ild_currentType} ->ild_currentTypeLoot #reference to loot list for this type
+			<-ild_currentTypeLoot 0 do
+				<-ild_currentTypeLoot[I] DeepCopy ->ild_currentLootObject
+				<-ild_currentLootObject{"WEIGHT"} <-ild_currentScalingConstant mul ->ild_currentScaledWeight
+				<-ild_currentScaledWeight ->ild_currentLootObject{"WEIGHT"}
+				<-ild_combinedLoot GetListCount ->ild_currentLootIndex
+				<-ild_combinedLoot <-ild_currentLootObject PushList
+				<-ild_currentScaledWeight 1 lt if
+					<-ild_smallWorklist <-ild_currentLootIndex PushList
+				else
+					<-ild_largeWorklist <-ild_currentLootIndex PushList
+				endif
+			loop
+		loop
+		
+		<-ild_combinedLoot GetListCount dup CreateListStartingSize ->ild_adjustedProbList CreateListStartingSize ->ild_aliasList
+		
+		while <-ild_smallWorklist GetListCount gt0 <-ild_largeWorklist GetListCount gt0 and repeat
+			<-ild_smallWorklist PopList ->ild_smallIndex
+			<-ild_largeWorklist PopList ->ild_largeIndex
+			<-ild_combinedLoot[<-ild_smallIndex] ->ild_smallItem
+			<-ild_combinedLoot[<-ild_largeIndex] ->ild_largeItem
+			<-ild_smallItem{"WEIGHT"} ->ild_adjustedProbList[<-ild_smallIndex]
+			<-ild_largeIndex ->ild_aliasList[<-ild_smallIndex]
+			<-ild_smallItem{"WEIGHT"} <-ild_largeItem{"WEIGHT"} add 1.0 sub dup ->ild_largeItem{"WEIGHT"} #dup value carried to next line
+			1.0 lt if #value being compared is the adjusted weight dup'ed on the last line
+					<-ild_smallWorklist <-ild_largeIndex PushList
+				else
+					<-ild_largeWorklist <-ild_largeIndex PushList
+			endif
+			
+		endwhile
+		
+		while <-ild_largeWorklist GetListCount gt0 repeat
+			<-ild_largeWorklist PopList ->ild_largeIndex
+			1.0 ->ild_adjustedProbList[<-ild_largeIndex]
+		endwhile
+		
+		while <-ild_smallWorklist GetListCount gt0 repeat
+			<-ild_smallWorklist PopList ->ild_smallIndex
+			1.0 ->ild_adjustedProbList[<-ild_smallIndex]
+		endwhile
+		
+		<-ild_combinedLoot ->ild_currentBox{"CombinedLootList"}
+		<-ild_aliasList ->ild_currentBox{"Aliases"}
+		<-ild_adjustedProbList ->ild_currentBox{"AdjustedProb"}
+		<-ild_totalItemCount ->ild_currentBox{"TotalItems"}	
+
+		#Seed built-in RNG.
+		ElapsedTime 1000 mod 0 do
+			RandFloat pop 
+		loop
+		
+		#Generate seeds for configs.
+		1 100000 RandInt ->ild_currentBox{"Seed"}
+	loop
+	
+# s1 i1 i2 - i3
+:RandIntSeeded
+	->RIS_iMaxExcl
+	->RIS_iMinIncl
+	@RandFloatSeeded ->RIS_iRand
+	
+	<-RIS_iMaxExcl <-RIS_iMinIncl sub <-RIS_iRand mul floor <-RIS_iMinIncl add
+# s1 - f1
+:RandFloatSeeded
+	->RFS_sType
+	
+	<-G_tttltConf{<-RFS_sType}{"Seed"} ->RFS_iSeed
+	<-RFS_iSeed sin 10000.0 mul ->RFS_fVal
+	
+	#Increment seed.
+	<-G_tttltConf{<-RFS_sType} "Seed" <-RFS_iSeed 1 add SetTableElement
+	
+	<-RFS_fVal <-RFS_fVal floor sub
+	
+	# s = Math.sin(s) * 10000; return s - Math.floor(s);
+	
+	
+# - t1
+:OnMysteryBoxOpened
+	<-_DATA{"sType"} ->MBO_sType
+	<-_DATA{"v3fPos"} ->MBO_v3fPos
+	
+	#####
+	# Now things get fun
+	
+	#Get current config.
+	<-G_tttltConf{<-MBO_sType} ->MBO_ttltConfRoot
+	<-MBO_ttltConfRoot{"CombinedLootList"} ->MBO_lootList
+	
+	#Get all types in this config.
+	#<-MBO_ttltConfRoot{"Types"} GetTableKeys ->MBO_lsKeysTypes
+	
+	#Roll RNG for type selection.
+	#<-MBO_sType @RandFloatSeeded <-MBO_ttltConfRoot{"TypeWeightsTotal"} mul ->MBO_fRNGRoll
+	#NULL ->MBO_tChosenType
+	
+	#Select type based on roll.
+	#0.0 ->MBO_fTotal
+	#<-MBO_lsKeysTypes 0 do
+		#<-MBO_lsKeysTypes[I] ->MBO_sKeyType
+		#<-MBO_ttltConfRoot{"TypeWeights"}{<-MBO_sKeyType} <-MBO_fTotal add ->MBO_fTotal
+		#<-MBO_fTotal <-MBO_fRNGRoll gte if
+			#<-MBO_sKeyType ->MBO_tChosenType
+			#break
+		#endif
+	#loop
+	
+	#If for some reason (config misconfiguration) a type wasn't chosen, exit.
+	#<-MBO_tChosenType IsNull if
+		#return
+	#endif
+	
+	#Roll for chance of spawning nothing.
+	<-MBO_ttltConfRoot{"NothingChancePrc"} <-MBO_sType @RandFloatSeeded 100.0 mul gte if
+		return
+	endif
+	
+	######
+	# Type rolled, time for event roll
+	
+	#Roll RNG for event selection.
+	#<-MBO_sType @RandFloatSeeded <-MBO_ttltConfRoot{"WeightTotals"}{<-MBO_tChosenType} mul ->MBO_fRNGRoll
+	#<-MBO_ttltConfRoot{"Types"}{<-MBO_tChosenType} ->MBO_ltEntries
+	NULL ->MBO_tChosenEntry #reference to selected loot object
+	
+	<-MBO_sType 0 <-MBO_lootList GetListCount @RandIntSeeded ->MBO_selectedBucket #AdjustedProb Aliases
+	<-MBO_sType @RandFloatSeeded <-MBO_ttltConfRoot{"AdjustedProb"}[<-MBO_selectedBucket] gte if
+		<-MBO_ttltConfRoot{"Aliases"}[<-MBO_selectedBucket] ->MBO_selectedBucket
+	endif
+	<-MBO_lootList[<-MBO_selectedBucket] ->MBO_tChosenEntry
+	
+	#Select event based on roll.
+	#0.0 ->MBO_fTotal
+	#<-MBO_ltEntries 0 do
+		#<-MBO_ltEntries[I] ->MBO_tEntry
+		#<-MBO_fTotal <-MBO_tEntry{"WEIGHT"} add ->MBO_fTotal
+		#<-MBO_fTotal <-MBO_fRNGRoll gte if
+			#<-MBO_tEntry ->MBO_tChosenEntry
+			#break
+		#endif
+	#loop
+	
+	#If for some reason (config misconfiguration) an event wasn't chosen, exit.
+	<-MBO_tChosenEntry IsNull if
+		"SELECTED NULL" Print
+		return
+	endif
+	
+	
+	<-MBO_tChosenEntry{"TYPE"} ->MBO_sUnitType
+	<-MBO_tChosenEntry{"SPECIAL"} ->MBO_tSpecial
+	
+	<-MBO_tSpecial{"Count"} ->MBO_iCount
+	<-MBO_tSpecial{"Height"} ->MBO_iHeight
+	<-MBO_tSpecial{"CountMin"} ->MBO_iCountMin
+	<-MBO_tSpecial{"CountMax"} ->MBO_iCountMax
+	
+	<-MBO_tSpecial{"VeryScary"} if
+		"explosion5" <-MBO_v3fPos 4 4 4 V3 CreateEffect
+	endif
+	
+	#Process special event behaviors.
+	<-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPos @ProcessSpecialBoxSpawnBehaviors
+	
+	#These are types that should avoid default behavior in favor of special behavior.
+	<-MBO_sUnitType IsNull if
+		return
+	endif
+	
+	<-MBO_iCountMin IsNull not <-MBO_iCountMax IsNull not and if
+		<-MBO_iCount IsNull if
+			0 ->MBO_iCount
+		endif
+		<-MBO_sType <-MBO_iCountMin <-MBO_iCountMax 1 add @RandIntSeeded <-MBO_iCount add ->MBO_iCount
+	endif
+	
+	#If no count was determined, default to 1.
+	<-MBO_iCount IsNull <-MBO_iCount 0 lte or if
+		1 ->MBO_iCount
+	endif
+	
+	#Create the unit(s).
+	CreateList ->MBO_lfSpawnPositions
+	<-MBO_iCount 1 eq if
+		<-MBO_v3fPos.x <-MBO_v3fPos.z <-MBO_lfSpawnPositions AppendStackToList
+	else <-MBO_iCount 2 eq if
+		<-MBO_v3fPos.x <-MBO_v3fPos.z 2 add <-MBO_v3fPos.x <-MBO_v3fPos.z 2 sub <-MBO_lfSpawnPositions AppendStackToList
+	else <-MBO_iCount 3 eq if
+			<-MBO_v3fPos.x 2 add <-MBO_v3fPos.z 2 add 
+			<-MBO_v3fPos.x 2 sub <-MBO_v3fPos.z 2 add 
+			<-MBO_v3fPos.x <-MBO_v3fPos.z 2 sub
+		<-MBO_lfSpawnPositions AppendStackToList
+	else <-MBO_iCount 4 eq if
+			<-MBO_v3fPos.x 2 add <-MBO_v3fPos.z 2 add 
+			<-MBO_v3fPos.x 2 sub <-MBO_v3fPos.z 2 add 
+			<-MBO_v3fPos.x 2 add <-MBO_v3fPos.z 2 sub
+			<-MBO_v3fPos.x 2 sub <-MBO_v3fPos.z 2 sub
+		<-MBO_lfSpawnPositions AppendStackToList
+	else
+		<-MBO_iCount 0 do
+			<-MBO_sType @RandFloatSeeded 7.0 mul <-MBO_v3fPos.x 3 sub add
+				<-MBO_sType @RandFloatSeeded 7.0 mul <-MBO_v3fPos.z 3 sub add
+			<-MBO_lfSpawnPositions AppendStackToList
+		loop
+	endif endif endif endif
+	
+	0 ->MBO_iI
+	while <-MBO_iI <-MBO_lfSpawnPositions GetListCount lt repeat
+		<-MBO_lfSpawnPositions[<-MBO_iI 1 add] ->MBO_fPosX
+		<-MBO_lfSpawnPositions[<-MBO_iI] ->MBO_fPosZ
+		
+		<-MBO_iHeight IsNull if
+			<-MBO_tChosenEntry{"TYPE"} <-MBO_fPosX <-MBO_fPosZ <-MBO_tChosenEntry{"SETTINGS"} CreateUnitOnTerrain ->MBO_iUID
+			<-MBO_sType <-MBO_tChosenEntry <-MBO_fPosX 0 <-MBO_fPosZ V3 @ProcessSpecialUnitSpawnBehaviors
+		else
+			<-MBO_fPosX <-MBO_v3fPos.y <-MBO_iHeight add <-MBO_fPosZ V3 ->MBO_v3fPosUnit
+			<-MBO_tChosenEntry{"TYPE"} <-MBO_v3fPosUnit <-MBO_tChosenEntry{"SETTINGS"} CreateUnit ->MBO_iUID
+			<-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPosUnit @ProcessSpecialUnitSpawnBehaviors
+		endif
+		
+		<-MBO_iUID 9999 ConstructUnit
+		<-MBO_iUID <-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPosUnit @ProcessUnitAmmoBehaviors
+		
+		<-MBO_iI 2 add ->MBO_iI
+	endwhile
+
+# s1 t2 v3f3 -
+:ProcessUnitAmmoBehaviors
+	->PS_v3fPos
+	->PS_tEntry
+	->PS_sType
+	->PS_iUID
+	
+	<-PS_tEntry{"TYPE"} ->PS_s
+	
+	<-PS_s "ca8dfbe4-a3ca-4223-b8c4-070de8877b26" eq
+	<-PS_s "c5b44bd0-1518-4091-9f15-36c919bc37c7" eq or if
+		<-PS_iUID 0 SetUnitAmmo
+	else
+		<-PS_iUID dup GetUnitMaxAmmo SetUnitAmmo
+	endif 
+
+# s1 t2 v3f3 -
+:ProcessSpecialUnitSpawnBehaviors
+	->PS_v3fPos
+	->PS_tEntry
+	->PS_sType
+	
+	<-PS_tEntry{"TYPE"} ->PS_s
+	
+	<-PS_s "crystal" eq if
+		<-PS_v3fPos.z 2 add <-PS_v3fPos.z 1 sub do
+			<-PS_v3fPos.x 2 add <-PS_v3fPos.x 1 sub do
+				<-PS_sType @RandFloatSeeded 0.5 lte if
+					I J 9 SetTerrainSpecial
+				endif
+			loop
+		loop
+	else <-PS_s "miner" eq if
+		<-PS_tEntry{"SPECIAL"}{"Coverage"} 100.0 div ->PS_fCoverage
+	
+		<-PS_v3fPos.z 2 add <-PS_v3fPos.z 1 sub do
+			<-PS_v3fPos.x 3 add <-PS_v3fPos.x 2 sub do
+				<-PS_sType @RandFloatSeeded <-PS_fCoverage lte if
+					I J 1 SetTerrainSpecial
+				endif
+			loop
+		loop
+	endif endif
+	
+# s1 t2 v3f3 - 
+:ProcessSpecialBoxSpawnBehaviors
+	->PS_v3fPos
+	->PS_tEntry
+	->PS_sType
+	
+	<-PS_tEntry{"STYPE"} ->PS_s
+	
+	<-PS_s "creeper" eq if
+		<-PS_tEntry{"SPECIAL"}{"Payload"} ->PS_fPayload
+		FALSE ->PS_bIsAC
+		<-PS_fPayload 0 lt if
+			TRUE ->PS_bIsAC
+		endif
+		<-PS_fPayload abs ->PS_fPayload
+		
+		<-PS_fPayload 2000 49 mul gte if
+			4 ->PS_iRadius
+			<-PS_fPayload 81.0 div ->PS_fPayload
+		else <-PS_fPayload 2000 25 mul gte if
+			3 ->PS_iRadius
+			<-PS_fPayload 49.0 div ->PS_fPayload
+		else <-PS_fPayload 2000 9 mul gte if
+			2 ->PS_iRadius
+			<-PS_fPayload 25.0 div ->PS_fPayload
+		else <-PS_fPayload 2000 1 mul gte if
+			1 ->PS_iRadius
+			<-PS_fPayload 9.0 div ->PS_fPayload
+		else
+			0 ->PS_iRadius
+		endif endif endif endif
+		
+		<-PS_bIsAC if
+			<-PS_fPayload -1 mul ->PS_fPayload
+		endif
+		
+		<-PS_v3fPos.z <-PS_iRadius add 1 add <-PS_v3fPos.z <-PS_iRadius sub do
+			<-PS_v3fPos.x <-PS_iRadius add 1 add <-PS_v3fPos.x <-PS_iRadius sub do
+				I J <-PS_fPayload AddCreeper
+			loop
+		loop
+		
+		
+	else <-PS_s "crazonium" eq <-PS_s "wall" eq or if
+		<-PS_v3fPos.z 3 add ->PS_iZTop
+		<-PS_v3fPos.z 3 sub ->PS_iZBottom
+		<-PS_v3fPos.x 3 add ->PS_iXRight
+		<-PS_v3fPos.x 3 sub ->PS_iXLeft
+	
+		<-PS_sType 0 4 @RandIntSeeded ->PS_iEmptySide
+		
+		<-PS_iZTop 1 add <-PS_iZBottom do
+			<-PS_iXRight 1 add <-PS_iXLeft do
+				<-PS_iEmptySide 0 eq J <-PS_iZTop eq J <-PS_iZBottom eq I <-PS_iXRight eq or or and 
+				<-PS_iEmptySide 1 eq J <-PS_iZTop eq J <-PS_iZBottom eq I <-PS_iXLeft eq or or and or
+				<-PS_iEmptySide 2 eq I <-PS_iXLeft eq I <-PS_iXRight eq J <-PS_iZTop eq or or and or
+				<-PS_iEmptySide 3 eq I <-PS_iXLeft eq I <-PS_iXRight eq J <-PS_iZBottom eq or or and or if
+					<-PS_s I J NULL CreateUnitOnTerrain pop
+				endif
+			loop
+		loop
+	else <-PS_s "orb_rain" eq if
+		"2ab87cc7-cfa7-4526-a410-56268f37580f" <-PS_v3fPos NULL CreateUnit ->PS_iUID
+		<-PS_iUID "OrbVolcano.4rpl" "Type" 		<-PS_tEntry{"SPECIAL"}{"Type"} SetScriptVar
+		<-PS_iUID "OrbVolcano.4rpl" "AMT" 			<-PS_tEntry{"SPECIAL"}{"Payload"} SetScriptVar
+		<-PS_iUID "OrbVolcano.4rpl" "orbsErupting" <-PS_tEntry{"SPECIAL"}{"Count"} SetScriptVar
+	endif endif endif
+	
+	
+	
+	
+	
+	
+	
+	
