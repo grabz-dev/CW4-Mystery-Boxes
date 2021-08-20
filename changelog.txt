@@ -1,2 +1,12 @@
+Mystery Boxes 2 dev2.cpack
+  - Slightly rebalanced Wallis device and Flare
+  - Wallis device balls now explode into AC after a minute of being alive
+  - Flare no longer fires when stunned
+Mystery Boxes 2 dev1.cpack
+  - New weight selection algorithm (thanks to cornucanis)
+  - New CPACK loading system
+  - Built in titans are now imported through CPACKs as well
+  - Added Wallis device, ERNMaker, Flare (thanks to Alophox and Vertu)
+  - Added more bad outcomes from Titan, including egg wave and Skimmer Fortress
 Mystery Boxes 1 dev9.cpack
   - Replaced old weighting system with new system written by cornucanis
