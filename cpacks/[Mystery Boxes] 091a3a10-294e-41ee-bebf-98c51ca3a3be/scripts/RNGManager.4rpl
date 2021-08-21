@@ -12,6 +12,14 @@ GetGameUpdateCount 1 gte if
 	once
 		"Calculating weights and seed" Debug
 		@InitializeLootData
+		@SeedConfig
+	endonce
+endif
+
+GetEditMode if
+	once
+		"Glory to thee who do not endulge" Debug
+		@SeedConfig
 	endonce
 endif
 
@@ -297,16 +305,24 @@ endif
 		<-ild_aliasList ->ild_currentBox{"Aliases"}
 		<-ild_adjustedProbList ->ild_currentBox{"AdjustedProb"}
 		<-ild_totalItemCount ->ild_currentBox{"TotalItems"}	
-
-		#Seed built-in RNG.
-		ElapsedTime 1000 mod 0 do
-			RandFloat pop 
-		loop
-		
-		#Generate seeds for configs.
-		1 10000000 RandInt ->ild_currentBox{"Seed"}
 	loop
 	
+:SeedConfig 
+	#Seed built-in RNG.
+	ElapsedTime 1000 mod 0 do
+		RandFloat pop 
+	loop
+
+	<-G_tttltConf GetTableKeys ->SCF_lKeysRoot #object containing list of all boxes
+	<-SCF_lKeysRoot 0 do
+		<-G_tttltConf{<-SCF_lKeysRoot[I]} ->SCF_currentBox
+		
+		#Generate seeds for configs.
+		1 10000000 RandInt ->SCF_currentBox{"Seed"}
+	loop
+	
+	
+
 # s1 i1 i2 - i3
 :RandIntSeeded
 	->RIS_iMaxExcl
