@@ -1,3 +1,6 @@
+Mystery Boxes 2 dev6.cpack
+  - Renamed a few custom units
+  - Slightly increased chance of quad box and AC emitter
 Mystery Boxes 2 dev5.cpack
   - Reroll seed when entering edit mode
 Mystery Boxes 2 dev4.cpack
