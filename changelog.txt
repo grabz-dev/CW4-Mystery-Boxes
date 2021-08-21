@@ -1,3 +1,7 @@
+Mystery Boxes 2 dev4.cpack
+  - Added the orbital factory Titan result (thanks cornucanis)
+  - Slightly altered the design of the skimmer factory (thanks cornucanis)
+  - Increased seed pool from 100k to 10m
 Mystery Boxes 2 dev3.cpack
   - Altered Titan chances
   - Airship now uses Liftic instead of Energy

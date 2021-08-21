@@ -49,6 +49,9 @@ endif
 	
 	#########
 	# <Good> outcomes start here
+	
+	
+								 "WEIGHT" 30.0,	"STYPE" "orbital_factory",	2 TableN
 								 "WEIGHT" 75.0,	"TYPE" "ern",	"SPECIAL" TableN("CountMin" 5 "CountMax" 10, 2) 3 TableN
 	"Airship" @IsRegistered   if "WEIGHT" 80.0,	"TYPE" <-G_tCustomGUIDs{"Airship"},  "REQUIRED" TRUE,	3 TableN	endif
 	"Bertha" @IsRegistered    if "WEIGHT" 100.0,	"TYPE" <-G_tCustomGUIDs{"Bertha"},	 "REQUIRED" TRUE, "SPECIAL" TableN("Count" 4, 1) 4 TableN endif
@@ -163,6 +166,7 @@ endif
 	"WEIGHT" 5.0,	"TYPE" "greenarmother",	"SETTINGS" TableN("Interval" 20, 1), 	3 TableN
 	
 	#-----------
+	
 	
 	
 	"WEIGHT" 100.0,	"TYPE" "84555524-9060-4de3-8db1-ce1769cfe715",		"SPECIAL" TableN("Count" 4, 1), 	3 TableN
@@ -300,7 +304,7 @@ endif
 		loop
 		
 		#Generate seeds for configs.
-		1 100000 RandInt ->ild_currentBox{"Seed"}
+		1 10000000 RandInt ->ild_currentBox{"Seed"}
 	loop
 	
 # s1 i1 i2 - i3
@@ -556,17 +560,24 @@ endif
 		"stash" <-PS_v3fPos.x <-PS_v3fPos.z 2 sub "Size" 1000 "OfflineTime" 600 2 TableN CreateUnitOnTerrain pop
 		"emitter" <-PS_v3fPos.x 2 add <-PS_v3fPos.z "Payload" 25 1 TableN CreateUnitOnTerrain pop
 		"emitter" <-PS_v3fPos.x 2 sub <-PS_v3fPos.z "Payload" 25 1 TableN CreateUnitOnTerrain pop
-		"crystal" <-PS_v3fPos.x 2 add <-PS_v3fPos.z 2 add NULL CreateUnitOnTerrain pop
-		"crystal" <-PS_v3fPos.x 2 sub <-PS_v3fPos.z 2 add NULL CreateUnitOnTerrain pop
-		"crystal" <-PS_v3fPos.x 2 add <-PS_v3fPos.z 2 sub NULL CreateUnitOnTerrain pop
-		"crystal" <-PS_v3fPos.x 2 sub <-PS_v3fPos.z 2 sub NULL CreateUnitOnTerrain pop
+		"crystal" <-PS_v3fPos.x 1 add <-PS_v3fPos.z 2 add NULL CreateUnitOnTerrain pop
+		"crystal" <-PS_v3fPos.x 1 sub <-PS_v3fPos.z 2 add NULL CreateUnitOnTerrain pop
+		"crystal" <-PS_v3fPos.x 1 add <-PS_v3fPos.z 2 sub NULL CreateUnitOnTerrain pop
+		"crystal" <-PS_v3fPos.x 1 sub <-PS_v3fPos.z 2 sub NULL CreateUnitOnTerrain pop
 		
 		<-PS_v3fPos.z 6 add <-PS_v3fPos.z 5 sub do
 			<-PS_v3fPos.x 6 add <-PS_v3fPos.x 5 sub do
 				I J 6 SetTerrainSpecial 
 			loop
 		loop
-	endif endif endif endif
+	else <-PS_s "orbital_factory" eq if
+		"rocketpad" <-PS_v3fPos.x <-PS_v3fPos.z 0 CreateUnitOnTerrain 9999 ConstructUnit
+		"greenarmother" <-PS_v3fPos.x <-PS_v3fPos.z "Interval" 60 1 TableN CreateUnitOnTerrain pop
+		"greenarrefinery" <-PS_v3fPos.x 1 add <-PS_v3fPos.z 0 CreateUnitOnTerrain dup 9999 ConstructUnit V3(0 180 0) SetUnitRotation
+		"greenarrefinery" <-PS_v3fPos.x 1 sub <-PS_v3fPos.z 0 CreateUnitOnTerrain dup 9999 ConstructUnit V3(0 0 0) SetUnitRotation
+		"greenarrefinery" <-PS_v3fPos.x <-PS_v3fPos.z 1 add 0 CreateUnitOnTerrain dup 9999 ConstructUnit V3(0 90 0) SetUnitRotation
+		"greenarrefinery" <-PS_v3fPos.x <-PS_v3fPos.z 1 sub 0 CreateUnitOnTerrain dup 9999 ConstructUnit V3(0 270 0) SetUnitRotation
+	endif endif endif endif endif
 
 # s1 - b2
 :IsRegistered
