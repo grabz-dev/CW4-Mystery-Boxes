@@ -7,7 +7,7 @@
 $projSpeed:.4 #total speed
 $rotSpeed:1 #radians per second
 $fireCost:10
-$rechargeTime:150 #frames between bursts
+$rechargeTime:180 #frames between bursts
 $miniRechargeTime:10.0 #frames between shots, makes sure it is a float
 $DAMAGE_MESH:0.35
 $DAMAGE_DIST:7 #presumably the radius of the damage
@@ -106,9 +106,12 @@ endif
 		#Remove any damage map that was set by auto targeting.
 		#Each shot will set its own damage map data -KC
 		RemoveUnitDamageMap(self)
+		
+		GetERNPortalEfficiency(5) ->ERNefficiency
+		<-ERNefficiency 50.0 mul asint ->fireRateAdditionalCoefficient
 	
 		#reset cooldown
-		<-rechargeTime ->fireCount
+		<-rechargeTime <-fireRateAdditionalCoefficient sub ->fireCount
 		
 		#deduct cost
 		self GetUnitAmmo(self) <-fireCost - SetUnitAmmo
@@ -122,8 +125,10 @@ endif
 		#@FireProjectile(<-offset)
 		#burst timer
 		Self GetUnitERNState if
+			8.0 ->miniRechargeTime
 			<-miniRechargeTime 4 * ->burstCounter
 		else
+			10.0 ->miniRechargeTime
 			<-miniRechargeTime 2 * ->burstCounter
 		endif
 	endif
@@ -153,7 +158,7 @@ endif
 	ApplyToDamageMap(<-shotUnit <-target.X <-target.Z <-DAMAGE_DIST <-DAMAGE_DEPTH 1000000 * false)
 	
 :Once
-	Self 10 SetUnitPacketRequestRate
+	Self 7 SetUnitPacketRequestRate
 
 	#Gets called once and only once when unit is created -KC
 	#as a note, it is also called on recompile

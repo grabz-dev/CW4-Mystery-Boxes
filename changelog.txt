@@ -1,3 +1,10 @@
+Mystery Boxes 2 dev7.cpack
+  - Flare now works with fire rate and fire range, also has been slightly rebalanced in other areas
+  - Titan bad effects slightly rebalanced
+  - Replaced collector panel drops with a special solar farm that stacks multiple of them at once
+  - Slightly rebalanced different drop chances for mystery box
+  - Removed Titan box availability manipulation (will now always be available)
+  - Skimmer Factory Titan result redesigned
 Mystery Boxes 2 dev6.cpack
   - Renamed a few custom units
   - Slightly increased chance of quad box and AC emitter
