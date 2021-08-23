@@ -174,7 +174,7 @@ endif
 	
 	#-----------
 	
-	"WEIGHT" 125.0,	"TYPE" "84555524-9060-4de3-8db1-ce1769cfe715",		"SPECIAL" TableN("Count" 4, 1), 	3 TableN
+	"WEIGHT" 125.0,	"TYPE" "84555524-9060-4de3-8db1-ce1769cfe715",		"SPECIAL" TableN("Count" 4, "Unselectable" TRUE 2), 	3 TableN
 	"WEIGHT" 12.5,	"TYPE" "emitter",		"SETTINGS" TableN("Start" 0, 	"Interval" 15, 	"Payload" -5, 3), 	3 TableN
 	"WEIGHT" 100.0,	"STYPE" "creeper", 		"SPECIAL" TableN("Payload" -500, 1),	3 TableN
 		<-G_tttltConf{"REGULAR_MYSTERY_BOX"}{"Types"}{"Good"} AppendStackToList
@@ -377,6 +377,7 @@ endif
 	<-MBO_tSpecial{"Height"} ->MBO_iHeight
 	<-MBO_tSpecial{"CountMin"} ->MBO_iCountMin
 	<-MBO_tSpecial{"CountMax"} ->MBO_iCountMax
+	<-MBO_tSpecial{"Unselectable"} ->MBO_bUnselectable
 	
 	<-MBO_tSpecial{"Effect"} "boom1" StartsWith if
 		"explosion5" <-MBO_v3fPos 4 4 4 V3 CreateEffect
@@ -446,6 +447,9 @@ endif
 		
 		<-MBO_iUID 9999 ConstructUnit
 		<-MBO_iUID <-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPosUnit @ProcessUnitAmmoBehaviors
+		<-MBO_bUnselectable if
+			<-MBO_iUID FALSE SetUnitSelectable
+		endif
 		
 		<-MBO_iI 2 add ->MBO_iI
 	endwhile

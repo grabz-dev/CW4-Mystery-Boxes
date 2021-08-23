@@ -1,3 +1,5 @@
+Mystery Boxes 2 dev8.cpack
+  - Quad boxes are now unselectable
 Mystery Boxes 2 dev7.cpack
   - Flare now works with fire rate and fire range, also has been slightly rebalanced in other areas
   - Titan bad effects slightly rebalanced
