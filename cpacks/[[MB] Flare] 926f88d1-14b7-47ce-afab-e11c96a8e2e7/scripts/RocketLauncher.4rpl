@@ -29,8 +29,8 @@ Self GetUnitERNState if
 	<-currentUnitRange 1.8 mul ->currentUnitRange
 endif
 <-currentUnitRange asint ->currentUnitRange
-Self <-currentUnitRange SetUnitRange
 <-lastUnitRange <-currentUnitRange neq if
+	Self <-currentUnitRange SetUnitRange
 	Self RefreshUnitLosCache
 endif
 <-currentUnitRange ->lastUnitRange

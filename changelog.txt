@@ -1,3 +1,5 @@
+Mystery Boxes 2 dev9.cpack
+  - Fixed Flare ranging and indicator
 Mystery Boxes 2 dev8.cpack
   - Quad boxes are now unselectable
 Mystery Boxes 2 dev7.cpack
