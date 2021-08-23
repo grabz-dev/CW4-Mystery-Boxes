@@ -301,7 +301,7 @@ endif
 	
 :SeedConfig 
 	#Seed built-in RNG.
-	ElapsedTime 1000 mod 0 do
+	ElapsedTime 10000 mod 0 do
 		RandFloat pop 
 	loop
 

@@ -1,3 +1,5 @@
+Mystery Boxes 2 dev11.cpack
+  - Increased potential pool of seeds
 Mystery Boxes 2 dev10.cpack
   - Fixed one-off error when spawning more than 4 things that hopefully prevents a forb related game crash
 Mystery Boxes 2 dev9.cpack
