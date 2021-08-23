@@ -425,8 +425,8 @@ endif
 		<-MBO_lfSpawnPositions AppendStackToList
 	else
 		<-MBO_iCount 0 do
-			<-MBO_sType @RandFloatSeeded 7.0 mul <-MBO_v3fPos.x 3 sub add
-				<-MBO_sType @RandFloatSeeded 7.0 mul <-MBO_v3fPos.z 3 sub add
+			<-MBO_sType @RandFloatSeeded 6.0 mul <-MBO_v3fPos.x 3 sub add
+				<-MBO_sType @RandFloatSeeded 6.0 mul <-MBO_v3fPos.z 3 sub add
 			<-MBO_lfSpawnPositions AppendStackToList
 		loop
 	endif endif endif endif
