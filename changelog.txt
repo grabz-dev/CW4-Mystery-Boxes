@@ -1,3 +1,5 @@
+Mystery Boxes 2 dev12.cpack
+  - Changed the way unit addons are detected so that CPACK order in the package manager does not matter
 Mystery Boxes 2 dev11.cpack
   - Increased potential pool of seeds
 Mystery Boxes 2 dev10.cpack

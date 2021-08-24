@@ -2,21 +2,21 @@
 
 #This script RUNS while paused
 
-once
-	"Initializing Configuration" Debug
-	@InitializeConfiguration
-endonce
-
 #Frame 1 code
 GetGameUpdateCount 1 gte if
 	once
+		TRUE ->G_bInitialized
+		
+		"Initializing Configuration" Debug
+		@InitializeConfiguration
+		
 		"Calculating weights and seed" Debug
 		@InitializeLootData
 		@SeedConfig
 	endonce
 endif
 
-GetEditMode if
+GetEditMode <-G_bInitialized and if
 	once
 		"Glory to thee who do not endulge" Debug
 		@SeedConfig
@@ -25,7 +25,9 @@ endif
 
 :awake
 	once
+		CreateTable ->G_tsRegisteredCPACKUnits
 		"MB_MysteryBoxOpened" "OnMysteryBoxOpened" RegisterForMsg
+		"MB_CPACKUnitRegister" "OnCPACKUnitRegister" RegisterForMsg
 	endonce
 :once
 	@awake
@@ -619,11 +621,16 @@ endif
 		
 	endif endif endif endif endif endif
 
+:OnCPACKUnitRegister
+	"Registered custom unit " <-_DATA concat Debug
+	TRUE ->G_tsRegisteredCPACKUnits{<-_DATA}
 # s1 - b2
 :IsRegistered
 	->IRT_sName
 	
-	"MB_tRegisteredCPACKUnits" GetGlobalTable <-IRT_sName GetTableElement if
+	"IsRegistered " <-IRT_sName concat Debug
+	
+	<-G_tsRegisteredCPACKUnits{<-IRT_sName} if
 		TRUE return
 	endif
 	FALSE return
@@ -638,6 +645,14 @@ endif
 		endif
 	loop
 	FALSE return
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
