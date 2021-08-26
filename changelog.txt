@@ -1,3 +1,7 @@
+Mystery Boxes 2 dev14.cpack
+  - Friend box text now scales with amount of digits
+  - ERN Maker request rate buffed from 15 to 7
+  - Friend box request rate now decreased by 1 for each 200 ammo left to supply
 Mystery Boxes 2 dev13.cpack
   - Deleted useless script
   - Cleaned up interface settings for all custom units
