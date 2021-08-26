@@ -11,3 +11,10 @@ endif
 	SetUnitPopupEnabled(self, true)
 	SetUnitPopupText0(self, "ERN Forge")
 	SetUnitPopupText1(self, "Makes ERNs")
+	
+	once
+		SetUnitPacketRequestRate(Self 7) 
+	endonce
+:Once
+	@Awake
+	

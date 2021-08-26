@@ -13,13 +13,31 @@ $Ammo_Cost_Start:1
 		"WAITING_FOR_AMMO" @SetState
 	endif
 else <-G_sState "WAITING_FOR_AMMO" eq if
-	Self "text" 14 SetObjTextFontSize
-	Self "text" <-G_iMyMaxAmmo Self GetUnitAmmo sub SetObjText
+	<-G_iMyMaxAmmo Self GetUnitAmmo sub ->fAmmoLeft
 
-	Self GetUnitAmmo <-G_iMyMaxAmmo gte if
-		Self "text" "" SetObjText
-		"SHRINKING" @SetState
+	<-fAmmoLeft <-fLastAmmoLeft neq if
+		Self 15 <-fAmmoLeft 200 div floor sub 0 max SetUnitPacketRequestRate
+	
+		<-fAmmoLeft 10000 gte if
+			7 ->G_iAmmoCostFontSize
+		else <-fAmmoLeft 1000 gte if
+			9 ->G_iAmmoCostFontSize
+		else <-fAmmoLeft 100 gte if
+			12 ->G_iAmmoCostFontSize
+		else
+			14 ->G_iAmmoCostFontSize
+		endif endif endif
+		
+		Self "text" <-G_iAmmoCostFontSize SetObjTextFontSize
+		Self "text" <-G_iMyMaxAmmo Self GetUnitAmmo sub SetObjText
+		
+		Self GetUnitAmmo <-G_iMyMaxAmmo gte if
+			Self "text" "" SetObjText
+			"SHRINKING" @SetState
+		endif
 	endif
+	
+	<-fAmmoLeft ->fLastAmmoLeft
 else <-G_sState "SHRINKING" eq if
 	<-fCurrentScale 0.95 mul <-fShrinkToScale max ->fCurrentScale
 	Self "script_root" <-fCurrentScale dup dup V3 SetObjScale
