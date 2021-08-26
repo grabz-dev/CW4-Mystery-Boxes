@@ -1,3 +1,11 @@
+Mystery Boxes 2 dev13.cpack
+  - Deleted useless script
+  - Cleaned up interface settings for all custom units
+    - Wallis now included in recorder
+	- Now showing Sweeper health bar
+	- Other minor cleanups
+  - Changed "Makes ERNS from ARG" message to just 'Makes ERNs' for ERN Factory
+  - Nerfed resources slightly to make them more in line with what was intended. They were balanced without thinking about Mine production in mind.
 Mystery Boxes 2 dev12.cpack
   - Changed the way unit addons are detected so that CPACK order in the package manager does not matter
 Mystery Boxes 2 dev11.cpack

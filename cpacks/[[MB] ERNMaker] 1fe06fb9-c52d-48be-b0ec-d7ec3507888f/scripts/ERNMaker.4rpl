@@ -10,4 +10,4 @@ endif
 :Awake	
 	SetUnitPopupEnabled(self, true)
 	SetUnitPopupText0(self, "ERN Forge")
-	SetUnitPopupText1(self, "[Makes ERNS from ARG]")	
+	SetUnitPopupText1(self, "Makes ERNs")
