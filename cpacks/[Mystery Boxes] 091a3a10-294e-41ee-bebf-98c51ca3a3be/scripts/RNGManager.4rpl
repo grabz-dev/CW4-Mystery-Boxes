@@ -25,6 +25,8 @@ endif
 
 #Mverse things
 GetMVersePlayerNum 0 gte if
+	#Look over shared units. We only construct these after some frames otherwise they appear
+	#still in construction for other players.
 	0 ->iI
 	while <-iI <-G_ltMverseSharedUnitsToConstruct GetListCount lt repeat
 		<-G_ltMverseSharedUnitsToConstruct[<-iI] ->tSharedUnit
@@ -38,16 +40,18 @@ GetMVersePlayerNum 0 gte if
 		<-iI 1 add ->iI
 	endwhile
 	
+	#Look over units that should sync their destruction with other players.
+	#We do this less often because units in this list may linger for a while until they are gone.
 	GetTimer0 eq0 if
 		30 SetTimer0
 		
 		0 ->iI
-		while <-iI <-G_ltMverseEnemiesToSyncDestruction GetListCount lt repeat
-			<-G_ltMverseEnemiesToSyncDestruction[<-iI] ->tEnemy
-			<-tEnemy{"iUID"} ->iUID
+		while <-iI <-G_ltMverseUnitsToSyncDestruction GetListCount lt repeat
+			<-G_ltMverseUnitsToSyncDestruction[<-iI] ->tUnit
+			<-tUnit{"iUID"} ->iUID
 			<-iUID GetUnitDestroyed if
-				"MB_MverseEnemyDestroyed" <-tEnemy SendMVerseMsg
-				<-G_ltMverseEnemiesToSyncDestruction <-iI RemoveListElement
+				"MB_MverseSyncedUnitDestroyed" <-tUnit SendMVerseMsg
+				<-G_ltMverseUnitsToSyncDestruction <-iI RemoveListElement
 				<-iI 1 sub ->iI
 			endif
 			
@@ -59,17 +63,18 @@ endif
 :awake
 	once
 		CreateList ->G_ltMverseSharedUnitsToConstruct
-		CreateList ->G_ltMverseEnemiesToSyncDestruction
+		CreateList ->G_ltMverseUnitsToSyncDestruction
 		CreateTable ->G_tsRegisteredCPACKUnits
 		"MB_MysteryBoxOpened" "OnMysteryBoxOpened" RegisterForMsg
 		"MB_CPACKUnitRegister" "OnCPACKUnitRegister" RegisterForMsg
 		"MB_MverseMysteryBoxOpened" "OnMverseMysteryBoxOpened" RegisterForMsg
-		"MB_MverseEnemyDestroyed" "OnMverseEnemyDestroyed" RegisterForMsg
+		"MB_MverseSyncedUnitDestroyed" "OnMverseSyncedUnitDestroyed" RegisterForMsg
 	endonce
 :once
 	@awake
 
 :InitializeConfiguration
+	#Container for custom GUIDs for easy access. No other use.
 	CreateTable ->G_tCustomGUIDs
 	"84555524-9060-4de3-8db1-ce1769cfe715" ->G_tCustomGUIDs{"Mystery Box"}
 	"f028eb66-8215-461f-bfee-95039386e950" ->G_tCustomGUIDs{"Airship"}
@@ -78,6 +83,7 @@ endif
 	"7aecbd59-910a-4242-9fe6-37e0a7506f83" ->G_tCustomGUIDs{"Wallis"}
 	"a9ad2e49-1bd1-486b-9afa-f33b65c11fbb" ->G_tCustomGUIDs{"ERNMaker"}
 	"60e2f17f-5487-4108-866f-e9e6fc6596a3" ->G_tCustomGUIDs{"Flare"}
+	"746e142d-5e17-481d-8cb7-79cda5116c66" ->G_tCustomGUIDs{"Splitmitter"}
 	
 	ClearStack 
 	
@@ -119,7 +125,7 @@ endif
 	
 	
 	#Put unit types in this table
-	#IF THEY CAN BE NULLIFIER OVERLOADED
+	#THAT SHOULD SYNC THEIR DESTRUCTION WITH OTHER PLAYERS.
 	"emitter" 1 "sporelauncher" 1 "blobnest" 1 "skimmerfactory" 1 "darktower" 1
 	"airsaccauldron" 1 
 	Table ->G_tbMverseNullifiableEnemies
@@ -147,27 +153,27 @@ endif
 	<-G_tttltConf{"TITAN_MYSTERY_BOX"} "TotalItems" 		0												 SetTableElement
 	<-G_tttltConf{"TITAN_MYSTERY_BOX"} "Seed" 				0												 SetTableElement
 	
-        
+       
 	
 	#########
 	# <Good> outcomes start here
 								 "WEIGHT" 30.0,	"STYPE" "orbital_factory",	2 TableN
 								 "WEIGHT" 75.0,	"TYPE" "ern",	"SPECIAL" TableN("CountMin" 5 "CountMax" 10, 2) 3 TableN
-	"Airship" @IsRegistered   if "WEIGHT" 80.0,	"TYPE" <-G_tCustomGUIDs{"Airship"},  "REQUIRED" TRUE,	3 TableN	endif
-	"Bertha" @IsRegistered    if "WEIGHT" 100.0,	"TYPE" <-G_tCustomGUIDs{"Bertha"},	 "REQUIRED" TRUE, "SPECIAL" TableN("Count" 4, 1) 4 TableN endif
-	"Sweeper" @IsRegistered   if "WEIGHT" 50.0,		"TYPE" <-G_tCustomGUIDs{"Sweeper"},	 "REQUIRED" TRUE, 3 TableN endif
-	"Wallis" @IsRegistered    if "WEIGHT" 80.0,		"TYPE" <-G_tCustomGUIDs{"Wallis"},	 "REQUIRED" TRUE, 3 TableN endif
-	"ERNMaker" @IsRegistered  if "WEIGHT" 50.0,		"TYPE" <-G_tCustomGUIDs{"ERNMaker"}, "REQUIRED" TRUE, 3 TableN endif
+	"Airship" @IsRegistered   if "WEIGHT" 80.0,	"TYPE" <-G_tCustomGUIDs{"Airship"},  2 TableN	endif
+	"Bertha" @IsRegistered    if "WEIGHT" 100.0,	"TYPE" <-G_tCustomGUIDs{"Bertha"},	  "SPECIAL" TableN("Count" 4, 1) 3 TableN endif
+	"Sweeper" @IsRegistered   if "WEIGHT" 50.0,		"TYPE" <-G_tCustomGUIDs{"Sweeper"},	 2 TableN endif
+	"Wallis" @IsRegistered    if "WEIGHT" 80.0,		"TYPE" <-G_tCustomGUIDs{"Wallis"},	 2 TableN endif
+	"ERNMaker" @IsRegistered  if "WEIGHT" 50.0,		"TYPE" <-G_tCustomGUIDs{"ERNMaker"}, 2 TableN endif
 		<-G_tttltConf{"TITAN_MYSTERY_BOX"}{"Types"}{"Good"} AppendStackToList
 		
 	#########
 	# <Bad> outcomes start here
-	"WEIGHT" 100.0,	"STYPE" "orb_rain", "SPECIAL" TableN("Type" "orb", "Payload" 300, "Count" 150, "Effect" "boom1", 4)	3 TableN
-	"WEIGHT" 75.0,	"STYPE" "orb_rain", "SPECIAL" TableN("Type" "egg", "Payload" 1200, "Count" 50, "Effect" "boom1", 4)	3 TableN
-	"WEIGHT" 100.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 50000, "Effect" "boom1", 2)	3 TableN
+	"WEIGHT" 50.0,	"STYPE" "orb_rain", "SPECIAL" TableN("Type" "orb", "Payload" 300, "Count" 150, "Effect" "boom1", 4)	3 TableN
+	"WEIGHT" 50.0,	"STYPE" "orb_rain", "SPECIAL" TableN("Type" "egg", "Payload" 1200, "Count" 50, "Effect" "boom1", 4)	3 TableN
+	"WEIGHT" 50.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 50000, "Effect" "boom1", 2)	3 TableN
 	"WEIGHT" 25.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 100000, "Effect" "boom2", 2)	3 TableN
 	"WEIGHT" 25.0,	"STYPE" "skimmer_fortress",	2 TableN
-	
+	"Splitmitter" @IsRegistered if "WEIGHT" 25.0	"TYPE" <-G_tCustomGUIDs{"Splitmitter"} "SPECIAL" TableN("Seed" TRUE, 1) 3 TableN endif
 		<-G_tttltConf{"TITAN_MYSTERY_BOX"}{"Types"}{"Bad"} AppendStackToList
 		
 		
@@ -396,6 +402,10 @@ endif
 		<-ild_totalItemCount ->ild_currentBox{"TotalItems"}	
 	loop
 	
+# -
+# Description: Generate a random seed for every box type in the config.
+# Arguments: 
+# Result: 
 :SeedConfig 
 	#Seed built-in RNG.
 	ElapsedTime 10000 mod 0 do
@@ -411,15 +421,21 @@ endif
 	loop
 	
 	
-
 # s1 i1 i2 - i3
+# Description: Generate a random integer between min (inclusive) or max (exclusive) using a box's current seed and increment the seed.
+# Arguments: The name of the current box, min, max
+# Result: Random int
 :RandIntSeeded
 	->RIS_iMaxExcl
 	->RIS_iMinIncl
 	@RandFloatSeeded ->RIS_iRand
 	
 	<-RIS_iMaxExcl <-RIS_iMinIncl sub <-RIS_iRand mul floor <-RIS_iMinIncl add
+
 # s1 - f1
+# Description: Generate a random float between 0 and 1 using a box's current seed and increment the seed.
+# Arguments: The name of the current box
+# Result: Random float
 :RandFloatSeeded
 	->RFS_sType
 	
@@ -430,12 +446,18 @@ endif
 	<-G_tttltConf{<-RFS_sType} "Seed" <-RFS_iSeed 1 add SetTableElement
 	
 	<-RFS_fVal <-RFS_fVal floor sub
-	
-	# s = Math.sin(s) * 10000; return s - Math.floor(s);
-	
-	
+
+# _DATA -
+# Description: MSG event handler for a mystery box opening event of the current player.
+# Arguments: 
+# Result: 
 :OnMysteryBoxOpened
 	<-_DATA{"sType"} <-_DATA{"v3fPos"} FALSE @_OnMysteryBoxOpened
+
+# _DATA -
+# Description: Mverse MSG event handler for a mystery box opening event from another player.
+# Arguments: 
+# Result: 
 :OnMverseMysteryBoxOpened
 	<-_DATA{"sType"} ->MMB_sType
 	<-G_tttltConf{<-MMB_sType} ->MMB_ttltConfRoot
@@ -450,6 +472,11 @@ endif
 	
 	#Put back our seed
 	<-MMB_iSeedBackup ->MMB_ttltConfRoot{"Seed"}
+	
+# s1 v3f b1 -
+# Description: Processes a box opening event.
+# Arguments: Box name, 3D position of the event, bool TRUE if event came from another player in mverse FALSE otherwise
+# Result: 
 :_OnMysteryBoxOpened
 	->MBO_bIsFromMverse ->MBO_v3fPos ->MBO_sType
 	
@@ -514,7 +541,9 @@ endif
 	<-MBO_tSpecial{"CountMin"} ->MBO_iCountMin
 	<-MBO_tSpecial{"CountMax"} ->MBO_iCountMax
 	<-MBO_tSpecial{"Unselectable"} ->MBO_bUnselectable
+	<-MBO_tSpecial{"Seed"} ->MBO_bSeed
 	
+	#Play effect, if any.
 	<-MBO_tSpecial{"Effect"} "boom1" StartsWith if
 		"explosion5" <-MBO_v3fPos 4 4 4 V3 CreateEffect
 	else <-MBO_tSpecial{"Effect"} "boom2" StartsWith if
@@ -525,10 +554,12 @@ endif
 	<-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPos <-MBO_bIsFromMverse @ProcessSpecialBoxSpawnBehaviors
 	
 	#These are types that should avoid default behavior in favor of special behavior.
+	#Past this point, we are guaranteed to create some units using default behavior.
 	<-MBO_sUnitType IsNull if
 		return
 	endif
 	
+	#Process CountMin and CountMax, add them to Count.
 	<-MBO_iCountMin IsNull not <-MBO_iCountMax IsNull not and if
 		<-MBO_iCount IsNull if
 			0 ->MBO_iCount
@@ -541,7 +572,7 @@ endif
 		1 ->MBO_iCount
 	endif
 	
-	#Create the unit(s).
+	#Generate a list of positions to create the units that are to be spawned.
 	CreateList ->MBO_lfSpawnPositions
 	<-MBO_iCount 1 eq if
 		<-MBO_v3fPos.x <-MBO_v3fPos.z <-MBO_lfSpawnPositions AppendStackToList
@@ -566,6 +597,7 @@ endif
 		loop
 	endif endif endif endif
 	
+	#Create the unit(s).
 	0 ->MBO_iI
 	while <-MBO_iI <-MBO_lfSpawnPositions GetListCount lt repeat
 		<-MBO_lfSpawnPositions[<-MBO_iI 1 add] ->MBO_fPosX
@@ -580,7 +612,7 @@ endif
 			<-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPosUnit @ProcessSpecialUnitSpawnBehaviors
 		endif
 		
-		#If we're in mverse and this is a shared unit, stagger its construction
+		#If we're in mverse and this is a shared unit, stagger its construction.
 		GetMVersePlayerNum 0 gte <-G_tbMverseSharedUnits{<-MBO_tChosenEntry{"TYPE"}} and if
 			#Do not lower the stagger frames. It will go wrong at higher game speeds.
 			<-MBO_iUID @MverseRegisterSharedUnit
@@ -588,24 +620,36 @@ endif
 			<-MBO_iUID 9999 ConstructUnit
 		endif
 		
+		#If this is a nullifiable enemy, register it to sync destruction.
 		GetMVersePlayerNum 0 gte <-G_tbMverseNullifiableEnemies{<-MBO_tChosenEntry{"TYPE"}} and if
-			<-MBO_iUID @MverseRegisterEnemyOverloadableUnit
+			#Do nothing if this is an AC emitter as it cannot be nullified.
+			<-MBO_tChosenEntry{"TYPE"} "emitter" eq <-MBO_tChosenEntry{"SETTINGS"}{"Payload"} 0 lt and if
+				0 pop
+			else
+				<-MBO_iUID @MverseRegisterUnitSyncDestruction
+			endif
 		endif
 		
 		<-MBO_iUID <-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPosUnit @ProcessUnitAmmoBehaviors
 		<-MBO_bUnselectable if
 			<-MBO_iUID FALSE SetUnitSelectable
 		endif
+		<-MBO_bSeed if
+			<-MBO_iUID "" "Seed" <-MBO_sType 1 10000000 @RandIntSeeded SetScriptVar
+		endif
 		
 		<-MBO_iI 2 add ->MBO_iI
 	endwhile
 
 # i1 - 
-:MverseRegisterEnemyOverloadableUnit
+# Description: Register a unit as one that should sync its destruction with other players.
+# Arguments: UID of the unit
+# Result: 
+:MverseRegisterUnitSyncDestruction
 	->MRE_iUID
 	<-MRE_iUID GetUnitCell ->MRE_iPosZ ->MRE_iPosX
 	
-	<-G_ltMverseEnemiesToSyncDestruction
+	<-G_ltMverseUnitsToSyncDestruction
 		"iUID" <-MRE_iUID
 		"sType" <-MRE_iUID GetUnitType
 		"iPosX" <-MRE_iPosX
@@ -613,11 +657,19 @@ endif
 	4 TableN AppendToList
 
 # i1 - 
+# Description: Register a Mverse shared unit. These units have staggered construction due to a game bug.
+# Arguments: UID of the unit
+# Result: 
 :MverseRegisterSharedUnit
 	->MRS_iUID
 
 	<-G_ltMverseSharedUnitsToConstruct "UID" <-MRS_iUID "StaggerFrames" 10 2 TableN AppendToList
-:OnMverseEnemyDestroyed
+	
+# _DATA -
+# Description: Mverse MSG that comes in whenever a synced unit is destroyed.
+# Arguments:
+# Result: 
+:OnMverseSyncedUnitDestroyed
 	<-_DATA{"sType"} <-_DATA{"iPosX"} 0 <-_DATA{"iPosZ"} V3 0 0 0 0 0 0 0 GetUnits ->OME_lUnits
 	#Find the first one, destroy it. Good enough
 	<-OME_lUnits 0 do
@@ -625,7 +677,10 @@ endif
 		break
 	loop
 
-# s1 t2 v3f3 -
+# i1 s1 t1 v3f -
+# Description: Determine the created unit's initial ammo count. Units are set to full ammo by default, but this can be overridden.
+# Arguments: Unit UID, Box name, config entry, unit 3D position
+# Result: 
 :ProcessUnitAmmoBehaviors
 	->PS_v3fPos
 	->PS_tEntry
@@ -644,6 +699,9 @@ endif
 	endif 
 
 # s1 t2 v3f3 -
+# Description: Determine the created unit's special behaviors.
+# Arguments: Box name, config entry, unit 3D position
+# Result: 
 :ProcessSpecialUnitSpawnBehaviors
 	->PS_v3fPos
 	->PS_tEntry
@@ -662,6 +720,10 @@ endif
 	endif
 	
 # s1 t2 v3f3 - 
+# Description: Determine the created box spawn behaviors. This handles special occurrences that do not use the default unit spawning mechanism.
+#              Because of this, many normally automated behaviors have to be defined manually.
+# Arguments: Box name, config entry, unit 3D position, TRUE if from another player FALSE if from current player
+# Result: 
 :ProcessSpecialBoxSpawnBehaviors
 	->PS_bIsFromMverse
 	->PS_v3fPos
@@ -765,7 +827,7 @@ endif
 		
 		GetMVersePlayerNum 0 gte if
 			<-PS_lUnits 0 do
-				<-PS_lUnits[I] @MverseRegisterEnemyOverloadableUnit
+				<-PS_lUnits[I] @MverseRegisterUnitSyncDestruction
 			loop
 		endif
 		
@@ -804,9 +866,9 @@ endif
 		"greenarmother" <-PS_v3fPos.x <-PS_v3fPos.z "Interval" 60 1 TableN CreateUnitOnTerrain pop
 	else <-PS_s "solar_farm" eq if
 		6 0 do
-			"collectorpanel5" <-PS_v3fPos.x <-PS_v3fPos.z NULL CreateUnitOnTerrain pop
+			"collectorpanel5" <-PS_v3fPos.x <-PS_v3fPos.z NULL CreateUnitOnTerrain @MverseRegisterUnitSyncDestruction
 		loop
-		"collectorpanel3" <-PS_v3fPos.x 1 sub <-PS_v3fPos.z 2 sub NULL CreateUnitOnTerrain pop
+		"collectorpanel3" <-PS_v3fPos.x 1 sub <-PS_v3fPos.z 2 sub NULL CreateUnitOnTerrain @MverseRegisterUnitSyncDestruction
 	
 	else <-PS_s "miner_res" eq if
 		<-PS_tEntry{"SPECIAL"}{"Coverage"} 100.0 div ->PS_fCoverage
@@ -857,10 +919,18 @@ endif
 		
 	endif endif endif endif endif endif endif
 
+# _DATA -
+# Description: MSG coming in from MB CPACK addons. Lets us know that it is contained in the project, so we know that we can use it.
+# Arguments: 
+# Result: 
 :OnCPACKUnitRegister
 	"Registered custom unit " <-_DATA concat Debug
 	TRUE ->G_tsRegisteredCPACKUnits{<-_DATA}
+
 # s1 - b2
+# Description: Function that tells us if a custom unit type GUID from a MB CPACK addon is contained inside the project.
+# Arguments: CMOD GUID
+# Result: TRUE if this CMOD is in the project, FALSE otherwise
 :IsRegistered
 	->IRT_sName
 	
@@ -871,16 +941,6 @@ endif
 	endif
 	FALSE return
 
-# - b1
-:TitanBoxContainsAnyRequiredElements
-	<-G_tttltConf{"TITAN_MYSTERY_BOX"}{"Types"}{"Good"} ->ETB_lt
-	<-ETB_lt 0 do
-		<-ETB_lt[I] ->ETB_tEntry
-		<-ETB_tEntry{"REQUIRED"} if
-			TRUE return
-		endif
-	loop
-	FALSE return
 	
 	
 	

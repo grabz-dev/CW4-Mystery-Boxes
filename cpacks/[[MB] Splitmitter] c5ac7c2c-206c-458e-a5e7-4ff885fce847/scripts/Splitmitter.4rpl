@@ -1,0 +1,175 @@
+# --Splitmitter-- 8/25/2021 11:37:27 AM
+
+$$SPLITMITTER_GUID:"746e142d-5e17-481d-8cb7-79cda5116c66"
+$$MAX_SPEED:0.8
+$$GRAVITY:0.012
+$$ACCELERATION:0.0025
+$$HOVER_HEIGHT:30
+$SplitHealth:5
+$Payload:1000.0
+$Interval:120
+
+GetUnitPosition(self) ->position
+
+<-position <-lastPosition - ->delta
+<-delta <-force + <-G - ->newDelta
+
+if (magnitude(<-newDelta) <-MAX_SPEED gt)
+	<-MAX_SPEED normalize(<-newDelta) * ->newDelta
+endif
+
+<-position ->lastPosition
+<-position <-newDelta + ->position
+
+BounceTerrainCollision(<-position, <-lastPosition, false, true, <-HOVER_HEIGHT, 0.3) ->nlp ->np
+if (<-np.w) 
+	<-np ->position
+	<-nlp ->lastPosition
+endif
+
+BounceEdgeCollision(<-position, <-lastPosition, 1) ->nlp ->np
+if (<-np.w) 
+	<-np ->position
+	<-nlp ->lastPosition
+endif
+
+Normalize(<-position <-lastPosition -) <-ACCELERATION mul ->force
+
+SetUnitPosition(self <-position)
+
+#If we are client.
+-?HostUID if
+	Self GetUnitHealth ->fCurHealth
+	
+	<-fCurHealth <-fLastCurHealth lt if
+		"MB_SplitmitterDamaged" "HostUID" <-HostUID "Damage" <-fLastCurHealth <-fCurHealth sub 2 TableN SendMVerseMsg
+	endif
+	
+	<-fCurHealth ->fLastCurHealth
+#If we are host.
+else
+	GetTimer0 eq0 if
+		<-Interval SetTimer0
+		<-position.x <-position.z <-Payload AddCreeper
+	endif
+endif
+
+
+:destroyed
+	#If we are client, do nothing.
+	-?HostUID if
+		return
+	endif
+
+	#If we are host, send a message to others that this guy is destroyed.
+	-?HostUID not if
+		"MB_SplitmitterDestroyed" Self SendMVerseMsg
+	endif
+	
+	#If we're out of health, that's it.
+	<-SplitHealth 0 lte if
+		return
+	endif
+	
+	#If we are host, spawn two more Splitmitters and send the creation event to others.
+	-?HostUID not if
+		2 0 do
+			"SplitHealth" <-SplitHealth 1 sub, 
+			"InitialForce" V3(@RandFloatSeeded 0.5 - 0.15 *, 1.1, @RandFloatSeeded 0.5 - 0.15 *)
+			"InitialPosition" <-position
+			"Payload" <-Payload 0.75 mul
+			"IsClone" TRUE 
+			"Seed" 1 10000000 @RandIntSeeded
+				6 TableN ->tInitParams
+			
+			<-SPLITMITTER_GUID <-position <-tInitParams CreateUnit ->unitUID
+			
+			<-tInitParams "UID" <-unitUID SetTableElement
+			"MB_SplitmitterCreated" <-tInitParams SendMVerseMsg
+		loop
+	endif
+:awake
+	once
+		"MB_SplitmitterDestroyed" "OnSplitmitterDestroyed" RegisterForMsg
+		"MB_SplitmitterDamaged" "OnSplitmitterDamaged" RegisterForMsg
+		Self FALSE SetMVerseCreatesUnitGhost
+	
+		Self <-Payload @Prettify " every " <-Interval 30.0 div @Prettify "s" concat4 SetUnitPopupText1
+		Self "script_root" <-Payload 250.0 div dup dup V3 SetObjScale
+		-?InitialPosition not if
+			Self GetUnitPosition ->position
+			Self <-position.x <-position.y <-HOVER_HEIGHT add 3 add <-position.z V3 SetUnitPosition
+		endif
+		
+		#If we are client, make sure this unit doesn't heal. Only host unit should heal. Also give it more health to prevent the unit dying accidentally.
+		-?HostUID if
+			Self 0 SetUnitHealRate
+			Self 10000 SetUnitMaxHealth
+			Self 10000 SetUnitHealth
+			return
+		endif
+	
+		#If we are host, send a message to others to create a clone.
+		-?HostUID not <-IsClone not and if
+			"UID" Self
+			"SplitHealth" <-SplitHealth, 
+			"InitialPosition" Self GetUnitPosition
+			"Payload" <-Payload
+				4 TableN ->tInitParams
+			"MB_SplitmitterCreated" <-tInitParams SendMVerseMsg
+		endif
+	endonce
+:once
+	@awake
+	
+	GetUnitPosition(Self) ->lastPosition
+	V3(0, <-GRAVITY, 0) ->G
+	CreateTrail(Self "script_root" 0 1.0)
+	
+	-?InitialForce not if
+		0 0.5 0 V3 ->force
+	else
+		<-InitialForce ->force
+	endif
+	
+	<-Interval SetTimer0
+	GetUnitMaxHealth ->fLastCurHealth
+	
+:OnSplitmitterDestroyed
+	#If we are client and the signature matches Host's Splitmitter, destroy our clone.
+	<-_DATA <-HostUID eq if
+		Self 0 0 0 DestroyUnit
+	endif
+
+:OnSplitmitterDamaged
+	#If we are host and the signature matches our unit, damage it.
+	-?HostUID not <-_DATA{"HostUID"} Self eq and if
+		Self <-_DATA{"Damage"} DamageUnit
+	endif
+# n1 - s2
+:Prettify
+	->PRT_number
+	
+	<-PRT_number 10.0 mul floor 10.0 div ->PRT_number
+	
+	<-PRT_number 1 mod 0 eq if
+		<-PRT_number ".0" concat return
+	else
+		<-PRT_number asstring return
+	endif
+
+# i1 i2 - i3
+:RandIntSeeded
+	->RIS_iMaxExcl
+	->RIS_iMinIncl
+	@RandFloatSeeded ->RIS_iRand
+	
+	<-RIS_iMaxExcl <-RIS_iMinIncl sub <-RIS_iRand mul floor <-RIS_iMinIncl add
+# - f1
+:RandFloatSeeded
+	<-Seed sin 10000.0 mul ->RFS_fVal
+	<-Seed 1 add ->Seed
+	
+	<-RFS_fVal <-RFS_fVal floor sub
+	
+	

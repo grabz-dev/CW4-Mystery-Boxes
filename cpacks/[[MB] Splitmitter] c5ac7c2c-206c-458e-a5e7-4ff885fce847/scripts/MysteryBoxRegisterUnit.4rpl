@@ -1,0 +1,15 @@
+# --MysteryBoxRegisterUnit-- 8/20/2021 4:32:19 PM
+$Registered_As:""
+
+:awake
+	once
+		<-Registered_As StringLength 0 gt if
+			"MB_CPACKUnitRegister" <-Registered_As SendMsg
+			"Sending message: " <-Registered_As concat Debug
+		else
+			"Failed to send message - name not set" Debug
+		endif
+	endonce
+:once
+	@awake
+	

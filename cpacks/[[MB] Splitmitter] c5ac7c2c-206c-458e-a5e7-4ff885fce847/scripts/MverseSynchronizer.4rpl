@@ -1,0 +1,17 @@
+# --MverseSynchronizer-- 8/28/2021 3:00:17 PM
+
+$$SPLITMITTER_GUID:"746e142d-5e17-481d-8cb7-79cda5116c66"
+
+:awake
+	once
+		"MB_SplitmitterCreated" "OnSplitmitterCreated" RegisterForMsg
+	endonce
+:once
+	@awake
+
+
+:OnSplitmitterCreated
+	<-_DATA Copy ->OSC_tInitParams
+	<-OSC_tInitParams "HostUID" <-_DATA{"UID"} SetTableElement
+	<-SPLITMITTER_GUID <-_DATA{"InitialPosition"} <-OSC_tInitParams CreateUnit pop
+
