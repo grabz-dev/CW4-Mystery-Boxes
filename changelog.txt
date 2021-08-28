@@ -1,3 +1,6 @@
+Mystery Boxes 3 dev3.cpack
+  - Do some config reinitializing in Mverse
+
 Mystery Boxes 3 dev2.cpack
   - Added Splitmitter as new Titan enemy (Mverse compatible)
   - Solar panels now synchronize their destruction with other Mverse players

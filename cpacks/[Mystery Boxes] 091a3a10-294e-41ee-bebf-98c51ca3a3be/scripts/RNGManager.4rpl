@@ -13,15 +13,45 @@ GetGameUpdateCount 1 gte if
 		"Calculating weights and seed" Debug
 		@InitializeLootData
 		@SeedConfig
+		
+		return
 	endonce
+endif
+
+#Mverse
+<-G_bInitialized if
+	#This happens on the host when Mverse is started
+	-?G_iMversePlayerNum not GetMversePlayerNum 0 gte and if
+		once
+			GetMversePlayerNum ->G_iMversePlayerNum
+			@InitializeConfiguration
+			@InitializeLootData
+			@SeedConfig
+			return
+		endonce
+	endif
+	
+	#This happens on clients that join a mverse host
+	-?G_iMversePlayerNum GetMversePlayerNum <-G_iMversePlayerNum neq and if
+		once
+			GetMversePlayerNum ->G_iMversePlayerNum
+			@InitializeConfiguration
+			@InitializeLootData
+			@SeedConfig
+			return
+		endonce
+	endif
 endif
 
 GetEditMode <-G_bInitialized and if
 	once
 		"Glory to thee who do not endulge" Debug
 		@SeedConfig
+		
+		return
 	endonce
 endif
+
 
 #Mverse things
 GetMVersePlayerNum 0 gte if
