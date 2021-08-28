@@ -1,7 +1,15 @@
+Mystery Boxes 3 dev1.cpack
+  - Now Mverse compatible!
+  - Disabled Forb spawning in Mverse due to a bug
+  - Friend box scaling now linearly increases with each Mverse player in the game
+  - Slightly altered wall and miner spawning code
+  - Slightly nerfed resource spawn rate
+
 Mystery Boxes 2 dev14.cpack
   - Friend box text now scales with amount of digits
   - ERN Maker request rate buffed from 15 to 7
   - Friend box request rate now decreased by 1 for each 200 ammo left to supply
+ 
 Mystery Boxes 2 dev13.cpack
   - Deleted useless script
   - Cleaned up interface settings for all custom units
@@ -10,16 +18,22 @@ Mystery Boxes 2 dev13.cpack
 	- Other minor cleanups
   - Changed "Makes ERNS from ARG" message to just 'Makes ERNs' for ERN Factory
   - Nerfed resources slightly to make them more in line with what was intended. They were balanced without thinking about Mine production in mind.
+
 Mystery Boxes 2 dev12.cpack
   - Changed the way unit addons are detected so that CPACK order in the package manager does not matter
+
 Mystery Boxes 2 dev11.cpack
   - Increased potential pool of seeds
+
 Mystery Boxes 2 dev10.cpack
   - Fixed one-off error when spawning more than 4 things that hopefully prevents a forb related game crash
+
 Mystery Boxes 2 dev9.cpack
   - Fixed Flare ranging and indicator
+
 Mystery Boxes 2 dev8.cpack
   - Quad boxes are now unselectable
+
 Mystery Boxes 2 dev7.cpack
   - Flare now works with fire rate and fire range, also has been slightly rebalanced in other areas
   - Titan bad effects slightly rebalanced
@@ -27,27 +41,34 @@ Mystery Boxes 2 dev7.cpack
   - Slightly rebalanced different drop chances for mystery box
   - Removed Titan box availability manipulation (will now always be available)
   - Skimmer Factory Titan result redesigned
+
 Mystery Boxes 2 dev6.cpack
   - Renamed a few custom units
   - Slightly increased chance of quad box and AC emitter
+
 Mystery Boxes 2 dev5.cpack
   - Reroll seed when entering edit mode
+
 Mystery Boxes 2 dev4.cpack
   - Added the orbital factory Titan result (thanks cornucanis)
   - Slightly altered the design of the skimmer factory (thanks cornucanis)
   - Increased seed pool from 100k to 10m
+
 Mystery Boxes 2 dev3.cpack
   - Altered Titan chances
   - Airship now uses Liftic instead of Energy
+
 Mystery Boxes 2 dev2.cpack
   - Slightly rebalanced Wallis device and Flare
   - Wallis device balls now explode into AC after a minute of being alive
   - Flare no longer fires when stunned
+
 Mystery Boxes 2 dev1.cpack
   - New weight selection algorithm (thanks to cornucanis)
   - New CPACK loading system
   - Built in titans are now imported through CPACKs as well
   - Added Wallis device, ERNMaker, Flare (thanks to Alophox and Vertu)
   - Added more bad outcomes from Titan, including egg wave and Skimmer Fortress
+
 Mystery Boxes 1 dev9.cpack
   - Replaced old weighting system with new system written by cornucanis

@@ -23,23 +23,115 @@ GetEditMode <-G_bInitialized and if
 	endonce
 endif
 
+#Mverse things
+GetMVersePlayerNum 0 gte if
+	0 ->iI
+	while <-iI <-G_ltMverseSharedUnitsToConstruct GetListCount lt repeat
+		<-G_ltMverseSharedUnitsToConstruct[<-iI] ->tSharedUnit
+		<-tSharedUnit{"StaggerFrames"} 1 sub ->tSharedUnit{"StaggerFrames"}
+		<-tSharedUnit{"StaggerFrames"} 0 lte if
+			<-tSharedUnit{"UID"} 9999 ConstructUnit
+			<-G_ltMverseSharedUnitsToConstruct <-iI RemoveListElement
+			<-iI 1 sub ->iI
+		endif
+		
+		<-iI 1 add ->iI
+	endwhile
+	
+	GetTimer0 eq0 if
+		30 SetTimer0
+		
+		0 ->iI
+		while <-iI <-G_ltMverseEnemiesToSyncDestruction GetListCount lt repeat
+			<-G_ltMverseEnemiesToSyncDestruction[<-iI] ->tEnemy
+			<-tEnemy{"iUID"} ->iUID
+			<-iUID GetUnitDestroyed if
+				"MB_MverseEnemyDestroyed" <-tEnemy SendMVerseMsg
+				<-G_ltMverseEnemiesToSyncDestruction <-iI RemoveListElement
+				<-iI 1 sub ->iI
+			endif
+			
+			<-iI 1 add ->iI
+		endwhile
+	endif
+endif
+
 :awake
 	once
+		CreateList ->G_ltMverseSharedUnitsToConstruct
+		CreateList ->G_ltMverseEnemiesToSyncDestruction
 		CreateTable ->G_tsRegisteredCPACKUnits
 		"MB_MysteryBoxOpened" "OnMysteryBoxOpened" RegisterForMsg
 		"MB_CPACKUnitRegister" "OnCPACKUnitRegister" RegisterForMsg
+		"MB_MverseMysteryBoxOpened" "OnMverseMysteryBoxOpened" RegisterForMsg
+		"MB_MverseEnemyDestroyed" "OnMverseEnemyDestroyed" RegisterForMsg
 	endonce
 :once
 	@awake
 
 :InitializeConfiguration
 	CreateTable ->G_tCustomGUIDs
+	"84555524-9060-4de3-8db1-ce1769cfe715" ->G_tCustomGUIDs{"Mystery Box"}
 	"f028eb66-8215-461f-bfee-95039386e950" ->G_tCustomGUIDs{"Airship"}
 	"a38e8b23-88a3-4ba2-9b81-516c2073e86b" ->G_tCustomGUIDs{"Bertha"}
 	"f20014e7-fb81-4f13-8780-230358321022" ->G_tCustomGUIDs{"Sweeper"}
 	"7aecbd59-910a-4242-9fe6-37e0a7506f83" ->G_tCustomGUIDs{"Wallis"}
 	"a9ad2e49-1bd1-486b-9afa-f33b65c11fbb" ->G_tCustomGUIDs{"ERNMaker"}
 	"60e2f17f-5487-4108-866f-e9e6fc6596a3" ->G_tCustomGUIDs{"Flare"}
+	
+	ClearStack 
+	
+	#Unit types that are not included in any of the lists below
+	#APPEAR ONLY FOR THE HOST.
+	
+	#Put unit types in this table if they should only appear
+	#FOR THE PLAYER THAT OPENED THEM.
+	<-G_tCustomGUIDs{"Mystery Box"} 1
+	<-G_tCustomGUIDs{"Airship"} 1
+	<-G_tCustomGUIDs{"Bertha"} 1
+	<-G_tCustomGUIDs{"Sweeper"} 1
+	<-G_tCustomGUIDs{"Wallis"} 1
+	<-G_tCustomGUIDs{"ERNMaker"} 1
+	<-G_tCustomGUIDs{"Flare"} 1 
+	"tower" 1 "pylon" 1 "miner" 1 "greenarrefinery" 1 "terp" 1 "porter" 1
+	"cannon" 1 "mortar" 1 "sprayer" 1 "sniper" 1 "missilelauncher" 1 "nullifier" 1
+	"runway" 1 "acbomberpad" 1 "bomberpad" 1 "rocketpad" 1 "platform" 1
+	"shield" 1 "microrift" 1 "beacon" 1
+	"ern" 1 
+	Table ->G_tbMversePlayerUnits
+	
+	#Put unit types in this table if they should only appear
+	#FOR EVERYONE BY DEFAULT.
+	#Special behaviors may further restrict creation of specific events.
+	#e.g. skimmer_fortress only wants to spawn creeper for host, but units for everyone.
+
+	#TYPE
+	"resourcered" 1 "resourceblue" 1 "greenarmother" 1
+	"ultrac" 1 "pterosaur" 1
+	"emitter" 1 "darktower" 1
+	"crystal" 1 
+	#STYPE
+	"miner_res" 1
+	"solar_farm" 1
+	"skimmer_fortress" 1
+	"orbital_factory" 1
+	Table ->G_tbMverseTypesSpawnForEveryone
+	
+	
+	#Put unit types in this table
+	#IF THEY CAN BE NULLIFIER OVERLOADED
+	"emitter" 1 "sporelauncher" 1 "blobnest" 1 "skimmerfactory" 1 "darktower" 1
+	"airsaccauldron" 1 
+	Table ->G_tbMverseNullifiableEnemies
+	
+	#Do not edit this table
+	#This is a list of built in SHARED UNITS.
+	#Construction of these units in Mverse must be staggered by a frame
+	#for other players to see them as completed.
+	"miner" 1, "greenarrefinery" 1, "microrift" 1, "pylon" 1, "tower" 1
+	Table ->G_tbMverseSharedUnits
+	
+	
 	
 	CreateTable ->G_tttltConf
 
@@ -99,7 +191,7 @@ endif
 	"WEIGHT" 35.0,	"TYPE" "sniper",			2 TableN
 	"WEIGHT" 35.0,	"TYPE" "missilelauncher",	2 TableN
 	"WEIGHT" 50.0,	"TYPE" "sprayer",			2 TableN
-	"WEIGHT" 40.0,	"TYPE" "miner",				"SPECIAL" TableN("Coverage" 50.0, 1) 3 TableN
+	"WEIGHT" 40.0,	"STYPE" "miner_res",		"SPECIAL" TableN("Coverage" 50.0, 1) 3 TableN
 	"WEIGHT" 30.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 60, 1), 	3 TableN
 	"WEIGHT" 40.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 60, 1), 	3 TableN
 	"WEIGHT" 4.4,	"TYPE" "ern",				2 TableN
@@ -113,7 +205,7 @@ endif
 	# REGULAR_MYSTERY_BOX
 	CreateTable ->G_tttltConf{"REGULAR_MYSTERY_BOX"}
 	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "Types"			"Good" CreateList "Bad" CreateList "Currency" CreateList 3 TableN SetTableElement
-	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "TypeWeights" 		"Good" 35.0       "Bad" 50.0       "Currency" 15.0       3 TableN SetTableElement
+	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "TypeWeights" 		"Good" 38.0       "Bad" 50.0       "Currency" 12.0       3 TableN SetTableElement
 	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "CombinedLootList" 	CreateList									 SetTableElement
 	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "AdjustedProb" 		CreateList									 SetTableElement
 	<-G_tttltConf{"REGULAR_MYSTERY_BOX"} "Aliases" 				CreateList									 SetTableElement
@@ -123,19 +215,19 @@ endif
 	
 	#########
 	# <Currency> outcomes start here
-	"WEIGHT" 125.0,	"TYPE" "miner", 			"SPECIAL" TableN("CountMin" 1, "CountMax" 2, "Coverage" 100.0, 3) 3 TableN
+	"WEIGHT" 125.0,	"STYPE" "miner_res", 		"SPECIAL" TableN("Coverage" 100.0, "SpawnTwo" TRUE, 2) 3 TableN
 	"WEIGHT" 65.0,	"TYPE" "ern",				"SPECIAL" TableN("CountMin" 1, "CountMax" 2, 2) 3 TableN
 	
-	"WEIGHT" 20.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 20, 1), 	3 TableN
-	"WEIGHT" 15.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 15, 1), 	3 TableN
+	"WEIGHT" 15.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 20, 1), 	3 TableN
+	"WEIGHT" 10.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 15, 1), 	3 TableN
 	"WEIGHT" 5.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 10,  1), 	3 TableN
 	
-	"WEIGHT" 20.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 20, 1), 	3 TableN
-	"WEIGHT" 15.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 15, 1), 	3 TableN
+	"WEIGHT" 15.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 20, 1), 	3 TableN
+	"WEIGHT" 10.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 15, 1), 	3 TableN
 	"WEIGHT" 5.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 10,  1), 	3 TableN
 	
-	"WEIGHT" 20.0,	"TYPE" "greenarmother",	"SETTINGS" TableN("Interval" 240, 1), 	3 TableN
-	"WEIGHT" 15.0,	"TYPE" "greenarmother",	"SETTINGS" TableN("Interval" 150, 1), 	3 TableN
+	"WEIGHT" 15.0,	"TYPE" "greenarmother",	"SETTINGS" TableN("Interval" 240, 1), 	3 TableN
+	"WEIGHT" 10.0,	"TYPE" "greenarmother",	"SETTINGS" TableN("Interval" 150, 1), 	3 TableN
 	"WEIGHT" 5.0,	"TYPE" "greenarmother",	"SETTINGS" TableN("Interval" 90, 1), 	3 TableN
 		<-G_tttltConf{"REGULAR_MYSTERY_BOX"}{"Types"}{"Currency"} AppendStackToList
 	
@@ -171,13 +263,13 @@ endif
 	
 	#-----------
 	
-	"WEIGHT" 5.0,	"STYPE" "crazonium",		2 TableN
-	"WEIGHT" 15.0,	"STYPE" "wall",				2 TableN
+	"WEIGHT" 2.5,	"STYPE" "u_wall",		"SPECIAL" TableN("Type" "crazonium", 1) 3 TableN
+	"WEIGHT" 10.0,	"STYPE" "u_wall",		"SPECIAL" TableN("Type" "wall", 1) 3 TableN
 	
 	#-----------
 	
-	"WEIGHT" 125.0,	"TYPE" "84555524-9060-4de3-8db1-ce1769cfe715",		"SPECIAL" TableN("Count" 4, "Unselectable" TRUE 2), 	3 TableN
-	"WEIGHT" 12.5,	"TYPE" "emitter",		"SETTINGS" TableN("Start" 0, 	"Interval" 15, 	"Payload" -5, 3), 	3 TableN
+	"WEIGHT" 125.0,	"TYPE" <-G_tCustomGUIDs{"Mystery Box"},		"SPECIAL" TableN("Count" 4, "Unselectable" TRUE 2), 	3 TableN
+	"WEIGHT" 5.0,	"TYPE" "emitter",		"SETTINGS" TableN("Start" 0, 	"Interval" 15, 	"Payload" -10, 3), 	3 TableN
 	"WEIGHT" 100.0,	"STYPE" "creeper", 		"SPECIAL" TableN("Payload" -500, 1),	3 TableN
 		<-G_tttltConf{"REGULAR_MYSTERY_BOX"}{"Types"}{"Good"} AppendStackToList
 	
@@ -210,9 +302,12 @@ endif
 	"WEIGHT" 25.0,	"TYPE" "blob",		"SETTINGS" 	TableN("Target" 0, "Payload" 500, 2), 	"SPECIAL" TableN("CountMin" 6, "CountMax" 8, "Height" 0, 3)	4 TableN
 	"WEIGHT" 5.0,	"TYPE" "blob",		"SETTINGS" 	TableN("Target" 0, "Payload" 1500, 2),	"SPECIAL" TableN("CountMin" 13, "CountMax" 20, "Height" 0, "Effect" "boom1", 4)	4 TableN
 	
-	"WEIGHT" 75.0,	"TYPE" "forb",		"SPECIAL" TableN("CountMin" 2, "CountMax" 4, "Height" 0, 3)	3 TableN
-	"WEIGHT" 25.0,	"TYPE" "forb",		"SPECIAL" TableN("CountMin" 5, "CountMax" 7, "Height" 0, 3)	3 TableN
-	"WEIGHT" 5.0,	"TYPE" "forb",		"SPECIAL" TableN("CountMin" 10, "CountMax" 14, "Height" 0, "Effect" "boom1", 4)	3 TableN
+	#Temp disabled due to mverse game bug
+	GetMVersePlayerNum 0 lt if
+		"WEIGHT" 75.0,	"TYPE" "forb",		"SPECIAL" TableN("CountMin" 2, "CountMax" 4, "Height" 0, 3)	3 TableN
+		"WEIGHT" 25.0,	"TYPE" "forb",		"SPECIAL" TableN("CountMin" 5, "CountMax" 7, "Height" 0, 3)	3 TableN
+		"WEIGHT" 5.0,	"TYPE" "forb",		"SPECIAL" TableN("CountMin" 10, "CountMax" 14, "Height" 0, "Effect" "boom1", 4)	3 TableN
+	endif
 	
 	"WEIGHT" 75.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 1500, 1)	3 TableN
 	"WEIGHT" 25.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 2000, 1)	3 TableN
@@ -339,16 +434,31 @@ endif
 	# s = Math.sin(s) * 10000; return s - Math.floor(s);
 	
 	
-# - t1
 :OnMysteryBoxOpened
-	<-_DATA{"sType"} ->MBO_sType
-	<-_DATA{"v3fPos"} ->MBO_v3fPos
+	<-_DATA{"sType"} <-_DATA{"v3fPos"} FALSE @_OnMysteryBoxOpened
+:OnMverseMysteryBoxOpened
+	<-_DATA{"sType"} ->MMB_sType
+	<-G_tttltConf{<-MMB_sType} ->MMB_ttltConfRoot
+	
+	#Backup current seed
+	<-MMB_ttltConfRoot{"Seed"} ->MMB_iSeedBackup
+	#Temporarily replace current seed with mverse seed
+	<-_DATA{"Seed"} ->MMB_ttltConfRoot{"Seed"}
+	
+	#Open box
+	<-MMB_sType <-_DATA{"v3fPos"} TRUE @_OnMysteryBoxOpened
+	
+	#Put back our seed
+	<-MMB_iSeedBackup ->MMB_ttltConfRoot{"Seed"}
+:_OnMysteryBoxOpened
+	->MBO_bIsFromMverse ->MBO_v3fPos ->MBO_sType
 	
 	#####
 	# Now things get fun
 	
 	#Get current config.
 	<-G_tttltConf{<-MBO_sType} ->MBO_ttltConfRoot
+	<-MBO_ttltConfRoot{"Seed"} ->MBO_iSeedUsed
 	<-MBO_ttltConfRoot{"CombinedLootList"} ->MBO_lootList
 	
 	#Roll for chance of spawning nothing.
@@ -371,8 +481,32 @@ endif
 		return
 	endif
 	
-	
 	<-MBO_tChosenEntry{"TYPE"} ->MBO_sUnitType
+	
+	#Mverse stuff
+	GetMVersePlayerNum 0 gte if
+		#Combine TYPE and STYPE
+		<-MBO_sUnitType ->MBO_sMverseUnitType
+		<-MBO_sMverseUnitType IsNull if
+			<-MBO_tChosenEntry{"STYPE"} ->MBO_sMverseUnitType
+		endif
+		
+		<-G_tbMversePlayerUnits{<-MBO_sMverseUnitType} not if
+			<-MBO_bIsFromMverse not if
+				"MB_MverseMysteryBoxOpened" "sType" <-MBO_sType "v3fPos" <-MBO_v3fPos "Seed" <-MBO_iSeedUsed 3 TableN SendMVerseMsg
+				
+				<-G_tbMverseTypesSpawnForEveryone{<-MBO_sMverseUnitType} not if
+					GetMVersePlayerNum 0 neq if return endif
+				endif
+			else
+				#Only intercept messages as host.
+				<-G_tbMverseTypesSpawnForEveryone{<-MBO_sMverseUnitType} not if
+					GetMVersePlayerNum 0 neq if return endif
+				endif
+			endif
+		endif
+	endif
+	
 	<-MBO_tChosenEntry{"SPECIAL"} ->MBO_tSpecial
 	
 	<-MBO_tSpecial{"Count"} ->MBO_iCount
@@ -384,12 +518,11 @@ endif
 	<-MBO_tSpecial{"Effect"} "boom1" StartsWith if
 		"explosion5" <-MBO_v3fPos 4 4 4 V3 CreateEffect
 	else <-MBO_tSpecial{"Effect"} "boom2" StartsWith if
-	"2" debug
 		"explosion5" <-MBO_v3fPos 8 8 8 V3 CreateEffect
 	endif endif
 	
 	#Process special event behaviors.
-	<-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPos @ProcessSpecialBoxSpawnBehaviors
+	<-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPos <-MBO_bIsFromMverse @ProcessSpecialBoxSpawnBehaviors
 	
 	#These are types that should avoid default behavior in favor of special behavior.
 	<-MBO_sUnitType IsNull if
@@ -447,7 +580,18 @@ endif
 			<-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPosUnit @ProcessSpecialUnitSpawnBehaviors
 		endif
 		
-		<-MBO_iUID 9999 ConstructUnit
+		#If we're in mverse and this is a shared unit, stagger its construction
+		GetMVersePlayerNum 0 gte <-G_tbMverseSharedUnits{<-MBO_tChosenEntry{"TYPE"}} and if
+			#Do not lower the stagger frames. It will go wrong at higher game speeds.
+			<-MBO_iUID @MverseRegisterSharedUnit
+		else
+			<-MBO_iUID 9999 ConstructUnit
+		endif
+		
+		GetMVersePlayerNum 0 gte <-G_tbMverseNullifiableEnemies{<-MBO_tChosenEntry{"TYPE"}} and if
+			<-MBO_iUID @MverseRegisterEnemyOverloadableUnit
+		endif
+		
 		<-MBO_iUID <-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPosUnit @ProcessUnitAmmoBehaviors
 		<-MBO_bUnselectable if
 			<-MBO_iUID FALSE SetUnitSelectable
@@ -455,6 +599,31 @@ endif
 		
 		<-MBO_iI 2 add ->MBO_iI
 	endwhile
+
+# i1 - 
+:MverseRegisterEnemyOverloadableUnit
+	->MRE_iUID
+	<-MRE_iUID GetUnitCell ->MRE_iPosZ ->MRE_iPosX
+	
+	<-G_ltMverseEnemiesToSyncDestruction
+		"iUID" <-MRE_iUID
+		"sType" <-MRE_iUID GetUnitType
+		"iPosX" <-MRE_iPosX
+		"iPosZ" <-MRE_iPosZ
+	4 TableN AppendToList
+
+# i1 - 
+:MverseRegisterSharedUnit
+	->MRS_iUID
+
+	<-G_ltMverseSharedUnitsToConstruct "UID" <-MRS_iUID "StaggerFrames" 10 2 TableN AppendToList
+:OnMverseEnemyDestroyed
+	<-_DATA{"sType"} <-_DATA{"iPosX"} 0 <-_DATA{"iPosZ"} V3 0 0 0 0 0 0 0 GetUnits ->OME_lUnits
+	#Find the first one, destroy it. Good enough
+	<-OME_lUnits 0 do
+		<-OME_lUnits[I] 0 0 0 DestroyUnit
+		break
+	loop
 
 # s1 t2 v3f3 -
 :ProcessUnitAmmoBehaviors
@@ -490,20 +659,11 @@ endif
 				endif
 			loop
 		loop
-	else <-PS_s "miner" eq if
-		<-PS_tEntry{"SPECIAL"}{"Coverage"} 100.0 div ->PS_fCoverage
-	
-		<-PS_v3fPos.z 2 add <-PS_v3fPos.z 1 sub do
-			<-PS_v3fPos.x 3 add <-PS_v3fPos.x 2 sub do
-				<-PS_sType @RandFloatSeeded <-PS_fCoverage lte if
-					I J 1 SetTerrainSpecial
-				endif
-			loop
-		loop
-	endif endif
+	endif
 	
 # s1 t2 v3f3 - 
 :ProcessSpecialBoxSpawnBehaviors
+	->PS_bIsFromMverse
 	->PS_v3fPos
 	->PS_tEntry
 	->PS_sType
@@ -545,7 +705,9 @@ endif
 		loop
 		
 		
-	else <-PS_s "crazonium" eq <-PS_s "wall" eq or if
+	else <-PS_s "u_wall" eq if
+		<-PS_tEntry{"SPECIAL"}{"Type"} ->PS_sWallType
+	
 		<-PS_v3fPos.z 3 add ->PS_iZTop
 		<-PS_v3fPos.z 3 sub ->PS_iZBottom
 		<-PS_v3fPos.x 3 add ->PS_iXRight
@@ -559,7 +721,7 @@ endif
 				<-PS_iEmptySide 1 eq J <-PS_iZTop eq J <-PS_iZBottom eq I <-PS_iXLeft eq or or and or
 				<-PS_iEmptySide 2 eq I <-PS_iXLeft eq I <-PS_iXRight eq J <-PS_iZTop eq or or and or
 				<-PS_iEmptySide 3 eq I <-PS_iXLeft eq I <-PS_iXRight eq J <-PS_iZBottom eq or or and or if
-					<-PS_s I J NULL CreateUnitOnTerrain pop
+					<-PS_sWallType I J NULL CreateUnitOnTerrain pop
 				endif
 			loop
 		loop
@@ -569,33 +731,44 @@ endif
 		<-PS_iUID "OrbVolcano.4rpl" "AMT" 			<-PS_tEntry{"SPECIAL"}{"Payload"} SetScriptVar
 		<-PS_iUID "OrbVolcano.4rpl" "orbsErupting" <-PS_tEntry{"SPECIAL"}{"Count"} SetScriptVar
 	else <-PS_s "skimmer_fortress" eq if
-		18 ->PS_iCircleRadius
-		<-PS_iCircleRadius 1 add <-PS_iCircleRadius neg do
+		GetMVersePlayerNum 0 lte if
+			18 ->PS_iCircleRadius
 			<-PS_iCircleRadius 1 add <-PS_iCircleRadius neg do
-				#In a circle
-				I I mul J J mul add <-PS_iCircleRadius dup mul lt if
-					I <-PS_v3fPos.x add J <-PS_v3fPos.z add GetCreeper 0 lt if
-						I <-PS_v3fPos.x add J <-PS_v3fPos.z add 0 0 SetCreeper
+				<-PS_iCircleRadius 1 add <-PS_iCircleRadius neg do
+					#In a circle
+					I I mul J J mul add <-PS_iCircleRadius dup mul lt if
+						I <-PS_v3fPos.x add J <-PS_v3fPos.z add GetCreeper 0 lt if
+							I <-PS_v3fPos.x add J <-PS_v3fPos.z add 0 0 SetCreeper
+						endif
 					endif
-				endif
+				loop
 			loop
-		loop
-	
-		<-PS_v3fPos.z 2 add <-PS_v3fPos.z 1 sub do
-			<-PS_v3fPos.x 2 add <-PS_v3fPos.x 1 sub do
-				I J 1111 AddCreeper
+		
+			<-PS_v3fPos.z 2 add <-PS_v3fPos.z 1 sub do
+				<-PS_v3fPos.x 2 add <-PS_v3fPos.x 1 sub do
+					I J 1111 AddCreeper
+				loop
 			loop
-		loop
+		endif
 	
 		10 0 do
 			"skimmer" <-PS_v3fPos.x <-PS_v3fPos.y 15 add <-PS_v3fPos.z V3 "Target" 0 "LifeTime" 140 2 TableN CreateUnit pop
 		loop
 		
-		"skimmerfactory" <-PS_v3fPos.x <-PS_v3fPos.z "Start" 0 "Count" 10 2 TableN CreateUnitOnTerrain pop
-		"blobnest" <-PS_v3fPos.x <-PS_v3fPos.z 2 add "Start" 0 "Interval" 900 "Target" 0 "Payload" 1500 4 TableN CreateUnitOnTerrain pop
-		"blobnest" <-PS_v3fPos.x <-PS_v3fPos.z 2 sub "Start" 0 "Interval" 900 "Target" 0 "Payload" 1500 4 TableN CreateUnitOnTerrain pop
-		"emitter" <-PS_v3fPos.x 2 add <-PS_v3fPos.z "Payload" 100 1 TableN CreateUnitOnTerrain pop
-		"emitter" <-PS_v3fPos.x 2 sub <-PS_v3fPos.z "Payload" 100 1 TableN CreateUnitOnTerrain pop
+		ClearStack
+		"skimmerfactory" <-PS_v3fPos.x <-PS_v3fPos.z "Start" 0 "Count" 10 2 TableN CreateUnitOnTerrain
+		"blobnest" <-PS_v3fPos.x <-PS_v3fPos.z 2 add "Start" 0 "Interval" 900 "Target" 0 "Payload" 1500 4 TableN CreateUnitOnTerrain
+		"blobnest" <-PS_v3fPos.x <-PS_v3fPos.z 2 sub "Start" 0 "Interval" 900 "Target" 0 "Payload" 1500 4 TableN CreateUnitOnTerrain
+		"emitter" <-PS_v3fPos.x 2 add <-PS_v3fPos.z "Payload" 100 1 TableN CreateUnitOnTerrain
+		"emitter" <-PS_v3fPos.x 2 sub <-PS_v3fPos.z "Payload" 100 1 TableN CreateUnitOnTerrain
+		List ->PS_lUnits
+		
+		GetMVersePlayerNum 0 gte if
+			<-PS_lUnits 0 do
+				<-PS_lUnits[I] @MverseRegisterEnemyOverloadableUnit
+			loop
+		endif
+		
 		"crystal" <-PS_v3fPos.x 1 add <-PS_v3fPos.z 2 add NULL CreateUnitOnTerrain pop
 		"crystal" <-PS_v3fPos.x 1 sub <-PS_v3fPos.z 2 add NULL CreateUnitOnTerrain pop
 		"crystal" <-PS_v3fPos.x 1 add <-PS_v3fPos.z 2 sub NULL CreateUnitOnTerrain pop
@@ -607,19 +780,82 @@ endif
 			loop
 		loop
 	else <-PS_s "orbital_factory" eq if
-		"rocketpad" <-PS_v3fPos.x <-PS_v3fPos.z 0 CreateUnitOnTerrain 9999 ConstructUnit
+		<-PS_bIsFromMverse not if
+			"rocketpad" <-PS_v3fPos.x <-PS_v3fPos.z 0 CreateUnitOnTerrain 9999 ConstructUnit
+			
+			ClearStack
+			"greenarrefinery" <-PS_v3fPos.x 1 add <-PS_v3fPos.z 0 CreateUnitOnTerrain dup V3(0 180 0) SetUnitRotation
+			"greenarrefinery" <-PS_v3fPos.x 1 sub <-PS_v3fPos.z 0 CreateUnitOnTerrain dup V3(0 0 0) SetUnitRotation
+			"greenarrefinery" <-PS_v3fPos.x <-PS_v3fPos.z 1 add 0 CreateUnitOnTerrain dup V3(0 90 0) SetUnitRotation
+			"greenarrefinery" <-PS_v3fPos.x <-PS_v3fPos.z 1 sub 0 CreateUnitOnTerrain dup V3(0 270 0) SetUnitRotation
+			List ->PS_lRefineries
+			
+			GetMVersePlayerNum 0 gte if
+				<-PS_lRefineries 0 do
+					<-PS_lRefineries[I] @MverseRegisterSharedUnit
+				loop
+			else
+				<-PS_lRefineries 0 do
+					<-PS_lRefineries[I] 9999 ConstructUnit
+				loop
+			endif
+		endif
+	
 		"greenarmother" <-PS_v3fPos.x <-PS_v3fPos.z "Interval" 60 1 TableN CreateUnitOnTerrain pop
-		"greenarrefinery" <-PS_v3fPos.x 1 add <-PS_v3fPos.z 0 CreateUnitOnTerrain dup 9999 ConstructUnit V3(0 180 0) SetUnitRotation
-		"greenarrefinery" <-PS_v3fPos.x 1 sub <-PS_v3fPos.z 0 CreateUnitOnTerrain dup 9999 ConstructUnit V3(0 0 0) SetUnitRotation
-		"greenarrefinery" <-PS_v3fPos.x <-PS_v3fPos.z 1 add 0 CreateUnitOnTerrain dup 9999 ConstructUnit V3(0 90 0) SetUnitRotation
-		"greenarrefinery" <-PS_v3fPos.x <-PS_v3fPos.z 1 sub 0 CreateUnitOnTerrain dup 9999 ConstructUnit V3(0 270 0) SetUnitRotation
 	else <-PS_s "solar_farm" eq if
 		6 0 do
 			"collectorpanel5" <-PS_v3fPos.x <-PS_v3fPos.z NULL CreateUnitOnTerrain pop
 		loop
 		"collectorpanel3" <-PS_v3fPos.x 1 sub <-PS_v3fPos.z 2 sub NULL CreateUnitOnTerrain pop
+	
+	else <-PS_s "miner_res" eq if
+		<-PS_tEntry{"SPECIAL"}{"Coverage"} 100.0 div ->PS_fCoverage
+		<-PS_tEntry{"SPECIAL"}{"SpawnTwo"} ->PS_bSpawnTwo
 		
-	endif endif endif endif endif endif
+		<-PS_bSpawnTwo if
+			<-PS_sType 0 2 @RandIntSeeded ->PS_bSpawnTwo
+		endif
+		
+		CreateList ->PS_lMiners
+		
+		<-PS_bSpawnTwo not if
+			GetMVersePlayerNum 0 lte if
+				<-PS_lMiners "miner" <-PS_v3fPos.x <-PS_v3fPos.z 0 CreateUnitOnTerrain AppendToList
+			endif
+			
+			<-PS_v3fPos.z 2 add <-PS_v3fPos.z 1 sub do
+				<-PS_v3fPos.x 3 add <-PS_v3fPos.x 2 sub do
+					<-PS_sType @RandFloatSeeded <-PS_fCoverage lte if
+						I J 1 SetTerrainSpecial
+					endif
+				loop
+			loop
+		else
+			GetMVersePlayerNum 0 lte if
+				<-PS_lMiners "miner" <-PS_v3fPos.x <-PS_v3fPos.z 2 add 0 CreateUnitOnTerrain AppendToList
+				<-PS_lMiners "miner" <-PS_v3fPos.x <-PS_v3fPos.z 2 sub 0 CreateUnitOnTerrain AppendToList
+			endif
+			
+			<-PS_v3fPos.z 4 add <-PS_v3fPos.z 3 sub do
+				<-PS_v3fPos.x 3 add <-PS_v3fPos.x 2 sub do
+					<-PS_sType @RandFloatSeeded <-PS_fCoverage lte if
+						I J 1 SetTerrainSpecial
+					endif
+				loop
+			loop
+		endif
+		
+		GetMVersePlayerNum 0 gte if
+			<-PS_lMiners 0 do
+				<-PS_lMiners[I] @MverseRegisterSharedUnit
+			loop
+		else
+			<-PS_lMiners 0 do
+				<-PS_lMiners[I] 9999 ConstructUnit
+			loop
+		endif
+		
+	endif endif endif endif endif endif endif
 
 :OnCPACKUnitRegister
 	"Registered custom unit " <-_DATA concat Debug

@@ -82,7 +82,7 @@ endif endif endif endif endif endif
 			<-Ammo_Cost_Start ->*MB_iFriendlyAmmoCost
 		else
 			<-*MB_iFriendlyAmmoCost <-*MB_iFriendlyAmmoNextRaise add ->*MB_iFriendlyAmmoCost
-			<-*MB_iFriendlyAmmoNextRaise 1 add ->*MB_iFriendlyAmmoNextRaise
+			<-*MB_iFriendlyAmmoNextRaise @GetCurrentCostIncrease add ->*MB_iFriendlyAmmoNextRaise
 		endif
 		
 		<-*MB_iFriendlyAmmoCost ->G_iMyMaxAmmo
@@ -219,9 +219,17 @@ endif endif endif endif endif endif
 	
 	
 	
+
+:GetCurrentCostIncrease
+	0 ->GCC_iCostIncrease
+	GetMVersePlayers ->GCC_lPlayers
+	<-GCC_lPlayers 0 do
+		<-GCC_lPlayers[I] IsNull not if
+			<-GCC_iCostIncrease 1 add ->GCC_iCostIncrease
+		endif
+	loop
 	
-	
-	
+	<-GCC_iCostIncrease 1 max
 	
 	
 	
