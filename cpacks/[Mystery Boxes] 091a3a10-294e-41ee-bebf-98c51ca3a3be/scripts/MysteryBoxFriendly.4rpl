@@ -94,7 +94,7 @@ endif endif endif endif endif endif
 :destroyed
 	#If a friendly box got destroyed without getting a chance at unboxing a unit, lower the ammo cost.
 	<-G_bUnitUnboxed not if
-		<-*MB_iFriendlyAmmoNextRaise 1 sub ->*MB_iFriendlyAmmoNextRaise
+		<-*MB_iFriendlyAmmoNextRaise @GetCurrentCostIncrease sub ->*MB_iFriendlyAmmoNextRaise
 		<-*MB_iFriendlyAmmoCost <-*MB_iFriendlyAmmoNextRaise sub ->*MB_iFriendlyAmmoCost
 	endif
 

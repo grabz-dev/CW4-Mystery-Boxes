@@ -1,3 +1,6 @@
+Mystery Boxes 3 dev4.cpack
+  - Fixed Mverse friend box cost decrease on premature destruction
+
 Mystery Boxes 3 dev3.cpack
   - Do some config reinitializing in Mverse
 
