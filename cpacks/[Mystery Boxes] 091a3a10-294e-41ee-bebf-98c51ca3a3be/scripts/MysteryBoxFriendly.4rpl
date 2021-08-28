@@ -4,8 +4,6 @@
 $RNG_Manager_Type:"FRIENDLY_MYSTERY_BOX"
 $$Explosion_Scale:0.3
 
-$Ammo_Cost_Start:1
-
 ##############
 # State engine
 <-G_sState "CONSTRUCTING" eq if
@@ -72,14 +70,14 @@ endif endif endif endif endif endif
 	once
 		"MB_SetBoxStateFromMsg" "OnSetBoxStateFromMsg" RegisterForMsg
 		
-		#Set starting cost raise to 1.
+		#Set starting cost raise
 		-?*MB_iFriendlyAmmoNextRaise not if
-			1 ->*MB_iFriendlyAmmoNextRaise
+			@GetCurrentCostIncrease ->*MB_iFriendlyAmmoNextRaise
 		endif
 		
 		#Update global ammo cost of friendly boxes.
 		-?*MB_iFriendlyAmmoCost not if
-			<-Ammo_Cost_Start ->*MB_iFriendlyAmmoCost
+			@GetCurrentCostIncrease ->*MB_iFriendlyAmmoCost
 		else
 			<-*MB_iFriendlyAmmoCost <-*MB_iFriendlyAmmoNextRaise add ->*MB_iFriendlyAmmoCost
 			<-*MB_iFriendlyAmmoNextRaise @GetCurrentCostIncrease add ->*MB_iFriendlyAmmoNextRaise

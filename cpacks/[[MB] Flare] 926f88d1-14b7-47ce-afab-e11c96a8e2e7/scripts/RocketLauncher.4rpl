@@ -22,15 +22,8 @@ Self GetUnitStunCount 0 gt if
 	return
 endif
 
-#Ranging is bugged so this is required
-<-baseUnitRange ->currentUnitRange
-GetERNPortalEfficiency(4) 0.2 mul 1 add <-currentUnitRange mul ->currentUnitRange
-Self GetUnitERNState if
-	<-currentUnitRange 1.8 mul ->currentUnitRange
-endif
-<-currentUnitRange asint ->currentUnitRange
-<-lastUnitRange <-currentUnitRange neq if
-	Self <-currentUnitRange SetUnitRange
+Self GetUnitRangeWithMods ->currentUnitRange
+<-currentUnitRange <-lastUnitRange neq if
 	Self RefreshUnitLosCache
 endif
 <-currentUnitRange ->lastUnitRange
@@ -174,9 +167,6 @@ endif
 	
 :Once
 	Self 7 SetUnitPacketRequestRate
-	
-	20 ->baseUnitRange
-	<-baseUnitRange ->currentUnitRange
 
 	#Gets called once and only once when unit is created -KC
 	#as a note, it is also called on recompile

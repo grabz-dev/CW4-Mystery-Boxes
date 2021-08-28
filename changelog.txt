@@ -1,3 +1,11 @@
+Mystery Boxes 3 dev5.cpack
+  - Fixed box particle effect not playing on clients in Mverse
+  - Fixed flare range double dipping from ERN bonus after game fix
+  - Nerfed skimmer fortress payload from 100 to 75
+  - Removed ERN Titan reward, gave Bertha reward 4 ERNs
+  - Applied friend box Mverse scaling to starting cost and starting cost increase
+  - Now scaling various resource rewards from boxes with amount of Mverse players
+
 Mystery Boxes 3 dev4.cpack
   - Fixed Mverse friend box cost decrease on premature destruction
 
