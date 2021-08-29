@@ -1,3 +1,6 @@
+Mystery Boxes 3 dev7.cpack
+  - Fixed Mverse not reinitializing config properly when player count changes
+  
 Mystery Boxes 3 dev6.cpack
   - Now scaling ERN rewards from Mystery box same way as resources
   - Nerfed resource spawn rate and interval in various places

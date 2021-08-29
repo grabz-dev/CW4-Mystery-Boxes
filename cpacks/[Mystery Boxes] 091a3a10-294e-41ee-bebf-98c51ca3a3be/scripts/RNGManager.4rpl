@@ -6,6 +6,7 @@
 GetGameUpdateCount 1 gte if
 	once
 		TRUE ->G_bInitialized
+		@ResDivFactor ->G_iLastResDivFactor
 		
 		"Initializing Configuration" Debug
 		@InitializeConfiguration
@@ -19,27 +20,19 @@ GetGameUpdateCount 1 gte if
 endif
 
 #Mverse
-<-G_bInitialized if
-	#This happens on the host when Mverse is started
-	-?G_iMversePlayerNum not GetMversePlayerNum 0 gte and if
-		once
-			GetMversePlayerNum ->G_iMversePlayerNum
+GetTimer1 eq0 if
+	30 SetTimer1
+	<-G_bInitialized if
+		@ResDivFactor ->G_iResDivFactor
+		
+		#If player count is different.
+		<-G_iResDivFactor <-G_iLastResDivFactor neq if
+			<-G_iResDivFactor ->G_iLastResDivFactor
 			@InitializeConfiguration
 			@InitializeLootData
 			@SeedConfig
 			return
-		endonce
-	endif
-	
-	#This happens on clients that join a mverse host
-	-?G_iMversePlayerNum GetMversePlayerNum <-G_iMversePlayerNum neq and if
-		once
-			GetMversePlayerNum ->G_iMversePlayerNum
-			@InitializeConfiguration
-			@InitializeLootData
-			@SeedConfig
-			return
-		endonce
+		endif
 	endif
 endif
 
@@ -104,6 +97,8 @@ endif
 	@awake
 
 :InitializeConfiguration
+	"MB_DebugMverse" GetMversePlayerNum @ResDivFactor 1 TableN SetGlobalTable
+
 	#Container for custom GUIDs for easy access. No other use.
 	CreateTable ->G_tCustomGUIDs
 	"84555524-9060-4de3-8db1-ce1769cfe715" ->G_tCustomGUIDs{"Mystery Box"}
