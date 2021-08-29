@@ -109,8 +109,11 @@ endif
 			return
 		endif
 	
-		#If we are host, send a message to others to create a clone.
+		#If we are host, send a message to others to create a clone. Also increase health of the first guy
 		-?HostUID not <-IsClone not and if
+			Self Self GetUnitMaxHealth 3.0 mul SetUnitMaxHealth
+			Self Self GetUnitHealth 3.0 mul SetUnitHealth
+		
 			"UID" Self
 			"SplitHealth" <-SplitHealth, 
 			"InitialPosition" Self GetUnitPosition
@@ -132,7 +135,6 @@ endif
 		<-InitialForce ->force
 	endif
 	
-	<-Interval SetTimer0
 	GetUnitMaxHealth ->fLastCurHealth
 	
 :OnSplitmitterDestroyed
