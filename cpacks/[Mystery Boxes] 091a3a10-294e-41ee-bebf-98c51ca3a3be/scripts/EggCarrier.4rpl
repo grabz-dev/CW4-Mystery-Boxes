@@ -1,0 +1,78 @@
+# --EggCarrier-- 8/30/2021 1:53:31 PM
+
+$$Type:"spore"
+$$CarrierData:0
+$$EggData:0
+$$Count:30
+$$Height:25
+
+once
+	CreateList ->ltUnits
+	Self GetUnitPosition ->pos
+	<-pos.x <-pos.y <-Height add <-pos.z V3 ->pos
+	GetMapSize ->mapSizeZ ->mapSizeX
+	
+	<-EggData "velocity" 0 0 0 V3 SetTableElement
+endonce 
+
+GetTimer0 eq0 <-Count 0 gt and if
+	#If spore is set to Target, randomize a location
+	<-Type "spore" eq if
+		<-CarrierData{"Target"} 2 eq if
+			0 <-mapSizeX @RandIntSeeded, 0 <-mapSizeZ @RandIntSeeded, V2 ->CarrierData{"TargetLocation"}
+		endif
+	endif
+
+	<-Type
+		<-pos.x RandFloat 10.0 mul 5.0 sub add
+		<-pos.y
+		<-pos.z RandFloat 10.0 mul 5.0 sub add
+	V3 <-CarrierData CreateUnit ->carrierUID
+	
+	<-EggData "moveto" <-carrierUID GetUnitPosition SetTableElement
+	<-pos <-EggData CreateEgg ->eggUID
+	
+	<-ltUnits "carrier" <-carrierUID "egg" <-eggUID 2 TableN AppendToList
+	
+	<-Count 1 sub ->Count
+	3 SetTimer0
+endif
+
+0 ->iI
+while <-iI <-ltUnits GetListCount lt repeat
+	<-ltUnits[<-iI] ->tUnit
+	<-tUnit{"carrier"} GetUnitPosition ->carrierPos
+	
+	<-tUnit{"carrier"} GetUnitDestroyed if
+		<-tUnit{"egg"} GetUnitPosition ->eggPos
+		<-EggData "moveto" <-eggPos SetTableElement
+		<-tUnit{"egg"} <-EggData SetEggOrbData
+		
+		<-ltUnits <-iI RemoveListElement
+		<-iI 1 sub ->iI
+	else
+		<-EggData "moveto" <-carrierPos SetTableElement
+		<-tUnit{"egg"} <-EggData SetEggOrbData
+	endif
+	
+	<-iI 1 add ->iI
+endwhile
+
+<-ltUnits GetListCount 0 lte if
+	Self TRUE TRUE TRUE DestroyUnit
+endif
+
+
+# i1 i2 - i3
+:RandIntSeeded
+	->RIS_iMaxExcl
+	->RIS_iMinIncl
+	@RandFloatSeeded ->RIS_iRand
+	
+	<-RIS_iMaxExcl <-RIS_iMinIncl sub <-RIS_iRand mul floor <-RIS_iMinIncl add
+# - f1
+:RandFloatSeeded
+	<-Seed sin 10000.0 mul ->RFS_fVal
+	<-Seed 1 add ->Seed
+	
+	<-RFS_fVal <-RFS_fVal floor sub

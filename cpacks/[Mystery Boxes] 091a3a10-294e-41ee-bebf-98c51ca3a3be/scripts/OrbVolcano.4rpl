@@ -1,12 +1,11 @@
 # --OrbVolcano-- 8/18/2021 9:47:13 PM
 
-$$POSX:0
-$$POSZ:0
-$$AMT:100
-$$orbsErupting:30
+$$Payload:100
+$$Count:30
 $$Type:"egg"
+$$Height:25
 
-if (<-orbsErupting 0 gt)
+if (<-Count 0 gt)
 	@OrbsErupt
 else
 	Self TRUE TRUE TRUE DestroyUnit
@@ -15,27 +14,40 @@ endif
 :OrbsErupt
 	Self GetUnitPosition ->pos
 	<-Type "egg" eq if
-		<-pos ToCell GetTerrain 25 add ->height
-		CreateEgg(V3(<-pos.x randint(-1 2) + <-height <-pos.z randint(-1 2) +) <-initData) pop
+		CreateEgg(V3(<-pos.x @RandIntSeeded(-1 2) + <-pos.y <-Height add <-pos.z @RandIntSeeded(-1 2) +) <-initData) pop
 	else <-Type "orb" eq if
-		<-pos ToCell GetTerrain 25 add ->height
-		V3(RandFloat 0.5 - 1 * 2 RandFloat 0.5 - 1 *) ->initData{"velocity"}
-		CreateOrb(V3(<-pos.x randint(-1 2) + <-height <-pos.z randint(-1 2) +) <-initData) pop
+		V3(@RandFloatSeeded 0.5 - 1 * 2 @RandFloatSeeded 0.5 - 1 *) ->initData{"velocity"}
+		CreateOrb(V3(<-pos.x @RandIntSeeded(-1 2) + <-pos.y <-Height add <-pos.z @RandIntSeeded(-1 2) +) <-initData) pop
 	endif endif
 	
-	<-orbsErupting 1 - ->orbsErupting
+	<-Count 1 - ->Count
 :once
 	<-Type "egg" eq if
-		Table(	"payload" <-AMT 
+		Table(	"payload" <-Payload 
 				"velocity" 0 10 0 V3 
 				"moveTo" 0 10 0 V3  
 				"showPathLine" FALSE 
 				"showPathLineColor" 0 0 0 0 V4) ->initData
 	else <-Type "orb" eq if
-		Table(	"payload" <-AMT 
+		Table(	"payload" <-Payload 
 				"bounce" true 
 				"creeperdamps" false 
 				"destroywhenstill" false 
 				"destroywhendrytime" 60 
 				"releaseondestroy" false) ->initData
 	endif endif
+
+
+# i1 i2 - i3
+:RandIntSeeded
+	->RIS_iMaxExcl
+	->RIS_iMinIncl
+	@RandFloatSeeded ->RIS_iRand
+	
+	<-RIS_iMaxExcl <-RIS_iMinIncl sub <-RIS_iRand mul floor <-RIS_iMinIncl add
+# - f1
+:RandFloatSeeded
+	<-Seed sin 10000.0 mul ->RFS_fVal
+	<-Seed 1 add ->Seed
+	
+	<-RFS_fVal <-RFS_fVal floor sub

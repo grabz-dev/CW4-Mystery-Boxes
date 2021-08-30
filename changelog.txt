@@ -1,3 +1,9 @@
+Mystery Boxes 3 dev8.cpack
+  - Added spores carrying eggs as bad Titan reward
+  - OrbVolcano is now seeded
+  - Added AC drops to friend and mystery box
+  - Removed Porter from mystery box
+
 Mystery Boxes 3 dev7.cpack
   - Fixed Mverse not reinitializing config properly when player count changes
   
