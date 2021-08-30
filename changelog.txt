@@ -1,5 +1,6 @@
 Mystery Boxes 3 dev9.cpack
   - Added the Blocker unit that acts exactly like a Tower except it doesn't generate energy and does not work as a network connector
+  - Moved all custom unit to the custom tab
 
 Mystery Boxes 3 dev8.cpack
   - Added spores carrying eggs as bad Titan reward
