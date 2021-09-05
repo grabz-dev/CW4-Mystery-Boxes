@@ -1,0 +1,137 @@
+# --PreGameSettingsManager-- 9/5/2021 5:05:30 PM
+
+
+$$CursorGhostGUID:"e81b3e36-c3cc-4cfc-9e31-da83aee69cf0"
+
+#Keep only a single ghost.
+-?G_iGhostUID not if
+	<-CursorGhostGUID 0 9999 0 0 0 0 0 0 GetUnits ->units
+	<-units 0 do
+		I eq0 if
+			<-units[I] ->G_iGhostUID
+		else
+			<-units[I] 1 1 1 DestroyUnit
+		endif
+	loop
+endif
+
+#If no ghost exists, create one.
+-?G_iGhostUID not if
+	<-CursorGhostGUID 0 0 0 V3 NULL CreateUnit ->G_iGhostUID
+	<-G_iGhostUID "" "bAlive" TRUE SetScriptVar
+endif
+
+#Make ghost follow mouse.
+@PositionGhost
+
+#If no difficulty was selected yet:
+-?*MB_OptionDifficulty not if
+	#If we're in edit mode, just set it to hard. This is so people don't have text thrown into map thumbnails.
+	GetEditMode if
+		"hard" ->*MB_OptionDifficulty
+		TRUE ->MB_LastOptionDifficultyExists
+		<-G_iGhostUID "text" "" SetObjText
+		return
+	endif
+	
+	#Keep the game paused.
+	@KeepPaused
+	
+	#Only execute this if we are in singleplayer or if we are host in Mverse.
+	#Difficulty selector.
+	GetMVersePlayerNum 0 lte if
+		@SetDifficultyText
+		
+		9 0 do
+			"LeftControl" FALSE GetKey
+			"RightControl" FALSE GetKey or
+			"Alpha" I 1 add concat FALSE GetKey
+			"Keypad" I 1 add concat FALSE GetKey or and if
+				<-G_tsDifficulties GetTableKeys I GetListElement ->str
+				<-str IsNull not if
+					<-str ->*MB_OptionDifficulty
+					"MB_MverseDifficultySelected" <-str SendMVerseMsg
+					return
+				endif
+			endif
+		loop
+	#Execute this if we are an Mverse client.
+	else
+		<-G_iGhostUID "text" "Waiting on Host to select difficulty." SetObjText
+		<-G_iGhostUID "text" 0 5 0 V3 FALSE SetObjPosition
+	endif
+	
+	return
+endif
+
+#If difficulty has changed, set animation timer.
+-?*MB_OptionDifficulty <-MB_LastOptionDifficultyExists neq if
+	90 SetTimer0
+endif
+-?*MB_OptionDifficulty ->MB_LastOptionDifficultyExists
+
+#Difficulty text animation.
+GetTimer0 neq0 if
+	<-G_iGhostUID "text" "Selected Difficulty
+	
+" <-G_tsDifficulties{<-*MB_OptionDifficulty}{"name"} concat "
+" concat <-G_tsDifficulties{<-*MB_OptionDifficulty}{"desc"} concat SetObjText
+	<-G_iGhostUID "text" 0 90 GetTimer0 sub 0.1 mul 20 add 0 V3 FALSE SetObjPosition
+	
+	#Disable the text once the animation is over.
+	GetTimer0 1 lte if
+		<-G_iGhostUID "text" "" SetObjText
+	endif
+
+	return
+endif
+
+
+
+
+
+
+:awake
+	once
+		--*MB_OptionDifficulty
+		
+		"MB_MverseDifficultySelected" "OnMverseDifficultySelected" RegisterForMsg
+	
+		"hard"   "name" "Hard"   "desc" "Higher chance of bad outcomes." 2 TableN
+		"normal" "name" "Normal" "desc" "Regular chance of bad outcomes." 2 TableN
+		"easy"   "name" "Easy"   "desc" "Lower chance of bad outcomes.
+Some bad outcomes disabled." 2 TableN
+		3 TableN ->G_tsDifficulties
+	endonce
+:once
+	@awake
+:OnMverseDifficultySelected
+	<-_DATA ->*MB_OptionDifficulty
+:PositionGhost
+	GetPointerTerrainCoords ->POG_iZ ->POG_iX
+	<-POG_iX <-POG_iZ GetTerrain ->POG_iY
+
+	<-G_iGhostUID <-POG_iX <-POG_iY <-POG_iZ V3 SetUnitPosition
+:SetDifficultyText
+	<-G_tsDifficulties GetTableValues ->SDT_lValues
+	"Choose Difficulty
+
+" ->SDT_s
+	
+	<-SDT_lValues 0 do
+		<-SDT_s
+			<-SDT_lValues[I] "name" GetTableElement concat " (Press [CTRL+" concat I 1 add concat "])
+" concat
+		<-SDT_lValues[I] "desc" GetTableElement concat "
+
+" concat ->SDT_s
+
+	loop
+	
+	<-G_iGhostUID "text" <-SDT_s SetObjText
+	<-G_iGhostUID "text" 0 30 0 V3 FALSE SetObjPosition
+
+:KeepPaused
+	GetPause not if
+		TRUE SetPause
+	endif
