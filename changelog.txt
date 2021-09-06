@@ -1,3 +1,6 @@
+Mystery Boxes 4 dev2.cpack
+  - Blocker removed. Turns out it was actually more laggy than towers
+
 Mystery Boxes 4 dev1.cpack
   - Players can now choose difficulty at the start of the game
   - Existing difficulty was moved in the "hard" difficulty bracket
