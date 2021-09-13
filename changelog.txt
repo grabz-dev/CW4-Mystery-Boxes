@@ -1,3 +1,7 @@
+Mystery Boxes 4 dev3 unreleased.cpack
+  - Added Recycler
+  - Shifted some code around, no changes to other things however
+
 Mystery Boxes 4 dev2.cpack
   - Blocker removed. Turns out it was actually more laggy than towers
 
