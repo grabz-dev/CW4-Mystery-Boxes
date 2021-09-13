@@ -15,30 +15,35 @@ Self GetUnitCell ->iUnitCellZ ->iUnitCellX
 	endif
 loop
 
-GetTimer0 eq0 if
-	20 SetTimer0
-	
-	Self GetUnitPosition 3 TRUE 0 0 0 0 0 GetUnitsInRange ->lUnits
-	<-lUnits 0 do
-		<-lUnits[I] ->iUID
-		<-G_tUIDsVacuuming{<-iUID} not <-G_tUnitsWaitingToLeave{<-iUID} not and if
-			<-iUID GetUnitMoveCell ->iZ ->iX 
-			
-			<-iX <-iUnitCellX <-G_iX1 add gte
-			<-iX <-iUnitCellX <-G_iX2 add lte or
-			<-iZ <-iUnitCellZ <-G_iZ1 add gte
-			<-iZ <-iUnitCellZ <-G_iZ2 add lte or and if
-				<-iUID GetUnitConstructing if
-					<-iUID TRUE FALSE TRUE DestroyUnit
-				else
-					<-G_ltUnitsVacuuming "UID" <-iUID "Offset" 0.0 2 TableN AppendToList
-					<-iUID FALSE SetUnitSelected
-					<-iUID FALSE SetUnitSelectable
-					TRUE ->G_tUIDsVacuuming{<-iUID}
+<-G_tUnitsWaitingToLeave GetTableCount 0 lte if
+	GetTimer0 eq0 if
+		20 SetTimer0
+		
+		Self GetUnitPosition 3 TRUE 0 0 0 0 0 GetUnitsInRange ->lUnits
+		<-lUnits 0 do
+			<-lUnits[I] ->iUID
+			<-G_tUIDsVacuuming{<-iUID} not <-G_tUnitsWaitingToLeave{<-iUID} not and if
+				<-*MB_tItemScrapValues{<-iUID GetUnitType} ->iScrapValue
+				<-iScrapValue IsNull not if
+					<-iUID GetUnitMoveCell ->iZ ->iX 
+					
+					<-iX <-iUnitCellX <-G_iX1 add gte
+					<-iX <-iUnitCellX <-G_iX2 add lte or
+					<-iZ <-iUnitCellZ <-G_iZ1 add gte
+					<-iZ <-iUnitCellZ <-G_iZ2 add lte or and if
+						<-iUID GetUnitConstructing if
+							<-iUID TRUE FALSE TRUE DestroyUnit
+						else
+							<-G_ltUnitsVacuuming "UID" <-iUID "Offset" 0.0 "Scrap" <-iScrapValue 3 TableN AppendToList
+							<-iUID FALSE SetUnitSelected
+							<-iUID FALSE SetUnitSelectable
+							TRUE ->G_tUIDsVacuuming{<-iUID}
+						endif
+					endif
 				endif
 			endif
-		endif
-	loop
+		loop
+	endif
 endif
 
 0 ->iI
@@ -57,7 +62,7 @@ while <-iI <-G_ltUnitsVacuuming GetListCount lt repeat
 			<-iUID TRUE FALSE TRUE DestroyUnit
 			<-G_tUIDsVacuuming <-iUID RemoveTableElement
 			<-G_ltUnitsVacuuming <-iI RemoveListElement
-			<-G_iScrap 1 add ->G_iScrap
+			<-G_iScrap <-tUnit{"Scrap"} add ->G_iScrap
 			@UpdateScrapText
 			
 			<-iI 1 sub ->iI
@@ -113,6 +118,20 @@ endif
 :once
 	@awake
 :Initialize
+	ClearStack
+	"cannon"			1
+	"mortar"			1
+	"shield"			2
+	"sprayer"			2
+	"sniper"			2
+	"missilelauncher"	2
+	"terp"				2
+	"beacon"			2
+	"Flare" @IsRegistered if 
+		<-*MB_tCustomGUIDs{"Flare"} 10
+	endif
+	Table ->*MB_tItemScrapValues
+
 	CreateList ->*MB_ltRecyclerConfig
 	ClearStack
 	"Flare" @IsRegistered if 
@@ -124,8 +143,7 @@ endif
 	"Name" "Sniper"		"UnitType" "sniper"							"Cost" 6		3 TableN
 	"Name" "Sprayer"	"UnitType" "sprayer"						"Cost" 5		3 TableN
 	"Name" "Shield"		"UnitType" "shield"							"Cost" 5		3 TableN
-	"Name" "Mortar" 	"UnitType" "mortar" 						"Cost" 3		3 TableN	
-	
+	"Name" "Mortar" 	"UnitType" "mortar" 						"Cost" 3		3 TableN
 	<-*MB_ltRecyclerConfig AppendStackToList
 
 	CreateList ->IR_lOptions
@@ -155,7 +173,7 @@ endif
 	Self "door_left_anchor" 0 0 <-G_fCurrentDoorRotation V3 FALSE SetObjRotation
 	Self "door_right_anchor" 180 0 <-G_fCurrentDoorRotation V3 FALSE SetObjRotation
 :UpdateScrapText
-	Self "text" "Scrap
+	Self "text" "scrap
 " <-G_iScrap concat SetObjText
 	Self "text" 16 SetObjTextFontSize
 	Self 0 "Scrap: " <-G_iScrap concat SetUnitUIText
