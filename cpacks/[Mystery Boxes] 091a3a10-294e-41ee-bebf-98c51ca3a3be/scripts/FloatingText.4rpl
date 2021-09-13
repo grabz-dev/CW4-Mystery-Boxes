@@ -1,0 +1,30 @@
+# --FloatingText-- 9/13/2021 11:26:10 PM
+$text:"I am the very model of a modern major general"
+$lifetime:90
+$speed:2.5
+$size:18
+
+:awake
+	once
+		"MSG_PostUpdate" "PostUpdate" RegisterForMSG
+	
+		-?color not if
+			1 1 1 1 V4 ->color
+		endif
+	
+		Self "text" <-text SetObjText
+		Self "text" <-size SetObjTextFontSize
+		Self "text" <-color SetObjTextColor
+	endonce
+:once
+	@awake
+:PostUpdate
+	<-lifetime 0 lte if
+		Self 1 1 1 DestroyUnit
+	endif
+
+	<-lifetime 1 sub ->lifetime
+
+	Self GetUnitPosition ->pos
+	<-pos.y <-speed 30.0 div <-speed mul add ->pos.y
+	Self <-pos SetUnitPosition

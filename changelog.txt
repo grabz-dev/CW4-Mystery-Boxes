@@ -1,5 +1,6 @@
 Mystery Boxes 4 dev3 unreleased.cpack
   - Added Recycler
+  - Added support for floating text
   - Shifted some code around, no changes to other things however
 
 Mystery Boxes 4 dev2.cpack

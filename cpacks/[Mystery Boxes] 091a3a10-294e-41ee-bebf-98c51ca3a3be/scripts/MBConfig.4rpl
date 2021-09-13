@@ -7,6 +7,8 @@
 	
 		#Container for custom GUIDs for easy access. No other use.
 		CreateTable ->*MB_tCustomGUIDs
+		"63450c29-dced-4ef8-bc2c-e245619862b9" ->*MB_tCustomGUIDs{"Floating Text"}
+		
 		"2ab87cc7-cfa7-4526-a410-56268f37580f" ->*MB_tCustomGUIDs{"Orb Rain"}
 		"409513bf-4011-4e7d-941d-2e3153dee512" ->*MB_tCustomGUIDs{"Egg Carrier"}
 		"84555524-9060-4de3-8db1-ce1769cfe715" ->*MB_tCustomGUIDs{"Mystery Box"}
