@@ -1,0 +1,170 @@
+# --Recycler-- 9/13/2021 5:43:08 PM
+
+GetGameUpdateCount 1 gte if
+	once
+		@Initialize
+	endonce
+endif
+
+Self GetUnitCell ->iUnitCellZ ->iUnitCellX
+
+<-G_tUnitsWaitingToLeave GetTableKeys ->lKeys
+<-lKeys 0 do
+	<-lKeys[I] GetUnitMoveCell pop -1 neq if
+		<-G_tUnitsWaitingToLeave <-lKeys[I] RemoveTableElement
+	endif
+loop
+
+GetTimer0 eq0 if
+	20 SetTimer0
+	
+	Self GetUnitPosition 3 TRUE 0 0 0 0 0 GetUnitsInRange ->lUnits
+	<-lUnits 0 do
+		<-lUnits[I] ->iUID
+		<-G_tUIDsVacuuming{<-iUID} not <-G_tUnitsWaitingToLeave{<-iUID} not and if
+			<-iUID GetUnitMoveCell ->iZ ->iX 
+			
+			<-iX <-iUnitCellX <-G_iX1 add gte
+			<-iX <-iUnitCellX <-G_iX2 add lte or
+			<-iZ <-iUnitCellZ <-G_iZ1 add gte
+			<-iZ <-iUnitCellZ <-G_iZ2 add lte or and if
+				<-iUID GetUnitConstructing if
+					<-iUID TRUE FALSE TRUE DestroyUnit
+				else
+					<-G_ltUnitsVacuuming "UID" <-iUID "Offset" 0.0 2 TableN AppendToList
+					<-iUID FALSE SetUnitSelected
+					<-iUID FALSE SetUnitSelectable
+					TRUE ->G_tUIDsVacuuming{<-iUID}
+				endif
+			endif
+		endif
+	loop
+endif
+
+0 ->iI
+while <-iI <-G_ltUnitsVacuuming GetListCount lt repeat
+	<-G_ltUnitsVacuuming[<-iI] ->tUnit
+	<-tUnit{"UID"} ->iUID
+	<-iUID GetUnitMoveCell pop -1 eq if
+		<-iUID GetUnitPosition ->vPos
+		
+		<-vPos.y 0.25 sub ->vPos.y
+		<-tUnit{"Offset"} 0.25 sub ->tUnit{"Offset"}
+		
+		<-iUID <-vPos SetUnitPosition
+		
+		<-tUnit{"Offset"} -10.0 lt if
+			<-iUID TRUE FALSE TRUE DestroyUnit
+			<-G_tUIDsVacuuming <-iUID RemoveTableElement
+			<-G_ltUnitsVacuuming <-iI RemoveListElement
+			<-G_iScrap 1 add ->G_iScrap
+			@UpdateScrapText
+			
+			<-iI 1 sub ->iI
+		endif
+	endif
+	
+	<-iI 1 add ->iI
+endwhile
+
+<-G_ltUnitsVacuuming GetListCount 0 gt <-G_bOpened not and if
+	TRUE ->G_bOpened
+	1 ->G_bAnimatingOpen
+	
+endif
+
+<-G_ltUnitsVacuuming GetListCount 0 lte <-G_bOpened and if
+	FALSE ->G_bOpened
+	-1 ->G_bAnimatingOpen
+	Self "door_left_anchor" 0 0 0 V3 FALSE SetObjRotation
+	Self "door_right_anchor" 180 0 0 V3 FALSE SetObjRotation
+endif
+
+<-G_bAnimatingOpen 0 neq if
+	<-G_bAnimatingOpen 0 gt if
+		<-G_fCurrentDoorRotation 10.0 add 100.0 min ->G_fCurrentDoorRotation
+		<-G_fCurrentDoorRotation 100.0 gte if
+			0 ->G_bAnimatingOpen
+		endif
+	else <-G_bAnimatingOpen 0 lt if
+		<-G_fCurrentDoorRotation 10.0 sub 0.0 max ->G_fCurrentDoorRotation
+		<-G_fCurrentDoorRotation 0.0 lte if
+			0 ->G_bAnimatingOpen
+		endif
+	endif endif
+	@UpdateAnimation
+endif
+
+:awake
+	once
+		CreateList ->G_ltUnitsVacuuming
+		CreateTable ->G_tUnitsWaitingToLeave
+		CreateTable ->G_tUIDsVacuuming
+		FALSE ->G_bOpened
+		0 ->G_bAnimatingOpen
+		0.0 ->G_fCurrentDoorRotation
+		
+		0 ->G_iScrap
+		
+		@Initialize
+	endonce
+	
+	@UpdateScrapText
+:once
+	@awake
+:Initialize
+	CreateList ->*MB_ltRecyclerConfig
+	ClearStack
+	"Flare" @IsRegistered if 
+		"Name" "Flare"		"UnitType" <-*MB_tCustomGUIDs{"Flare"}		"Cost" 30	3 TableN
+	endif
+	"Name" "Beacon"		"UnitType" "beacon"							"Cost" 15		3 TableN
+	"Name" "Terp"		"UnitType" "terp"							"Cost" 10		3 TableN
+	"Name" "Missile"	"UnitType" "missilelauncher"				"Cost" 6		3 TableN
+	"Name" "Sniper"		"UnitType" "sniper"							"Cost" 6		3 TableN
+	"Name" "Sprayer"	"UnitType" "sprayer"						"Cost" 5		3 TableN
+	"Name" "Shield"		"UnitType" "shield"							"Cost" 5		3 TableN
+	"Name" "Mortar" 	"UnitType" "mortar" 						"Cost" 3		3 TableN	
+	
+	<-*MB_ltRecyclerConfig AppendStackToList
+
+	CreateList ->IR_lOptions
+	<-*MB_ltRecyclerConfig 0 do
+		<-*MB_ltRecyclerConfig[I] ->IR_tConf
+		<-IR_lOptions "(" <-IR_tConf{"Cost"} concat ") " concat <-IR_tConf{"Name"} concat AppendToList
+	loop
+	
+	Self 2 "Cost" SetUnitUIText
+	Self 2 <-IR_lOptions SetUnitUIOptions
+	
+	Self 3 "BUILD" SetUnitUIText
+:_uicallback
+	<-_DATA 3 eq if
+		<-*MB_ltRecyclerConfig[Self 2 GetUnitUIState] ->UI_tConf
+		<-UI_tConf{"Cost"} <-G_iScrap lte if
+			<-G_iScrap <-UI_tConf{"Cost"} sub ->G_iScrap
+			@UpdateScrapText
+			
+			<-UI_tConf{"UnitType"} Self GetUnitPosition 0 CreateUnit ->UI_iUID
+			<-UI_iUID 9999 ConstructUnit
+			TRUE ->G_tUnitsWaitingToLeave{<-UI_iUID}
+		endif
+	endif
+	
+:UpdateAnimation
+	Self "door_left_anchor" 0 0 <-G_fCurrentDoorRotation V3 FALSE SetObjRotation
+	Self "door_right_anchor" 180 0 <-G_fCurrentDoorRotation V3 FALSE SetObjRotation
+:UpdateScrapText
+	Self "text" "Scrap
+" <-G_iScrap concat SetObjText
+	Self "text" 16 SetObjTextFontSize
+	Self 0 "Scrap: " <-G_iScrap concat SetUnitUIText
+	
+	
+	
+# s1 - b2
+# Description: Function that tells us if a custom unit type GUID from a MB CPACK addon is contained inside the project.
+# Arguments: CMOD GUID
+# Result: TRUE if this CMOD is in the project, FALSE otherwise
+:IsRegistered
+	<-*MB_tsRegisteredCPACKUnits swap GetTableElement IsNull not

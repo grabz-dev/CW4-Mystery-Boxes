@@ -1,0 +1,29 @@
+# --MBConfig-- 9/13/2021 8:37:34 PM
+
+:awake
+	once
+		"MB_CPACKUnitRegister" "OnCPACKUnitRegister" RegisterForMsg
+		CreateTable ->*MB_tsRegisteredCPACKUnits
+	
+		#Container for custom GUIDs for easy access. No other use.
+		CreateTable ->*MB_tCustomGUIDs
+		"2ab87cc7-cfa7-4526-a410-56268f37580f" ->*MB_tCustomGUIDs{"Orb Rain"}
+		"409513bf-4011-4e7d-941d-2e3153dee512" ->*MB_tCustomGUIDs{"Egg Carrier"}
+		"84555524-9060-4de3-8db1-ce1769cfe715" ->*MB_tCustomGUIDs{"Mystery Box"}
+		"f028eb66-8215-461f-bfee-95039386e950" ->*MB_tCustomGUIDs{"Airship"}
+		"a38e8b23-88a3-4ba2-9b81-516c2073e86b" ->*MB_tCustomGUIDs{"Bertha"}
+		"f20014e7-fb81-4f13-8780-230358321022" ->*MB_tCustomGUIDs{"Sweeper"}
+		"7aecbd59-910a-4242-9fe6-37e0a7506f83" ->*MB_tCustomGUIDs{"Wallis"}
+		"a9ad2e49-1bd1-486b-9afa-f33b65c11fbb" ->*MB_tCustomGUIDs{"ERNMaker"}
+		"60e2f17f-5487-4108-866f-e9e6fc6596a3" ->*MB_tCustomGUIDs{"Flare"}
+		"746e142d-5e17-481d-8cb7-79cda5116c66" ->*MB_tCustomGUIDs{"Splitmitter"}
+	endonce
+:once
+	@awake
+# _DATA -
+# Description: MSG coming in from MB CPACK addons. Lets us know that it is contained in the project, so we know that we can use it.
+# Arguments: 
+# Result: 
+:OnCPACKUnitRegister
+	"Registered custom unit " <-_DATA concat Debug
+	TRUE ->*MB_tsRegisteredCPACKUnits{<-_DATA}
