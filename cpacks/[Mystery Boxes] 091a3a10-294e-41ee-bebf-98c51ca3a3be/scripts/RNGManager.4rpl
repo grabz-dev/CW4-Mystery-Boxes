@@ -150,13 +150,6 @@ endif
 	"airsaccauldron" 1 
 	Table ->G_tbMverseNullifiableEnemies
 	
-	#Do not edit this table
-	#This is a list of built in SHARED UNITS.
-	#Construction of these units in Mverse must be staggered by a frame
-	#for other players to see them as completed.
-	"miner" 1, "greenarrefinery" 1, "microrift" 1, "pylon" 1, "tower" 1
-	Table ->G_tbMverseSharedUnits
-	
 	
 	
 	CreateTable ->G_tttltConf
@@ -191,8 +184,8 @@ endif
 		
 	#########
 	# <Bad> outcomes start here
-	"WEIGHT" 50.0,	"TYPE" <-*MB_tCustomGUIDs{"Orb Rain"}, "SETTINGS" TableN("Type" "orb", "Payload" 300, "Count" 150, "Height" 25, 4) "SPECIAL" TableN("Seed" TRUE, "Effect" "boom1" 2) 4 TableN
-	"WEIGHT" 50.0,	"TYPE" <-*MB_tCustomGUIDs{"Orb Rain"}, "SETTINGS" TableN("Type" "egg", "Payload" 1200, "Count" 50, "Height" 25, 4)	"SPECIAL" TableN("Seed" TRUE, "Effect" "boom1" 2) 4 TableN
+	"WEIGHT" 50.0,	"TYPE" <-*MB_tCustomGUIDs{"Orb Volcano"}, "SETTINGS" TableN("Type" "orb", "Payload" 300, "Count" 150, "Height" 25, 4) "SPECIAL" TableN("Seed" TRUE, "Effect" "boom1" 2) 4 TableN
+	"WEIGHT" 50.0,	"TYPE" <-*MB_tCustomGUIDs{"Orb Volcano"}, "SETTINGS" TableN("Type" "egg", "Payload" 1200, "Count" 50, "Height" 25, 4)	"SPECIAL" TableN("Seed" TRUE, "Effect" "boom1" 2) 4 TableN
 	"WEIGHT" 50.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 50000, "Effect" "boom1", 2)	3 TableN
 	<-IC_diff "easy" neq if
 		"WEIGHT" 25.0,	"TYPE" <-*MB_tCustomGUIDs{"Egg Carrier"}, "SETTINGS" TableN("Type" "spore", "CarrierData" TableN("Target" 2, "Payload" 200, 2), "EggData" TableN("payload" 800, "showpathline" TRUE, "showpathlinecolor" 0.3 0.3 0.7 1 V4 , 3), "Count" 30, "Height" 25, 5), "SPECIAL" TableN("Seed" TRUE, "Effect" "boom2" 2) 4 TableN 
@@ -649,7 +642,7 @@ endif
 		endif
 		
 		#If we're in mverse and this is a shared unit, stagger its construction.
-		GetMVersePlayerNum 0 gte <-G_tbMverseSharedUnits{<-MBO_tChosenEntry{"TYPE"}} and if
+		GetMVersePlayerNum 0 gte <-*MB_tbMverseSharedUnits{<-MBO_tChosenEntry{"TYPE"}} and if
 			#Do not lower the stagger frames. It will go wrong at higher game speeds.
 			<-MBO_iUID @MverseRegisterSharedUnit
 		else

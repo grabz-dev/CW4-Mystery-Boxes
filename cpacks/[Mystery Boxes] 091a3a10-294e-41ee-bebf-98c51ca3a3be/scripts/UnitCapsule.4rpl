@@ -1,0 +1,38 @@
+# --UnitCapsule-- 9/14/2021 2:04:57 PM
+
+:awake
+	once
+		Self "light" <-Color SetObjColor
+		Self 1 <-Name SetUnitUIText
+	endonce
+:once
+	@awake
+:_uicallback
+	#Things to do when the DEPLOY button is clicked
+	<-_DATA 2 eq if
+		#Make sure the capsule is landed
+		Self GetUnitMoveCell pop -1 neq if
+			"text" "Must land before deploying" "lifetime" 30 "color" 1 0.58 0.58 1 V4 3 TableN @SpawnFloatingText
+		else
+			#Make sure the capsule is not too close to a recycler
+			<-*MB_tCustomGUIDs{"Recycler"} Self GetUnitPosition 6 1 1 0 0 0 0 GetUnits ->lUnits
+			<-lUnits GetListCount 0 gt if
+				"text" "Too close to Recycler to deploy" "lifetime" 30 "color" 1 0.58 0.58 1 V4 3 TableN @SpawnFloatingText
+			else
+				<-UnitType Self GetUnitCell 0 CreateUnitOnTerrain ->iUnit
+				#Do not construct the unit if we're playing Mverse and this is a shared unit
+				GetMversePlayerNum 0 gte <-*MB_tbMverseSharedUnits{<-UnitType} and if
+				
+				else
+					<-iUnit 9999 ConstructUnit
+				endif
+				
+				Self 1 1 1 DestroyUnit
+			endif
+		endif
+	endif
+:SpawnFloatingText
+	->SFT_tData #text, lifetime, speed, size, color
+	
+	<-*MB_tCustomGUIDs{"Floating Text"} Self GetUnitPosition <-SFT_tData CreateUnit pop
+	

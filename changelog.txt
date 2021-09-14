@@ -1,5 +1,6 @@
 Mystery Boxes 4 dev3 unreleased.cpack
   - Added Recycler
+  - Some immobile units will spawn as capsules from the Recycler that can be deployed in chosen locations
   - Added support for floating text
   - Shifted some code around, no changes to other things however
 

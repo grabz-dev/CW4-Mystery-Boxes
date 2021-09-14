@@ -1,91 +1,19 @@
 # --Recycler-- 9/13/2021 5:43:08 PM
 
-GetGameUpdateCount 1 gte if
-	once
-		@Initialize
-	endonce
-endif
+#----Animation
 
-Self GetUnitCell ->iUnitCellZ ->iUnitCellX
-
-<-G_tUnitsWaitingToLeave GetTableKeys ->lKeys
-<-lKeys 0 do
-	<-lKeys[I] GetUnitMoveCell pop -1 neq if
-		<-G_tUnitsWaitingToLeave <-lKeys[I] RemoveTableElement
-	endif
-loop
-
-<-G_tUnitsWaitingToLeave GetTableCount 0 lte if
-	GetTimer0 eq0 if
-		20 SetTimer0
-		
-		Self GetUnitPosition 3 TRUE 0 0 0 0 0 GetUnitsInRange ->lUnits
-		<-lUnits 0 do
-			<-lUnits[I] ->iUID
-			<-G_tUIDsVacuuming{<-iUID} not <-G_tUnitsWaitingToLeave{<-iUID} not and if
-				<-*MB_tItemScrapValues{<-iUID GetUnitType} ->iScrapValue
-				<-iScrapValue IsNull not if
-					<-iUID GetUnitMoveCell ->iZ ->iX 
-					
-					<-iX <-iUnitCellX <-G_iX1 add gte
-					<-iX <-iUnitCellX <-G_iX2 add lte or
-					<-iZ <-iUnitCellZ <-G_iZ1 add gte
-					<-iZ <-iUnitCellZ <-G_iZ2 add lte or and if
-						<-iUID GetUnitConstructing if
-							<-iUID TRUE TRUE TRUE DestroyUnit
-						else
-							<-G_ltUnitsVacuuming "UID" <-iUID "Offset" 0.0 "Scrap" <-iScrapValue 3 TableN AppendToList
-							<-iUID FALSE SetUnitSelected
-							<-iUID FALSE SetUnitSelectable
-							TRUE ->G_tUIDsVacuuming{<-iUID}
-						endif
-					endif
-				endif
-			endif
-		loop
-	endif
-endif
-
-0 ->iI
-while <-iI <-G_ltUnitsVacuuming GetListCount lt repeat
-	<-G_ltUnitsVacuuming[<-iI] ->tUnit
-	<-tUnit{"UID"} ->iUID
-	<-iUID GetUnitMoveCell pop -1 eq if
-		<-iUID GetUnitPosition ->vPos
-		
-		<-vPos.y 0.25 sub ->vPos.y
-		<-tUnit{"Offset"} 0.25 sub ->tUnit{"Offset"}
-		
-		<-iUID <-vPos SetUnitPosition
-		
-		<-tUnit{"Offset"} -10.0 lt if
-			<-iUID TRUE TRUE FALSE DestroyUnit
-			<-G_tUIDsVacuuming <-iUID RemoveTableElement
-			<-G_ltUnitsVacuuming <-iI RemoveListElement
-			<-G_iScrap <-tUnit{"Scrap"} add ->G_iScrap
-			@UpdateScrapText
-			"text" "+" <-tUnit{"Scrap"} concat " scrap" concat "color" 1 0.67 0.49 1 V4 2 TableN @SpawnFloatingText
-			
-			<-iI 1 sub ->iI
-		endif
-	endif
-	
-	<-iI 1 add ->iI
-endwhile
-
+#Play the recycler opening animation if the recycler is closed and a new unit is marked for vacuuming
 <-G_ltUnitsVacuuming GetListCount 0 gt <-G_bOpened not and if
 	TRUE ->G_bOpened
 	1 ->G_bAnimatingOpen
-	
 endif
-
+#Play the recycler closing animation if the recycler is opened and no more units are marked for vacuuming
 <-G_ltUnitsVacuuming GetListCount 0 lte <-G_bOpened and if
 	FALSE ->G_bOpened
 	-1 ->G_bAnimatingOpen
-	Self "door_left_anchor" 0 0 0 V3 FALSE SetObjRotation
-	Self "door_right_anchor" 180 0 0 V3 FALSE SetObjRotation
 endif
 
+#Play the recycler open/close animation
 <-G_bAnimatingOpen 0 neq if
 	<-G_bAnimatingOpen 0 gt if
 		<-G_fCurrentDoorRotation 10.0 add 100.0 min ->G_fCurrentDoorRotation
@@ -101,8 +29,96 @@ endif
 	@UpdateAnimation
 endif
 
+#----Health
+
+#Prevent the recycler from getting below 50% health
+Self GetUnitHealth Self GetUnitMaxHealth 0.5 mul lt if
+	Self Self GetUnitMaxHealth 0.5 mul SetUnitHealth
+endif
+#Prevent the recycler from functioning if not at max health
+Self GetUnitHealth Self GetUnitMaxHealth lt if
+	return
+endif
+
+#----Logic
+
+Self GetUnitCell ->iUnitCellZ ->iUnitCellX
+
+#Periodically search for units landing/landed on top of the recycler so that we can vacuum them
+#Prevent this from occuring if a unit was created in the recycler and is waiting to be moved out
+<-G_tUnitsWaitingToLeave GetTableCount 0 lte if
+	GetTimer0 eq0 if
+		20 SetTimer0
+		
+		#Get units in range of the recycler
+		Self GetUnitPosition 3 TRUE 0 0 0 0 0 GetUnitsInRange ->lUnits
+		<-lUnits 0 do
+			<-lUnits[I] ->iUID
+			#Only do stuff if we haven't picked this unit up already
+			<-G_tUIDsVacuuming{<-iUID} not <-G_tUnitsWaitingToLeave{<-iUID} not and if
+				#Find this unit's scrap value. If none found, don't vacuum this unit
+				<-*MB_tItemScrapValues{<-iUID GetUnitType} ->iScrapValue
+				<-iScrapValue IsNull not if
+					#Check if the unit is actually moving towards the recycler, ignore it if not
+					<-iUID GetUnitMoveCell ->iZ ->iX 	
+					<-iX <-iUnitCellX <-G_iX1 add gte
+					<-iX <-iUnitCellX <-G_iX2 add lte or
+					<-iZ <-iUnitCellZ <-G_iZ1 add gte
+					<-iZ <-iUnitCellZ <-G_iZ2 add lte or and if
+						#If the unit is under construction, just delete it
+						#We don't allow players to construct units on top of the recycler
+						<-iUID GetUnitConstructing if
+							<-iUID TRUE TRUE TRUE DestroyUnit
+						else
+							#Set the unit to be vacuumed
+							#We no longer allow the player to select the unit so they can't manually delete or move it
+							<-G_ltUnitsVacuuming "UID" <-iUID "Offset" 0.0 "Scrap" <-iScrapValue 3 TableN AppendToList
+							<-iUID FALSE SetUnitSelected
+							<-iUID FALSE SetUnitSelectable
+							TRUE ->G_tUIDsVacuuming{<-iUID}
+						endif
+					endif
+				endif
+			endif
+		loop
+	endif
+endif
+
+#Go over the list of units that are currently being vacuumed
+#Once their sinking animation is finished, we destroy them and turn them into scrap
+0 ->iI
+while <-iI <-G_ltUnitsVacuuming GetListCount lt repeat
+	<-G_ltUnitsVacuuming[<-iI] ->tUnit
+	<-tUnit{"UID"} ->iUID
+	#If the unit has landed, we play the animation
+	<-iUID GetUnitMoveCell pop -1 eq if
+		<-iUID GetUnitPosition ->vPos
+		
+		<-vPos.y 0.25 sub ->vPos.y
+		<-tUnit{"Offset"} 0.25 sub ->tUnit{"Offset"}
+		
+		<-iUID <-vPos SetUnitPosition
+		
+		#Once the unit has sunk into the ground enough, we destroy it and turn it to scrap
+		<-tUnit{"Offset"} -10.0 lt if
+			<-iUID TRUE TRUE FALSE DestroyUnit
+			<-G_tUIDsVacuuming <-iUID RemoveTableElement
+			<-G_ltUnitsVacuuming <-iI RemoveListElement
+			<-G_iScrap <-tUnit{"Scrap"} add ->G_iScrap
+			@UpdateScrapText
+			"text" "+" <-tUnit{"Scrap"} concat " scrap" concat "color" 1 0.67 0.49 1 V4 2 TableN @SpawnFloatingText
+			
+			<-iI 1 sub ->iI
+		endif
+	endif
+	
+	<-iI 1 add ->iI
+endwhile
+
 :awake
 	once
+		RegisterForMSG("MSG_PreUpdate" "PreUpdate")
+	
 		CreateList ->G_ltUnitsVacuuming
 		CreateTable ->G_tUnitsWaitingToLeave
 		CreateTable ->G_tUIDsVacuuming
@@ -110,7 +126,7 @@ endif
 		0 ->G_bAnimatingOpen
 		0.0 ->G_fCurrentDoorRotation
 		
-		0 ->G_iScrap
+		1000 ->G_iScrap
 		
 		@Initialize
 	endonce
@@ -118,6 +134,24 @@ endif
 	@UpdateScrapText
 :once
 	@awake
+:PreUpdate
+	#Need to reinitialize a bit later so the Recycler can pick up custom units
+	#No harm in staggering this a bit
+	GetGameTickCount 30 gte if
+		once
+			@Initialize
+		endonce
+	endif
+	
+	#Look over units that have been created by the recycler
+	#Remove them from the table if they have been moved
+	<-G_tUnitsWaitingToLeave GetTableKeys ->lKeys
+	<-lKeys 0 do
+		<-lKeys[I] GetUnitDestroyed
+		<-lKeys[I] GetUnitMoveCell pop -1 neq or if
+			<-G_tUnitsWaitingToLeave <-lKeys[I] RemoveTableElement
+		endif
+	loop
 :Initialize
 	ClearStack
 	"cannon"			1
@@ -135,6 +169,8 @@ endif
 
 	CreateList ->*MB_ltRecyclerConfig
 	ClearStack
+	"Name" "Rocket"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 7x7"}	"Cost" 50	"Opts" TableN("UnitType" "rocketpad" "Name" "ROCKET" "Color" 0 1 0 1 V4 3)		4 TableN
+	"Name" "Refinery"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 50	"Opts" TableN("UnitType" "greenarrefinery" "Name" "REFINERY" "Color" 0 1 0 1 V4 3)		4 TableN
 	"Flare" @IsRegistered if 
 		"Name" "Flare"		"UnitType" <-*MB_tCustomGUIDs{"Flare"}		"Cost" 30	3 TableN
 	endif
@@ -158,22 +194,39 @@ endif
 	
 	Self 3 "BUILD" SetUnitUIText
 :_uicallback
+	#Things that happen when the BUILD button is clicked
 	<-_DATA 3 eq if
-		<-*MB_ltRecyclerConfig[Self 2 GetUnitUIState] ->UI_tConf
-		<-UI_tConf{"Cost"} <-G_iScrap lte if
-			<-G_iScrap <-UI_tConf{"Cost"} sub ->G_iScrap
-			@UpdateScrapText
-			
-			<-UI_tConf{"UnitType"} Self GetUnitPosition 0 CreateUnit ->UI_iUID
-			<-UI_iUID 9999 ConstructUnit
-			TRUE ->G_tUnitsWaitingToLeave{<-UI_iUID}
-			
-			"text" <-UI_tConf{"Name"} " built" concat "color" 0.58 0.58 1 1 V4 2 TableN @SpawnFloatingText
+		#Make sure the recycler is at full health before it can operate (because why not)
+		Self GetUnitHealth Self GetUnitMaxHealth lt if
+			"text" "Busy repairing damage" "lifetime" 30 "color" 1 0.58 0.58 1 V4 3 TableN @SpawnFloatingText
+		#Make sure no units are waiting on the recycler
+		else <-G_tUnitsWaitingToLeave GetTableCount 0 gt if
+			"text" "Pad is obstructed" "lifetime" 30 "color" 1 0.58 0.58 1 V4 3 TableN @SpawnFloatingText
 		else
-			"text" "Can't afford" "lifetime" 30 "color" 1 0.58 0.58 1 V4 3 TableN @SpawnFloatingText
-		endif
+			#Make sure we have enough scrap to buy the unit
+			<-*MB_ltRecyclerConfig[Self 2 GetUnitUIState] ->UI_tConf
+			<-UI_tConf{"Cost"} <-G_iScrap lte if
+				<-G_iScrap <-UI_tConf{"Cost"} sub ->G_iScrap
+				@UpdateScrapText
+				
+				#Send special options if the unit being created is a capsule
+				<-UI_tConf{"UnitType"} <-*MB_tCustomGUIDs{"Unit Capsule 3x3"} eq
+				<-UI_tConf{"UnitType"} <-*MB_tCustomGUIDs{"Unit Capsule 7x7"} eq or if 
+					<-UI_tConf{"UnitType"} Self GetUnitPosition <-UI_tConf{"Opts"} CreateUnit ->UI_iUID
+				else
+					<-UI_tConf{"UnitType"} Self GetUnitPosition 0 CreateUnit ->UI_iUID
+					<-UI_iUID 9999 ConstructUnit
+				endif
+				
+				TRUE ->G_tUnitsWaitingToLeave{<-UI_iUID}
+				"text" <-UI_tConf{"Name"} " built" concat "color" 0.58 0.58 1 1 V4 2 TableN @SpawnFloatingText
+			else
+				"text" "Can't afford" "lifetime" 30 "color" 1 0.58 0.58 1 V4 3 TableN @SpawnFloatingText
+			endif
+		endif endif
 	endif
-	
+:GameLoaded
+    Self FALSE SetMVerseCreatesUnitGhost
 :UpdateAnimation
 	Self "door_left_anchor" 0 0 <-G_fCurrentDoorRotation V3 FALSE SetObjRotation
 	Self "door_right_anchor" 180 0 <-G_fCurrentDoorRotation V3 FALSE SetObjRotation

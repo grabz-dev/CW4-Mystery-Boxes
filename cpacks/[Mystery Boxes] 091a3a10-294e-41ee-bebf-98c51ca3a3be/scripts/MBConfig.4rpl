@@ -8,10 +8,16 @@
 		#Container for custom GUIDs for easy access. No other use.
 		CreateTable ->*MB_tCustomGUIDs
 		"63450c29-dced-4ef8-bc2c-e245619862b9" ->*MB_tCustomGUIDs{"Floating Text"}
+		"e81b3e36-c3cc-4cfc-9e31-da83aee69cf0" ->*MB_tCustomGUIDs{"Cursor Ghost"}
 		
-		"2ab87cc7-cfa7-4526-a410-56268f37580f" ->*MB_tCustomGUIDs{"Orb Rain"}
+		"2ab87cc7-cfa7-4526-a410-56268f37580f" ->*MB_tCustomGUIDs{"Orb Volcano"}
 		"409513bf-4011-4e7d-941d-2e3153dee512" ->*MB_tCustomGUIDs{"Egg Carrier"}
+		
 		"84555524-9060-4de3-8db1-ce1769cfe715" ->*MB_tCustomGUIDs{"Mystery Box"}
+		"e18fe3ff-1957-40af-8527-76ed74f62ae0" ->*MB_tCustomGUIDs{"Recycler"}
+		"e3e9fba7-30e3-4de3-b68c-6440ae8f0796" ->*MB_tCustomGUIDs{"Unit Capsule 3x3"}
+		"1be3f343-9bb3-40cc-92d7-05227ef04932" ->*MB_tCustomGUIDs{"Unit Capsule 7x7"}
+		
 		"f028eb66-8215-461f-bfee-95039386e950" ->*MB_tCustomGUIDs{"Airship"}
 		"a38e8b23-88a3-4ba2-9b81-516c2073e86b" ->*MB_tCustomGUIDs{"Bertha"}
 		"f20014e7-fb81-4f13-8780-230358321022" ->*MB_tCustomGUIDs{"Sweeper"}
@@ -19,6 +25,14 @@
 		"a9ad2e49-1bd1-486b-9afa-f33b65c11fbb" ->*MB_tCustomGUIDs{"ERNMaker"}
 		"60e2f17f-5487-4108-866f-e9e6fc6596a3" ->*MB_tCustomGUIDs{"Flare"}
 		"746e142d-5e17-481d-8cb7-79cda5116c66" ->*MB_tCustomGUIDs{"Splitmitter"}
+		
+		
+		#Do not edit this table
+		#This is a list of built in SHARED UNITS.
+		#Construction of these units in Mverse must be staggered by some frames
+		#for other players to see them as completed.
+		"miner" 1, "greenarrefinery" 1, "microrift" 1, "pylon" 1, "tower" 1
+		Table ->*MB_tbMverseSharedUnits
 	endonce
 :once
 	@awake
