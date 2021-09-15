@@ -118,7 +118,8 @@ endwhile
 :awake
 	once
 		RegisterForMSG("MSG_PreUpdate" "PreUpdate")
-	
+		RegisterForMSG("MSG_PostUpdate" "PostUpdate")
+		
 		CreateList ->G_ltUnitsVacuuming
 		CreateTable ->G_tUnitsWaitingToLeave
 		CreateTable ->G_tUIDsVacuuming
@@ -134,6 +135,8 @@ endwhile
 	@UpdateScrapText
 :once
 	@awake
+:destroyed
+	<-G_iCurrentlyOccupiedX <-G_iCurrentlyOccupiedZ FALSE @SetCustomOccupiedLand
 :PreUpdate
 	#Need to reinitialize a bit later so the Recycler can pick up custom units
 	#No harm in staggering this a bit
@@ -152,6 +155,45 @@ endwhile
 			<-G_tUnitsWaitingToLeave <-lKeys[I] RemoveTableElement
 		endif
 	loop
+:PostUpdate
+	Self GetUnitMoveCell ->POU_iMoveZ ->POU_iMoveX
+	<-POU_iMoveX ->POU_iMoveCell
+	Self GetUnitCell ->POU_iZ ->POU_iX
+	
+	#Set the initial configuration of our unit 
+	once
+		<-POU_iX <-POU_iZ TRUE @SetCustomOccupiedLand
+		<-POU_iX <-POU_iZ ->G_iCurrentlyOccupiedZ ->G_iCurrentlyOccupiedX
+	endonce
+	
+	#If the unit has been ordered to move
+	<-POU_iMoveCell <-POU_iLastMoveCell neq <-POU_iMoveCell -1 neq and if
+		#If the unit is already moving and has been reordered to move,
+		#we clear the occupied count from the area we ordered the unit to previously
+		<-POU_iLastMoveCell -1 neq if
+			<-POU_iLastMoveX <-POU_iLastMoveZ FALSE @SetCustomOccupiedLand
+		#If the unit was not moving and this is the first order,
+		#we clear the occupied count from the area the unit was sitting on
+		else
+			<-POU_iX <-POU_iZ FALSE @SetCustomOccupiedLand
+		endif
+		
+		#We set the occupied land at the new target location our unit is meant to land in
+		<-POU_iMoveX <-POU_iMoveZ TRUE @SetCustomOccupiedLand
+		<-POU_iMoveX <-POU_iMoveZ ->G_iCurrentlyOccupiedZ ->G_iCurrentlyOccupiedX
+	#If the unit is stationary
+	else <-POU_iMoveCell <-POU_iLastMoveCell eq <-POU_iMoveCell -1 eq and if
+		#If the unit was moved in the editor, clear last position and set new position
+		<-POU_iLastX <-POU_iX neq <-POU_iLastZ <-POU_iZ neq or if
+			<-POU_iLastX <-POU_iLastZ FALSE @SetCustomOccupiedLand
+			<-POU_iX <-POU_iZ TRUE @SetCustomOccupiedLand
+			<-POU_iX <-POU_iZ ->G_iCurrentlyOccupiedZ ->G_iCurrentlyOccupiedX
+		endif
+	endif endif
+	
+	<-POU_iMoveZ <-POU_iMoveX ->POU_iLastMoveX ->POU_iLastMoveZ
+	<-POU_iZ <-POU_iX ->POU_iLastX ->POU_iLastZ
+	<-POU_iMoveCell ->POU_iLastMoveCell
 :Initialize
 	ClearStack
 	"cannon"			1
@@ -235,7 +277,24 @@ endwhile
 " <-G_iScrap concat SetObjText
 	Self "text" 16 SetObjTextFontSize
 	Self 0 "Scrap: " <-G_iScrap concat SetUnitUIText
-	
+:SetCustomOccupiedLand
+	->SOL_bSet ->SOL_iCellZ ->SOL_iCellX
+	4 ->SOL_iRadius
+	<-SOL_iCellZ <-SOL_iRadius add 1 add <-SOL_iCellZ <-SOL_iRadius sub do
+		<-SOL_iCellX <-SOL_iRadius add 1 add <-SOL_iCellX <-SOL_iRadius sub do
+			<-SOL_iCellX <-SOL_iRadius sub I eq
+			<-SOL_iCellX <-SOL_iRadius add I eq or
+			<-SOL_iCellZ <-SOL_iRadius sub J eq or
+			<-SOL_iCellZ <-SOL_iRadius add J eq or if
+				I J GetCellOccupiedCount ->SOL_iCount
+				<-SOL_bSet if
+					I J <-SOL_iCount 1 add SetCellOccupiedCount
+				else
+					I J <-SOL_iCount 1 sub SetCellOccupiedCount
+				endif
+			endif
+		loop
+	loop
 	
 	
 # s1 - b2
