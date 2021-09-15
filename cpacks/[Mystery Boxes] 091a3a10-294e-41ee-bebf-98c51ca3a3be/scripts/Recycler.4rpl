@@ -138,8 +138,9 @@ endwhile
 :destroyed
 	<-G_iCurrentlyOccupiedX <-G_iCurrentlyOccupiedZ FALSE @SetCustomOccupiedLand
 :gameloaded
-	Self GetUnitCell TRUE @SetCustomOccupiedLand
-	Self GetUnitCell ->G_iCurrentlyOccupiedZ ->G_iCurrentlyOccupiedX
+	-?G_iCurrentlyOccupiedX if
+		<-G_iCurrentlyOccupiedX <-G_iCurrentlyOccupiedZ TRUE @SetCustomOccupiedLand
+	endif
 	Self FALSE SetMVerseCreatesUnitGhost
 :PreUpdate
 	#Need to reinitialize a bit later so the Recycler can pick up custom units
@@ -161,7 +162,6 @@ endwhile
 	loop
 :PostUpdate
 	Self GetUnitMoveCell ->POU_iMoveZ ->POU_iMoveX
-	<-POU_iMoveX ->POU_iMoveCell
 	Self GetUnitCell ->POU_iZ ->POU_iX
 	
 	#Set the initial configuration of our unit 
@@ -171,25 +171,17 @@ endwhile
 	endonce
 	
 	#If the unit has been ordered to move
-	<-POU_iMoveCell <-POU_iLastMoveCell neq <-POU_iMoveCell -1 neq and if
-		#If the unit is already moving and has been reordered to move,
-		#we clear the occupied count from the area we ordered the unit to previously
-		<-POU_iLastMoveCell -1 neq if
-			<-POU_iLastMoveX <-POU_iLastMoveZ FALSE @SetCustomOccupiedLand
-		#If the unit was not moving and this is the first order,
-		#we clear the occupied count from the area the unit was sitting on
-		else
-			<-POU_iX <-POU_iZ FALSE @SetCustomOccupiedLand
-		endif
-		
-		#We set the occupied land at the new target location our unit is meant to land in
+	<-POU_iMoveX <-POU_iLastMoveX neq <-POU_iMoveZ <-POU_iLastMoveZ neq or <-POU_iMoveX -1 neq and if
+		#We clear the last area the unit was set to occupy, and
+		#we set the occupied land at the new target location our unit is meant to land in
+		<-G_iCurrentlyOccupiedX <-G_iCurrentlyOccupiedZ FALSE @SetCustomOccupiedLand
 		<-POU_iMoveX <-POU_iMoveZ TRUE @SetCustomOccupiedLand
 		<-POU_iMoveX <-POU_iMoveZ ->G_iCurrentlyOccupiedZ ->G_iCurrentlyOccupiedX
 	#If the unit is stationary
-	else <-POU_iMoveCell <-POU_iLastMoveCell eq <-POU_iMoveCell -1 eq and if
+	else <-POU_iMoveX <-POU_iLastMoveX eq <-POU_iMoveZ <-POU_iLastMoveZ eq and <-POU_iMoveX -1 eq and if
 		#If the unit was moved in the editor, clear last position and set new position
 		<-POU_iLastX <-POU_iX neq <-POU_iLastZ <-POU_iZ neq or if
-			<-POU_iLastX <-POU_iLastZ FALSE @SetCustomOccupiedLand
+			<-G_iCurrentlyOccupiedX <-G_iCurrentlyOccupiedZ FALSE @SetCustomOccupiedLand
 			<-POU_iX <-POU_iZ TRUE @SetCustomOccupiedLand
 			<-POU_iX <-POU_iZ ->G_iCurrentlyOccupiedZ ->G_iCurrentlyOccupiedX
 		endif
@@ -197,7 +189,6 @@ endwhile
 	
 	<-POU_iMoveZ <-POU_iMoveX ->POU_iLastMoveX ->POU_iLastMoveZ
 	<-POU_iZ <-POU_iX ->POU_iLastX ->POU_iLastZ
-	<-POU_iMoveCell ->POU_iLastMoveCell
 :Initialize
 	ClearStack
 	"cannon"			1
