@@ -137,6 +137,10 @@ endwhile
 	@awake
 :destroyed
 	<-G_iCurrentlyOccupiedX <-G_iCurrentlyOccupiedZ FALSE @SetCustomOccupiedLand
+:gameloaded
+	Self GetUnitCell TRUE @SetCustomOccupiedLand
+	Self GetUnitCell ->G_iCurrentlyOccupiedZ ->G_iCurrentlyOccupiedX
+	Self FALSE SetMVerseCreatesUnitGhost
 :PreUpdate
 	#Need to reinitialize a bit later so the Recycler can pick up custom units
 	#No harm in staggering this a bit
@@ -267,8 +271,6 @@ endwhile
 			endif
 		endif endif
 	endif
-:GameLoaded
-    Self FALSE SetMVerseCreatesUnitGhost
 :UpdateAnimation
 	Self "door_left_anchor" 0 0 <-G_fCurrentDoorRotation V3 FALSE SetObjRotation
 	Self "door_right_anchor" 180 0 <-G_fCurrentDoorRotation V3 FALSE SetObjRotation
