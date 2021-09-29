@@ -634,11 +634,11 @@ endif
 		
 		<-MBO_iHeight IsNull if
 			<-MBO_tChosenEntry{"TYPE"} <-MBO_fPosX <-MBO_fPosZ <-MBO_tChosenEntry{"SETTINGS"} CreateUnitOnTerrain ->MBO_iUID
-			<-MBO_sType <-MBO_tChosenEntry <-MBO_fPosX 0 <-MBO_fPosZ V3 @ProcessSpecialUnitSpawnBehaviors
+			<-MBO_iUID <-MBO_sType <-MBO_tChosenEntry <-MBO_fPosX 0 <-MBO_fPosZ V3 @ProcessSpecialUnitSpawnBehaviors
 		else
 			<-MBO_fPosX <-MBO_v3fPos.y <-MBO_iHeight add <-MBO_fPosZ V3 ->MBO_v3fPosUnit
 			<-MBO_tChosenEntry{"TYPE"} <-MBO_v3fPosUnit <-MBO_tChosenEntry{"SETTINGS"} CreateUnit ->MBO_iUID
-			<-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPosUnit @ProcessSpecialUnitSpawnBehaviors
+			<-MBO_iUID <-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPosUnit @ProcessSpecialUnitSpawnBehaviors
 		endif
 		
 		#If we're in mverse and this is a shared unit, stagger its construction.
@@ -735,6 +735,7 @@ endif
 	->PS_v3fPos
 	->PS_tEntry
 	->PS_sType
+	->PS_iUID
 	
 	<-PS_tEntry{"TYPE"} ->PS_s
 	
@@ -746,7 +747,12 @@ endif
 				endif
 			loop
 		loop
-	endif
+	else <-PS_s "pod" eq if
+		<-PS_iUID TRUE SetUnitSelectable
+		<-PS_iUID TRUE SetUnitSelected
+		<-PS_iUID TRUE SetUnitConnectable
+		<-PS_iUID TRUE SetUnitOccupiesLand
+	endif endif
 	
 # s1 t2 v3f3 - 
 # Description: Determine the created box spawn behaviors. This handles special occurrences that do not use the default unit spawning mechanism.
