@@ -1,3 +1,10 @@
+Mystery Boxes 5 dev1 unreleased.cpack
+  - Added Recycler
+  - Some immobile units will spawn as capsules from the Recycler that can be deployed in chosen locations
+  - Added support for floating text
+  - Now properly handling creation of pods
+  - Shifted some code around, no changes to other things however
+
 Mystery Boxes 4 dev2.cpack
   - Blocker removed. Turns out it was actually more laggy than towers
 

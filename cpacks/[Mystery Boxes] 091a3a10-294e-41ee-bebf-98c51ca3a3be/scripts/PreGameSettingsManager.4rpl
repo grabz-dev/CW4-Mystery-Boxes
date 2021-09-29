@@ -1,11 +1,9 @@
 # --PreGameSettingsManager-- 9/5/2021 5:05:30 PM
 
 
-$$CursorGhostGUID:"e81b3e36-c3cc-4cfc-9e31-da83aee69cf0"
-
 #Keep only a single ghost.
 -?G_iGhostUID not if
-	<-CursorGhostGUID 0 9999 0 0 0 0 0 0 GetUnits ->units
+	<-*MB_tCustomGUIDs{"Cursor Ghost"} 0 9999 0 0 0 0 0 0 GetUnits ->units
 	<-units 0 do
 		I eq0 if
 			<-units[I] ->G_iGhostUID
@@ -17,7 +15,7 @@ endif
 
 #If no ghost exists, create one.
 -?G_iGhostUID not if
-	<-CursorGhostGUID 0 0 0 V3 NULL CreateUnit ->G_iGhostUID
+	<-*MB_tCustomGUIDs{"Cursor Ghost"} 0 0 0 V3 NULL CreateUnit ->G_iGhostUID
 	<-G_iGhostUID "" "bAlive" TRUE SetScriptVar
 endif
 
