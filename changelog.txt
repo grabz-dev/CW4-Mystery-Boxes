@@ -1,3 +1,6 @@
+Mystery Boxes 5 dev3.cpack
+  - Recycler will now function when damaged, but will still not allow constructing units until fully repaired
+
 Mystery Boxes 5 dev2.cpack
   - Nerfed Splitmitter from 1000 payload to 500
   - Added additional help info to Recycler

@@ -40,10 +40,6 @@ endif
 Self GetUnitHealth Self GetUnitMaxHealth 0.5 mul lt if
 	Self Self GetUnitMaxHealth 0.5 mul SetUnitHealth
 endif
-#Prevent the recycler from functioning if not at max health
-Self GetUnitHealth Self GetUnitMaxHealth lt if
-	return
-endif
 
 #----Logic
 
