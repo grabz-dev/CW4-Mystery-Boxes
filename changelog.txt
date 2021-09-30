@@ -1,3 +1,7 @@
+Mystery Boxes 5 dev2.cpack
+  - Nerfed Splitmitter from 1000 payload to 500
+  - Added additional help info to Recycler
+
 Mystery Boxes 5 dev1.cpack
   - Added Recycler
   - Some immobile units will spawn as capsules from the Recycler that can be deployed in chosen locations
