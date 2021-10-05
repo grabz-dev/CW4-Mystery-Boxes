@@ -2,7 +2,7 @@ Mystery Boxes 6 dev2.cpack
   - On hard difficulty, the Titan box now has three predetermined evil outcomes the player has to go through before Titan box starts rolling normally
 
 Mystery Boxes 6 dev1.cpack
-  - Added Custom objective that is completed 
+  - Added Custom objective that is completed when the map is won on hard difficulty
 
 Mystery Boxes 5 dev3.cpack
   - Recycler will now function when damaged, but will still not allow constructing units until fully repaired
