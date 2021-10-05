@@ -150,10 +150,17 @@ endif
 	"airsaccauldron" 1 
 	Table ->G_tbMverseNullifiableEnemies
 	
+	#########
+	# Evil Titan Config
+	CreateList ->G_ltEvilTitan
+	"WEIGHT" 50.0,	"TYPE" <-*MB_tCustomGUIDs{"Orb Volcano"}, "SETTINGS" TableN("Type" "orb", "Payload" 300, "Count" 150, "Height" 25, 4) "SPECIAL" TableN("Seed" TRUE, "Effect" "boom1" 2) 4 TableN
+	"WEIGHT" 50.0,	"TYPE" <-*MB_tCustomGUIDs{"Orb Volcano"}, "SETTINGS" TableN("Type" "egg", "Payload" 1200, "Count" 50, "Height" 25, 4)	"SPECIAL" TableN("Seed" TRUE, "Effect" "boom1" 2) 4 TableN
+	"WEIGHT" 50.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 50000, "Effect" "boom1", 2)	3 TableN
+	<-G_ltEvilTitan AppendStackToList
 	
 	
 	CreateTable ->G_tttltConf
-
+	
 	#########
 	# TITAN_MYSTERY_BOX
 	CreateTable ->G_tttltConf{"TITAN_MYSTERY_BOX"}
@@ -510,26 +517,38 @@ endif
 :_OnMysteryBoxOpened
 	->MBO_bIsFromMverse ->MBO_v3fPos ->MBO_sType
 	
+	NULL ->MBO_tChosenEntry #reference to selected loot object
+	
 	#####
 	# Now things get fun
 	
-	#Get current config.
-	<-G_tttltConf{<-MBO_sType} ->MBO_ttltConfRoot
-	<-MBO_ttltConfRoot{"Seed"} ->MBO_iSeedUsed
-	<-MBO_ttltConfRoot{"CombinedLootList"} ->MBO_lootList
-	
-	#Roll for chance of spawning nothing.
-	<-MBO_ttltConfRoot{"NothingChancePrc"} <-MBO_sType @RandFloatSeeded 100.0 mul gte if
-		return
+	#Titan box override
+	<-MBO_sType <-*MB_TitanGuaranteedBadCount DebugAllSp
+	<-MBO_sType "TITAN_MYSTERY_BOX" eq <-*MB_TitanGuaranteedBadCount 0 gt and if
+		<-G_ltEvilTitan <-*MB_TitanGuaranteedBadCount 1 sub GetListElement ->MBO_tChosenEntry
+		<-*MB_TitanGuaranteedBadCount 1 sub ->*MB_TitanGuaranteedBadCount
 	endif
 	
-	NULL ->MBO_tChosenEntry #reference to selected loot object
-	
-	<-MBO_sType 0 <-MBO_lootList GetListCount @RandIntSeeded ->MBO_selectedBucket #AdjustedProb Aliases
-	<-MBO_sType @RandFloatSeeded <-MBO_ttltConfRoot{"AdjustedProb"}[<-MBO_selectedBucket] gte if
-		<-MBO_ttltConfRoot{"Aliases"}[<-MBO_selectedBucket] ->MBO_selectedBucket
+	#Regular behavior
+	<-MBO_tChosenEntry IsNull if
+		#Get current config.
+		<-G_tttltConf{<-MBO_sType} ->MBO_ttltConfRoot
+		<-MBO_ttltConfRoot{"Seed"} ->MBO_iSeedUsed
+		<-MBO_ttltConfRoot{"CombinedLootList"} ->MBO_lootList
+		
+		#Roll for chance of spawning nothing.
+		<-MBO_ttltConfRoot{"NothingChancePrc"} <-MBO_sType @RandFloatSeeded 100.0 mul gte if
+			return
+		endif
+		
+		
+		
+		<-MBO_sType 0 <-MBO_lootList GetListCount @RandIntSeeded ->MBO_selectedBucket #AdjustedProb Aliases
+		<-MBO_sType @RandFloatSeeded <-MBO_ttltConfRoot{"AdjustedProb"}[<-MBO_selectedBucket] gte if
+			<-MBO_ttltConfRoot{"Aliases"}[<-MBO_selectedBucket] ->MBO_selectedBucket
+		endif
+		<-MBO_lootList[<-MBO_selectedBucket] ->MBO_tChosenEntry
 	endif
-	<-MBO_lootList[<-MBO_selectedBucket] ->MBO_tChosenEntry
 	
 	
 	#If for some reason (config misconfiguration) an event wasn't chosen, exit.

@@ -28,6 +28,7 @@ endif
 	GetEditMode if
 		"hard" ->*MB_OptionDifficulty
 		TRUE ->MB_LastOptionDifficultyExists
+		@SetDifficultyContext
 		<-G_iGhostUID "text" "" SetObjText
 		return
 	endif
@@ -62,11 +63,14 @@ endif
 	return
 endif
 
-#If difficulty has changed, set animation timer.
+#If difficulty has changed, set animation timer
 -?*MB_OptionDifficulty <-MB_LastOptionDifficultyExists neq if
+	@SetDifficultyContext
+
 	90 SetTimer0
+	-?*MB_OptionDifficulty ->MB_LastOptionDifficultyExists
 endif
--?*MB_OptionDifficulty ->MB_LastOptionDifficultyExists
+
 
 #Difficulty text animation.
 GetTimer0 neq0 if
@@ -84,18 +88,25 @@ GetTimer0 neq0 if
 	return
 endif
 
-
-
-
+IsMissionComplete if
+	<-*MB_OptionDifficulty "hard" eq if
+		5 TRUE AcquireMissionObjective
+	endif
+endif
 
 
 :awake
 	once
 		--*MB_OptionDifficulty
+		--*MB_TitanGuaranteedBadCount
+		
+		5 TRUE SetMissionObjectiveEnabled
+		"Hard Difficulty" SetCustomObjectiveText
 		
 		"MB_MverseDifficultySelected" "OnMverseDifficultySelected" RegisterForMsg
 	
-		"hard"   "name" "Hard"   "desc" "Higher chance of bad outcomes." 2 TableN
+		"hard"   "name" "Hard"   "desc" "Higher chance of bad outcomes.
+Titan won't like you for a bit." 2 TableN
 		"normal" "name" "Normal" "desc" "Regular chance of bad outcomes." 2 TableN
 		"easy"   "name" "Easy"   "desc" "Lower chance of bad outcomes.
 Some bad outcomes disabled." 2 TableN
@@ -110,6 +121,19 @@ Some bad outcomes disabled." 2 TableN
 	<-POG_iX <-POG_iZ GetTerrain ->POG_iY
 
 	<-G_iGhostUID <-POG_iX <-POG_iY <-POG_iZ V3 SetUnitPosition
+:SetDifficultyContext
+	GetEditMode not if
+		<-*MB_OptionDifficulty "hard" neq if
+			"Hard Difficulty <color=red>(Failed)</color>" SetCustomObjectiveText
+		else
+			"Hard Difficulty <color=green>(Chosen)</color>" SetCustomObjectiveText
+		endif
+	endif
+	
+	<-*MB_OptionDifficulty "hard" eq if
+		#If you increase this you also have to increase the amount of stuff in the EvilTitan list in RNGManager
+		3 ->*MB_TitanGuaranteedBadCount
+	endif
 :SetDifficultyText
 	<-G_tsDifficulties GetTableValues ->SDT_lValues
 	"Choose Difficulty
