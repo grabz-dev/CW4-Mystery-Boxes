@@ -1,3 +1,8 @@
+Mystery Boxes 6 dev3.cpack
+  - Added resources to the Recycler
+  - Reduced Rocket cost in the Recycler
+  - Buffed Greenar Mother random spawns slightly
+
 Mystery Boxes 6 dev2.cpack
   - On hard difficulty, the Titan box now has three predetermined evil outcomes the player has to go through before Titan box starts rolling normally
 

@@ -19,7 +19,7 @@
 			<-lUnits GetListCount 0 gt if
 				"text" "Too close to Recycler to deploy" "lifetime" 30 "color" 1 0.58 0.58 1 V4 3 TableN @SpawnFloatingText
 			else
-				<-UnitType Self GetUnitCell 0 CreateUnitOnTerrain ->iUnit
+				<-UnitType Self GetUnitCell <-UnitOpts CreateUnitOnTerrain ->iUnit
 				#Do not construct the unit if we're playing Mverse and this is a shared unit
 				GetMversePlayerNum 0 gte <-*MB_tbMverseSharedUnits{<-UnitType} and if
 				

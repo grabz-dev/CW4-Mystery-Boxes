@@ -219,11 +219,14 @@ endwhile
 	CreateList ->*G_ltRecyclerConfig
 
 	ClearStack
-	"Name" "Rocket"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 7x7"}	"Cost" 60	"ModeFour" FALSE "Opts" TableN("UnitType" "rocketpad" "Name" "ROCKET" "Color" 0 1 0 1 V4 3)		5 TableN
+	"Name" "Greenar"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 30	"ModeFour" TRUE "Opts" TableN("UnitType" "greenarmother" "Name" "GREENAR MOTHER" "Color" 0 0.9 0 1 V4 "UnitOpts" TableN("Interval" 800 1) 4)		5 TableN
+	"Name" "Redon"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 30	"ModeFour" TRUE "Opts" TableN("UnitType" "resourcered" "Name" "REDON CRYSTAL" "Color" 1 0.075 0.075 1 V4 "UnitOpts" TableN("Interval" 50 1) 4)		5 TableN
+	"Name" "Bluite"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 30	"ModeFour" TRUE "Opts" TableN("UnitType" "resourceblue" "Name" "BLUITE CRYSTAL" "Color" 0.05 0.15 1 1 V4 "UnitOpts" TableN("Interval" 50 1) 4)		5 TableN
 	"Flare" @IsRegistered if 
 		"Name" "Flare"		"UnitType" <-*MB_tCustomGUIDs{"Flare"}		"Cost" 40 "ModeFour" TRUE	4 TableN
 	endif
-	"Name" "Refinery"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 20	"ModeFour" TRUE "Opts" TableN("UnitType" "greenarrefinery" "Name" "REFINERY" "Color" 0 1 0 1 V4 3)		5 TableN
+	"Name" "Rocket"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 7x7"}	"Cost" 30	"ModeFour" FALSE "Opts" TableN("UnitType" "rocketpad" "Name" "ROCKET" "Color" 0 1 0 1 V4 3)		5 TableN
+	"Name" "Refinery"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 20	"ModeFour" TRUE "Opts" TableN("UnitType" "greenarrefinery" "Name" "REFINERY" "Color" 0.6 0.2 0.075 1 V4 3)		5 TableN
 	"Name" "Beacon"		"UnitType" "beacon"							"Cost" 15 "ModeFour" TRUE		4 TableN
 	"Name" "Terp"		"UnitType" "terp"							"Cost" 15 "ModeFour" TRUE		4 TableN
 	"Name" "Missile"	"UnitType" "missilelauncher"				"Cost" 10  "ModeFour" TRUE		4 TableN
