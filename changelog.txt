@@ -1,3 +1,6 @@
+Mystery Boxes 6 dev4.cpack
+  - Reduced Splitmitter health (3 -> 2), split count and payload
+
 Mystery Boxes 6 dev3.cpack
   - Added resources to the Recycler
   - Reduced Rocket cost in the Recycler
