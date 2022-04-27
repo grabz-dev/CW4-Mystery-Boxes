@@ -106,11 +106,12 @@ endif
 		"MB_MverseDifficultySelected" "OnMverseDifficultySelected" RegisterForMsg
 	
 		"hard"   "name" "Hard"   "desc" "Higher chance of bad outcomes.
-Titan won't like you for a bit." 2 TableN
+A formidable challenge." 2 TableN
 		"normal" "name" "Normal" "desc" "Regular chance of bad outcomes." 2 TableN
 		"easy"   "name" "Easy"   "desc" "Lower chance of bad outcomes.
 Some bad outcomes disabled." 2 TableN
-		3 TableN ->G_tsDifficulties
+		"peace"  "name" "Peaceful" "desc" "No bad outcomes. Peace and quiet." 2 TableN
+		4 TableN ->G_tsDifficulties
 	endonce
 :once
 	@awake

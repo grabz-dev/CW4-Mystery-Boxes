@@ -1,0 +1,124 @@
+# --RocketShot-- 11/18/2020 12:59:08 PM
+#Created by Alophox
+#Refurbished by Grabz
+
+-?targeting not if
+	Self FALSE FALSE TRUE DestroyUnit
+endif
+
+<-lifetimecount 1 add ->lifetimecount
+<-lifetimecount 900 gte if
+	@Kaboom
+endif
+
+#phase 0, or no more phases; aka go down, but straight
+#do no changes to t
+if(<-phase eq0) 
+
+#phase 1: go up
+else <-phase 1 eq if
+	<-t 1 add ->t
+	@CalcNormalizedVelocity
+	<-t <-tMultiplier mul 1 gte if
+		2 ->phase
+		1 <-tMultiplier div ->t
+		@CalcNormalizedVelocity
+	endif
+#phase 2: go up, but straight
+else <-phase 2 eq if
+	Self GetUnitPosition ->currentPos
+	#determine when to turn to hit target
+	<-currentPos.y <-target.y sub <-projSpeed 15 mul add, <-currentPos.x <-target.x sub 2 pow <-currentPos.z <-target.z sub 2 pow add sqrt gte if
+		3 ->phase
+		<-t 1 add ->t
+	endif
+#phase 3: go down
+else <-phase 3 eq if
+	<-t 1 add ->t
+	@CalcNormalizedVelocity
+	if(<-t <-tMultiplier mul 3 gte)
+		0 ->phase
+		3 <-tMultiplier div ->t
+		@CalcNormalizedVelocity
+	endif
+endif endif endif endif
+
+#and i scale it to the desired speed, whatever thtat may be, because the vector is a magnitude of 1
+<-projSpeed <-normalizedVelocity mul ->velocity
+#then I apply that to the unit
+Self <-velocity SetUnitForward
+Self dup GetUnitPosition <-velocity add SetUnitPosition
+
+Self GetUnitPosition ->currentPos
+<-currentPos.y <-currentPos.X <-currentPos.Z false GetExactTerrain lte if
+	@Kaboom
+endif
+
+#calculates normalized velocity and puts it into ->normalizedVelocity
+:CalcNormalizedVelocity
+	#this uses the properties of spherical coordinates, in a unit sphere
+	#first, I get my desired y velocity. it's a VERY complicated formula, sin(t). just, you know, split because of the switch above
+	
+	#literally just if its negative or not, cause i can't sqrt negative numbers
+	HALFPI <-t mul <-tMultiplier mul sin ->a
+	<-a neq0 if
+		<-a dup abs div ->negY
+	else
+		<-a ->negY
+	endif
+	<-a <-projSpeedY <-projSpeed div mul abs sqrt <-negY mul ->yMultiplier
+	
+	#next, I get the corresponding horizantal velocity(1^2 = y^2 + r^2). This will be split into x and z components later
+	1 <-yMultiplier 2 pow sub sqrt ->radiusMultiplier
+	
+	#radius multiplier is split, and everything put into a vector3- this is the xyz of a coord on the unit sphere
+	<-launchAngle cos <-radiusMultiplier mul, <-yMultiplier, <-launchAngle sin <-radiusMultiplier mul V3 ->normalizedVelocity
+
+:Kaboom
+	<-currentPos.X <-currentPos.Z 9999 <-DAMAGE_DIST <-DAMAGE_DEPTH FALSE DamageCreeper
+	<-currentPos.X <-currentPos.Z <-DAMAGE_DIST <-DAMAGE_MESH DamageMesh
+	Self FALSE FALSE TRUE DestroyUnit
+
+:Once
+	1 ->phase
+	0 ->lifetimecount
+	
+	#tMultiplier scales how long I want the turns to be. less, the more time per turn
+	0.1 ->tMultiplier
+	-1 ->t
+	<-projSpeed 0.5 mul ->projSpeedY
+
+	#offset, cause who wants perfectly accurate rockets
+	Self GetUnitPosition ->currentPos
+	<-target -4 5 @RandIntSeeded, 0, -4 5 @RandIntSeeded V3 add ->target
+	<-target.z <-currentPos.z sub <-target.x <-currentPos.x sub atan2 ->launchAngle
+	
+	#add damage map info
+	Self <-target.x <-target.z <-DAMAGE_DIST <-DAMAGE_DEPTH 1000000 mul FALSE ApplyToDamageMap
+	
+	Self "" 1 4 CreateTrail
+	
+	#if above target, immediately go down
+	<-currentPos.y <-target.y sub <-projSpeed 15 mul add, <-currentPos.x <-target.x sub 2 pow <-currentPos.z <-target.z sub 2 pow add sqrt gte if
+		3 ->phase
+		1.5 <-tMultiplier div ->t
+	endif
+:destroyed
+	Self RemoveUnitDamageMap
+	
+	"explosion4" Self GetUnitPosition 0.8 0.8 0.8 V3 CreateEffect
+	
+# i1 i2 - i3
+:RandIntSeeded
+	->RIS_iMaxExcl
+	->RIS_iMinIncl
+	@RandFloatSeeded ->RIS_iRand
+	
+	<-RIS_iMaxExcl <-RIS_iMinIncl sub <-RIS_iRand mul floor <-RIS_iMinIncl add
+# - f1
+:RandFloatSeeded
+	<-Seed sin 10000.0 mul ->RFS_fVal
+	<-Seed 1 add ->Seed
+	
+	<-RFS_fVal <-RFS_fVal floor sub
+

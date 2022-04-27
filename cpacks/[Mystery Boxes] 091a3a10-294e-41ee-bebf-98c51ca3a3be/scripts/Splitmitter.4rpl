@@ -1,6 +1,6 @@
 # --Splitmitter-- 8/25/2021 11:37:27 AM
 
-$$SPLITMITTER_GUID:"746e142d-5e17-481d-8cb7-79cda5116c66"
+$$SPLITMITTER_GUID:"10d70983-50b9-42fe-a848-6bc43dd9feaa"
 $$MAX_SPEED:0.8
 $$GRAVITY:0.012
 $$ACCELERATION:0.0025
@@ -54,6 +54,12 @@ else
 	endif
 endif
 
+Self "script_root" FALSE GetObjRotation ->rot
+<-fRotation 0.5 add ->fRotation
+<-fRotation 360.0 gte if
+	<-fRotation 360.0 sub ->fRotation
+endif
+Self "script_root" <-fRotation dup dup V3 FALSE SetObjRotation
 
 :destroyed
 	#If we are client, do nothing.
@@ -135,8 +141,8 @@ endif
 		<-InitialForce ->force
 	endif
 	
-	GetUnitMaxHealth ->fLastCurHealth
-	
+	Self GetUnitMaxHealth ->fLastCurHealth
+	0.0 ->fRotation
 :OnSplitmitterDestroyed
 	#If we are client and the signature matches Host's Splitmitter, destroy our clone.
 	<-_DATA <-HostUID eq if

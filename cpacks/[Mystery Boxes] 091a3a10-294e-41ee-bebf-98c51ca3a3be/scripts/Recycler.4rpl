@@ -144,21 +144,31 @@ endwhile
 	endif
 	Self FALSE SetMVerseCreatesUnitGhost
 :PreUpdate
-	#Need to reinitialize a bit later so the Recycler can pick up custom units
-	#No harm in staggering this a bit
-	GetGameTickCount 30 gte -?*MB_OptionDifficulty and if
+	-?*MB_OptionDifficulty if
 		once
-			<-*MB_OptionDifficulty "hard" eq if
-				<-G_iScrap 0 add ->G_iScrap
-			else <-*MB_OptionDifficulty "normal" eq if
-				<-G_iScrap 5 add ->G_iScrap
-			else <-*MB_OptionDifficulty "easy" eq if
-				<-G_iScrap 10 add ->G_iScrap
-			endif endif endif
+			#<-*MB_OptionDifficulty "hard" eq if
+			#	<-G_iScrap 0 add ->G_iScrap
+			#else <-*MB_OptionDifficulty "normal" eq if
+			#	<-G_iScrap 5 add ->G_iScrap
+			#else <-*MB_OptionDifficulty "easy" eq if
+			#	<-G_iScrap 10 add ->G_iScrap
+			#else <-*MB_OptionDifficulty "peace" eq if
+			#	<-G_iScrap 10 add ->G_iScrap
+			#endif endif endif endif
+			<-G_iScrap 10 add ->G_iScrap
 			
 			@UpdateScrapText
 			@InitializeUI
 		endonce
+	endif
+	
+	#If an mverse player joined or quit we have to reinitialize
+	GetGameTickCount 30 mod 0 eq if
+		@ResDivFactor ->rdf
+		<-G_iLastResDivFactor <-rdf neq if
+			@InitializeUI
+			<-rdf ->G_iLastResDivFactor
+		endif
 	endif
 	
 	#Look over units that have been created by the recycler
@@ -211,21 +221,16 @@ endwhile
 	"sniper"			2
 	"missilelauncher"	2
 	"terp"				3
-	"Flare" @IsRegistered if 
-		<-*MB_tCustomGUIDs{"Flare"} 8
-	endif
+	<-*MB_tCustomGUIDs{"Flare"} 8
+	<-*MB_tCustomGUIDs{"AC Bomb"} 8
 	Table ->*G_tItemScrapValues
 	
 	CreateList ->*G_ltRecyclerConfig
 
 	ClearStack
-	"Name" "Greenar"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 30	"ModeFour" TRUE "Opts" TableN("UnitType" "greenarmother" "Name" "GREENAR MOTHER" "Color" 0 0.9 0 1 V4 "UnitOpts" TableN("Interval" 800 1) 4)		5 TableN
-	"Name" "Redon"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 30	"ModeFour" TRUE "Opts" TableN("UnitType" "resourcered" "Name" "REDON CRYSTAL" "Color" 1 0.075 0.075 1 V4 "UnitOpts" TableN("Interval" 50 1) 4)		5 TableN
-	"Name" "Bluite"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 30	"ModeFour" TRUE "Opts" TableN("UnitType" "resourceblue" "Name" "BLUITE CRYSTAL" "Color" 0.05 0.15 1 1 V4 "UnitOpts" TableN("Interval" 50 1) 4)		5 TableN
-	"Flare" @IsRegistered if 
-		"Name" "Flare"		"UnitType" <-*MB_tCustomGUIDs{"Flare"}		"Cost" 40 "ModeFour" TRUE	4 TableN
-	endif
-	"Name" "Rocket"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 7x7"}	"Cost" 30	"ModeFour" FALSE "Opts" TableN("UnitType" "rocketpad" "Name" "ROCKET" "Color" 0 1 0 1 V4 3)		5 TableN
+	"Name" "Rocket"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 7x7"}	"Cost" 35	"ModeFour" FALSE "Opts" TableN("UnitType" "rocketpad" "Name" "ROCKET" "Color" 0 1 0 1 V4 3)		5 TableN
+	"Name" "ACBomb"		"UnitType" <-*MB_tCustomGUIDs{"AC Bomb"}		"Cost" 30 "ModeFour" TRUE	4 TableN
+	"Name" "Flare"		"UnitType" <-*MB_tCustomGUIDs{"Flare"}		"Cost" 20 "ModeFour" TRUE	4 TableN
 	"Name" "Refinery"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 20	"ModeFour" TRUE "Opts" TableN("UnitType" "greenarrefinery" "Name" "REFINERY" "Color" 0.6 0.2 0.075 1 V4 3)		5 TableN
 	"Name" "Beacon"		"UnitType" "beacon"							"Cost" 15 "ModeFour" TRUE		4 TableN
 	"Name" "Terp"		"UnitType" "terp"							"Cost" 15 "ModeFour" TRUE		4 TableN
@@ -234,13 +239,19 @@ endwhile
 	"Name" "Sprayer"	"UnitType" "sprayer"						"Cost" 10  "ModeFour" TRUE		4 TableN
 	"Name" "Shield"		"UnitType" "shield"							"Cost" 10  "ModeFour" TRUE		4 TableN
 	"Name" "Mortar" 	"UnitType" "mortar" 						"Cost" 5  "ModeFour" TRUE		4 TableN
+	"Name" "Green+"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 30 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "greenarmother" "Name" "GREENAR MOTHER" "Color" 0 0.9 0 1 V4 "UnitOpts" TableN("Interval" 240 1) 4)		5 TableN
+	"Name" "Redon+"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 15 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "resourcered" "Name" "REDON CRYSTAL" "Color" 1 0.075 0.075 1 V4 "UnitOpts" TableN("Interval" 30 1) 4)		5 TableN
+	"Name" "Bluite+"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 15 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "resourceblue" "Name" "BLUITE CRYSTAL" "Color" 0.05 0.15 1 1 V4 "UnitOpts" TableN("Interval" 30 1) 4)		5 TableN
+	"Name" "Greenar"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 10 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "greenarmother" "Name" "GREENAR MOTHER" "Color" 0 0.9 0 1 V4 "UnitOpts" TableN("Interval" 800 1) 4)		5 TableN
+	"Name" "Redon"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 5 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "resourcered" "Name" "REDON CRYSTAL" "Color" 1 0.075 0.075 1 V4 "UnitOpts" TableN("Interval" 100 1) 4)		5 TableN
+	"Name" "Bluite"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 5 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "resourceblue" "Name" "BLUITE CRYSTAL" "Color" 0.05 0.15 1 1 V4 "UnitOpts" TableN("Interval" 100 1) 4)		5 TableN
 	<-*G_ltRecyclerConfig AppendStackToList
 
 	CreateList ->IR_lOptions
 	-?*MB_OptionDifficulty if
 		<-*G_ltRecyclerConfig 0 do
 			<-*G_ltRecyclerConfig[I] ->IR_tConf
-			<-IR_lOptions "(" <-IR_tConf{"Cost"} @GetCostFromDifficulty concat ") " concat <-IR_tConf{"Name"} concat AppendToList
+			<-IR_lOptions "" <-IR_tConf{"Cost"} @GetCostFromDifficulty concat ": " concat <-IR_tConf{"Name"} concat AppendToList
 		loop
 	endif
 	
@@ -293,7 +304,7 @@ endwhile
 	Self 0 "Scrap: " <-G_iScrap concat SetUnitUIText
 :SetCustomOccupiedLand
 	->SOL_bSet ->SOL_iCellZ ->SOL_iCellX
-	4 ->SOL_iRadius
+	5 ->SOL_iRadius
 	<-SOL_iCellZ <-SOL_iRadius add 1 add <-SOL_iCellZ <-SOL_iRadius sub do
 		<-SOL_iCellX <-SOL_iRadius add 1 add <-SOL_iCellX <-SOL_iRadius sub do
 			<-SOL_iCellX <-SOL_iRadius sub I eq
@@ -386,20 +397,27 @@ endwhile
 	<-*MB_OptionDifficulty "hard" eq if
 		return
 	else <-*MB_OptionDifficulty "normal" eq if
-		0.5 mul ceil asint return
+		return #0.75 mul ceil asint return
 	else <-*MB_OptionDifficulty "easy" eq if
-		0.25 mul ceil asint return
-	endif endif endif
+		return #0.5 mul ceil asint return
+	else <-*MB_OptionDifficulty "peace" eq if
+		return #0.5 mul ceil asint return
+	endif endif endif endif
 	
 	
-	
-# s1 - b2
-# Description: Function that tells us if a custom unit type GUID from a MB CPACK addon is contained inside the project.
-# Arguments: CMOD GUID
-# Result: TRUE if this CMOD is in the project, FALSE otherwise
-:IsRegistered
-	<-*MB_tsRegisteredCPACKUnits swap GetTableElement IsNull not
+
 :SpawnFloatingText
 	->SFT_tData #text, lifetime, speed, size, color
 	
 	<-*MB_tCustomGUIDs{"Floating Text"} Self GetUnitPosition <-SFT_tData CreateUnit pop
+:ResDivFactor
+	0 ->RDF_iDivFactor
+	GetMVersePlayers ->RDF_lPlayers
+	<-RDF_lPlayers 0 do
+		<-RDF_lPlayers[I] IsNull not if
+			<-RDF_iDivFactor 1 add ->RDF_iDivFactor
+		endif
+	loop
+	
+	<-RDF_iDivFactor 1 max asfloat
+	

@@ -1,0 +1,187 @@
+# --RocketLauncher-- 11/17/2020 11:34:58 PM
+#Created by Alophox
+#Refurbished by Grabz
+
+$projSpeed:.4 #total speed
+$rotSpeed:1 #radians per second
+$fireCost:10
+$rechargeTime:180 #frames between bursts
+$miniRechargeTime:10.0 #frames between shots, makes sure it is a float
+$DAMAGE_MESH:0.35
+$DAMAGE_DIST:7 #presumably the radius of the damage
+$DAMAGE_DEPTH:4 #presumably the depth from point of impact. Think of it as the Y radius
+
+Self GetUnitConstructing Self GetUnitStunCount 0 gt or if
+	return
+endif
+
+#Calculate range
+Self GetUnitRangeWithMods ->currentUnitRange
+<-currentUnitRange <-lastUnitRange neq if
+	Self RefreshUnitLosCache
+endif
+<-currentUnitRange ->lastUnitRange
+
+#Fire rockets
+<-burstCounter -1 neq if
+	<-burstCounter <-miniRechargeTime mod 0 eq if
+		<-burstCounter <-miniRechargeTime div 3 mod ->barrel
+		
+		<-barrel 0 eq if
+			0.5 <-launchAngle HALFPI add cos mul, 0.45, 0.5 <-launchAngle HALFPI add sin mul V3 ->offset
+		else <-barrel 1 eq if
+			0.0, 0.45, 0.0 V3 ->offset
+		else <-barrel 2 eq if
+			0.5 <-launchAngle HALFPI sub cos mul, 0.45, 0.5 <-launchAngle HALFPI sub sin mul V3 ->offset
+		endif endif endif
+	
+		
+		<-offset @FireProjectile
+		
+		<-burstCounter 0 eq if
+			-1 -1 -1 V3 ->target
+		endif
+	endif
+	<-burstCounter 1 sub ->burstCounter
+endif
+
+#Refresh LOS if the unit was forcibly moved somehow
+Self GetUnitPosition ->curPos
+<-curPos.x <-lastPos.x neq
+<-curPos.y <-lastPos.y neq or
+<-curPos.z <-lastPos.z neq or if
+	1 @SetMoving
+	<-curPos ->lastPos
+endif
+
+#Refresh LOS
+Self GetUnitMoveCell pop -1 neq if
+	1 @SetMoving
+else
+	0 @SetMoving
+endif
+
+Self GetUnitEnabled Self GetUnitArmed and if 
+	<-moving not if
+		<-fireCount gt0 if
+			<-fireCount 1 sub ->fireCount
+		else
+			<-target.x gte0 if
+				Self "Rocket Pole" <-target.X <-target.Z <-rotSpeed Self GetUnitERNState if 2.0 mul endif RotateObjTowardsCell
+				<-target.z <-currentPos.z sub <-target.x <-currentPos.x sub atan2 ->launchAngle
+				
+				Self "Rocket Pole" <-target.x <-target.z GetObjFacingAngleCell ->facingAngle
+				<-facingAngle 0.5 lt if
+					@Fire
+				endif
+			else @CanFire if
+				Self TRUE 0 FindUnitEnemy ->autoTargetZ ->autoTargetX
+				Self <-autoTargetX, <-autoTargetX <-autoTargetZ FALSE GetExactTerrain, <-autoTargetZ V3 SetUnitSpecifiedTarget
+				Self <-autoTargetX <-autoTargetZ <-DAMAGE_DIST <-DAMAGE_DEPTH 1000000 mul 4 mul FALSE ApplyToDamageMap
+
+				Self FALSE SetUnitSpecifiedTargetShowPath
+				Self GetUnitSpecifiedTarget ->target
+				<-target.x gte0 not if
+					Self ClearUnitSpecifiedTarget
+				endif
+				Self GetUnitPosition ->currentPos
+			endif endif
+		endif	
+	endif
+endif
+
+:SetMoving
+	->movingNew
+		
+	<-movingNew <-moving neq if
+		#We were moving, and now we are not.
+		<-moving 0 gt if
+			Self RefreshUnitLOSCache
+			
+		#We were not moving, and now we are.
+		else
+			-1 -1 -1 V3 ->target
+			-1 ->burstCounter
+			Self ClearUnitSpecifiedTarget
+			Self RemoveUnitDamageMap
+		endif
+	endif
+	
+	<-movingNew ->moving
+
+#returns a boolean
+#we have no cooldown AND we have enough ammo
+:CanFire
+	<-fireCount eq0 Self GetUnitAmmo <-fireCost gte and
+
+#does internal if able to fire checks, as well as handling what happens when you can fire
+:Fire
+	@CanFire if
+		Self RemoveUnitDamageMap
+		
+		5 GetERNPortalEfficiency ->ERNefficiency
+		<-ERNefficiency 50.0 mul asint ->fireRateAdditionalCoefficient
+	
+		#reset cooldown
+		<-rechargeTime <-fireRateAdditionalCoefficient sub ->fireCount
+		
+		#deduct cost
+		Self dup GetUnitAmmo <-fireCost sub SetUnitAmmo
+		
+		CreateTable ->initParams
+		-0.5 <-launchAngle HALFPI add cos mul, .45, -0.5 <-launchAngle HALFPI add sin mul V3 ->offset
+		
+		Self GetUnitERNState if
+			8.0 ->miniRechargeTime
+			<-miniRechargeTime 4 mul ->burstCounter
+		else
+			10.0 ->miniRechargeTime
+			<-miniRechargeTime 2 mul ->burstCounter
+		endif
+	endif
+
+#creates projectils when firing
+#takes in a V3 for offseting, so make sure there's a V3 on the stack
+:FireProjectile
+	Self "Rocket Turret" TRUE GetObjPosition add ->firePos
+	<-projSpeed Self GetUnitERNState if 2.0 mul endif ->initParams{"projSpeed"}
+	<-launchAngle ->initParams{"launchAngle"}
+	<-DAMAGE_MESH ->initParams{"DAMAGE_MESH"}
+	<-DAMAGE_DIST ->initParams{"DAMAGE_DIST"}
+	<-DAMAGE_DEPTH ->initParams{"DAMAGE_DEPTH"}
+	<-target ->initParams{"TARGET"}
+	1 10000000 @RandIntSeeded ->initParams{"Seed"}
+	1 ->initParams{"targeting"}
+
+	<-*MB_tCustomGUIDs{"Flare Rocket"} <-firePos <-initParams CreateUnit ->shotUnit
+	"Sci Fi Explosion 12", 1, Self GetUnitPosition PlaySoundAtPosition
+	
+	#make it so it spawns facing the right way, instead of world forward
+	<-shotUnit 1 <-launchAngle cos mul, 0, 1 <-launchAngle sin mul V3 SetUnitForward
+	
+:Once
+	-?Seed not if
+		1 10000000 RandInt ->Seed
+	endif
+
+	Self 7 SetUnitPacketRequestRate
+	Self RemoveUnitDamageMap
+	0 ->targeting
+	-1 ->autoTargetX
+	-1 ->burstCounter
+	-1 -1 -1 V3 ->target
+	Self FALSE SetUnitSpecifiedTargetShowPath
+# i1 i2 - i3
+:RandIntSeeded
+	->RIS_iMaxExcl
+	->RIS_iMinIncl
+	@RandFloatSeeded ->RIS_iRand
+	
+	<-RIS_iMaxExcl <-RIS_iMinIncl sub <-RIS_iRand mul floor <-RIS_iMinIncl add
+# - f1
+:RandFloatSeeded
+	<-Seed sin 10000.0 mul ->RFS_fVal
+	<-Seed 1 add ->Seed
+	
+	<-RFS_fVal <-RFS_fVal floor sub
+	

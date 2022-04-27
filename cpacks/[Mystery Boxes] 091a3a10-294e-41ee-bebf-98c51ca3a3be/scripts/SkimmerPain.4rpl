@@ -1,0 +1,44 @@
+# --SkimmerPain-- 4/20/2022 8:01:57 PM
+# --pain-- 8/31/2021 3:02:10 AM
+
+$Interval:10
+
+once
+    GetMapSize ->mapSizeZ ->mapSizeX
+    Table(    "Target" 0 
+            "Payload" 0
+            "LifeTime" 0) ->SkimmerData
+	30 30 mul SetTimer0
+endonce
+
+GetTimer0 eq0 if
+	Self TRUE FALSE TRUE DestroyUnit
+endif
+
+GetMVersePlayerNum 0 lte if
+	if (GetGameUpdateCount <-Interval % eq0)
+		@RandFloatSeeded <-mapSizeX * ->rX
+		@RandFloatSeeded <-mapSizeZ * 20 sub ->rZ
+		CreateUnit("skimmer" V3(<-rX 500 <-rZ) <-SkimmerData) ->skimmer
+	endif
+endif
+
+Self "text" FALSE GetObjPosition ->pos
+<-pos.y 0.01 add ->pos.y
+Self "text" <-pos FALSE SetObjPosition
+
+:awake
+	Self "text" "Uh oh..." SetObjText 
+# i1 i2 - i3
+:RandIntSeeded
+	->RIS_iMaxExcl
+	->RIS_iMinIncl
+	@RandFloatSeeded ->RIS_iRand
+	
+	<-RIS_iMaxExcl <-RIS_iMinIncl sub <-RIS_iRand mul floor <-RIS_iMinIncl add
+# - f1
+:RandFloatSeeded
+	<-Seed sin 10000.0 mul ->RFS_fVal
+	<-Seed 1 add ->Seed
+	
+	<-RFS_fVal <-RFS_fVal floor sub

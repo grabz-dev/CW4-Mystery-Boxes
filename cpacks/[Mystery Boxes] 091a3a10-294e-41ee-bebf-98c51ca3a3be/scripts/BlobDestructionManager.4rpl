@@ -1,0 +1,34 @@
+# --BlobDestructionManager-- 4/20/2022 3:08:30 PM
+
+<-*G_lBlobsDestruction 0 do
+	<-*G_lBlobsDestruction[I] ->blob
+	<-blob{"uid"} ->uid
+	<-uid GetUnitDestroyed if
+		<-tBlobs{<-uid} ->pos
+		
+		<-*G_lBlobsDestruction I RemoveListElement
+		<-tBlobs <-uid RemoveTableElement
+		
+		<-*MB_OptionDifficulty "normal" eq if
+			<-pos ToCell <-blob{"payload"} AddCreeper
+		else <-*MB_OptionDifficulty "hard" eq if
+			<-pos ToCell <-blob{"payload"} AddCreeper
+			<-pos 4 FALSE TRUE TRUE 2 0 1 GetUnitsInRange ->units
+			<-units 0 do
+				<-units[I] FALSE FALSE FALSE DestroyUnit
+			loop
+		endif endif
+		
+		
+	else
+		<-tBlobs <-uid <-uid GetUnitPosition SetTableElement
+	endif
+loop
+
+:awake
+	once
+		CreateList ->*G_lBlobsDestruction
+		CreateTable ->tBlobs
+	endonce
+:once
+	@awake

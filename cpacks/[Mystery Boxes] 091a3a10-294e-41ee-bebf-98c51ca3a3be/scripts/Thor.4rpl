@@ -22,15 +22,15 @@ $fireVel:1
 $DAMAGE_DIST:7
 $DAMAGE_DEPTH:10
 $DAMAGE_MESH:0.52
-$thorShotGUID:"14d0f231-d6cf-4561-84a2-50af3ec81a9f"
 
-
-if (GetUnitConstructing(self) !)
-	@Operate
+Self GetUnitConstructing Self GetUnitStunCount 0 gt or if
+	return
 endif
 
+@Operate
+
 :BUILDCOMPLETE
-	SetObjActive(self "buildframe" false)
+	#SetObjActive(self "buildframe" false)
 	PlaySoundAtPosition("Sci Fi Explosion 03", 1, GetUnitPosition(self))
 
 	Table("color" V3(1 0.8 0.8) 
@@ -213,7 +213,7 @@ endif
 	<-target ->initParams{"target"}
 
 	GetObjPosition(self "gun" true) ->gunPos
-	CreateUnit(<-thorShotGUID <-gunPos <-initParams) ->shotUnit
+	CreateUnit(<-*MB_tCustomGUIDs{"Airship Shot"} <-gunPos <-initParams) ->shotUnit
 	
 	#Tag the damage map with the damage this shot will do. When the shot is destroyed, the damage will
 	#be automatically cleaned up (because we specified '<-shotUnit' as the unit to associate with the damage map call).

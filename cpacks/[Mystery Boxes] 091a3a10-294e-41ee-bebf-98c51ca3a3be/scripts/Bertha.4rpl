@@ -7,13 +7,12 @@ $fireCost:40
 $rechargeTime:180
 $DAMAGE_DIST:7
 $DAMAGE_DEPTH:10
-$$berthaShotGUID:"2978b013-5bc0-4867-bf29-c54c943b90c3"
 
 #UI 0: Flip; Auto Fire Mode (0=manual 1 = auto)
 
-if (GetUnitConstructing(self))
+Self GetUnitConstructing Self GetUnitStunCount 0 gt or if
 	return
-endif	
+endif
 
 GetUnitUIState(self 0) ->autoFireMode
 if (<-autoFireMode <-autoTargetX lt0 && @CanAutoAim &&)
@@ -86,7 +85,7 @@ endif
 
 :Fire
 	if (@CanFire)
-		<-rechargeTime RandInt(-2 3) + ->fireCount
+		<-rechargeTime @RandIntSeeded(-2 3) + ->fireCount
 		CreateTable ->initParams
 
 		#Remove any damage map that was set by auto targeting.
@@ -96,8 +95,8 @@ endif
 		if (GetUnitERNState(self))
 			<-target ->originalTarget
 			do(3 0)
-				<-originalTarget.x RandInt(-10 11) + ->newX
-				<-originalTarget.z RandInt(-10 11) + ->newZ
+				<-originalTarget.x @RandIntSeeded(-10 11) + ->newX
+				<-originalTarget.z @RandIntSeeded(-10 11) + ->newZ
 				V3(<-newX GetTerrain(<-newX <-newZ) <-newZ) ->target
 				@CalculateBallistics
 				@FireProjectile
@@ -122,7 +121,7 @@ endif
 	<-DAMAGE_DEPTH ->initParams{"DAMAGE_DEPTH"}
 	<-target ->initParams{"TARGET"}
 
-	CreateUnit(<-berthaShotGUID <-armPos <-initParams) ->shotUnit
+	CreateUnit(<-*MB_tCustomGUIDs{"Bertha Shot"} <-armPos <-initParams) ->shotUnit
 	
 	#Tag the damage map with the damage this shot will do. When the shot is destroyed, the damage will will
 	#be automatically cleaned up (because we specified '<-shotUnit' as the unit to associate with the damage map call).
@@ -136,9 +135,25 @@ endif
 	endif
 
 :Once
+	-?Seed not if
+		1 10000000 RandInt ->Seed
+	endif
 	#Gets called once and only once when unit is created
 	GetObjPosition(self "Arm" false) ->armPos
 	SetUnitSpecifiedTargetPathSourceOffset(self <-armPos)
 	SetUnitSpecifiedTargetPathHeight(self <-projMaxHeight)
 	-1 ->autoTargetX
 	
+# i1 i2 - i3
+:RandIntSeeded
+	->RIS_iMaxExcl
+	->RIS_iMinIncl
+	@RandFloatSeeded ->RIS_iRand
+	
+	<-RIS_iMaxExcl <-RIS_iMinIncl sub <-RIS_iRand mul floor <-RIS_iMinIncl add
+# - f1
+:RandFloatSeeded
+	<-Seed sin 10000.0 mul ->RFS_fVal
+	<-Seed 1 add ->Seed
+	
+	<-RFS_fVal <-RFS_fVal floor sub

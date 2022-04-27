@@ -1,3 +1,12 @@
+Mystery Boxes 7.5
+Note: Interim versions not included as they had not been released.
+  - Removed CPACK addons. All addons have been merged into the main CPACK.
+  - Added peaceful difficulty with no bad outcomes.
+  - Numerous changes to spawns of things in various difficulties.
+  - Several new box outcomes.
+  - Added AC Bomb. A more efficient AC generator.
+  - Now seeding random locations for blobs and spores.
+
 Mystery Boxes 6 dev5.cpack
   - Added new script PostBlobBoxMaker.4rpl in Post control. It's disabled by default; if enabled, blobs killed have a chance to spawn a mystery or titan box (thanks to Fire)
 

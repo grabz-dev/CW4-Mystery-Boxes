@@ -20,8 +20,8 @@ endif
 
 <-delta <-force + <-G - ->newDelta
 
-if (RandFloat 0.001 lt)
-	<-newDelta V3(RandFloat 0.5 - 0.01 *, 0.1, RandFloat 0.5 - 0.01 *) + ->newDelta
+if (@RandFloatSeeded 0.001 lt)
+	<-newDelta V3(@RandFloatSeeded 0.5 - 0.01 *, 0.1, @RandFloatSeeded 0.5 - 0.01 *) + ->newDelta
 endif
 
 if (magnitude(<-newDelta) <-MAX_SPEED gt)
@@ -73,3 +73,16 @@ endif
 	<-fireVel ->force
 	V3(0, <-GRAVITY, 0) ->G
 	CreateTrail(self "Sphere" 0 0.5)
+# i1 i2 - i3
+:RandIntSeeded
+	->RIS_iMaxExcl
+	->RIS_iMinIncl
+	@RandFloatSeeded ->RIS_iRand
+	
+	<-RIS_iMaxExcl <-RIS_iMinIncl sub <-RIS_iRand mul floor <-RIS_iMinIncl add
+# - f1
+:RandFloatSeeded
+	<-Seed sin 10000.0 mul ->RFS_fVal
+	<-Seed 1 add ->Seed
+	
+	<-RFS_fVal <-RFS_fVal floor sub

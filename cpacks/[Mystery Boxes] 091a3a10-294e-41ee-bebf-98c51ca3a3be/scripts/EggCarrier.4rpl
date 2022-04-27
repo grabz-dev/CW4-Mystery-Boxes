@@ -24,9 +24,9 @@ GetTimer0 eq0 <-Count 0 gt and if
 	endif
 
 	<-Type
-		<-pos.x RandFloat 10.0 mul 5.0 sub add
+		<-pos.x @RandFloatSeeded 10.0 mul 5.0 sub add
 		<-pos.y
-		<-pos.z RandFloat 10.0 mul 5.0 sub add
+		<-pos.z @RandFloatSeeded 10.0 mul 5.0 sub add
 	V3 <-CarrierData CreateUnit ->carrierUID
 	
 	<-EggData "moveto" <-carrierUID GetUnitPosition SetTableElement

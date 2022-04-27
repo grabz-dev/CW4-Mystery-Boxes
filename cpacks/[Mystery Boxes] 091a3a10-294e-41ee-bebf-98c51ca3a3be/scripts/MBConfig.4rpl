@@ -2,7 +2,7 @@
 
 :awake
 	once
-		"MB_CPACKUnitRegister" "OnCPACKUnitRegister" RegisterForMsg
+		"MB_UnitCapsuleSpecialPlaced" "OnUnitCapsuleSpecialPlaced" RegisterForMsg
 		CreateTable ->*MB_tsRegisteredCPACKUnits
 	
 		#Container for custom GUIDs for easy access. No other use.
@@ -12,6 +12,7 @@
 		
 		"2ab87cc7-cfa7-4526-a410-56268f37580f" ->*MB_tCustomGUIDs{"Orb Volcano"}
 		"409513bf-4011-4e7d-941d-2e3153dee512" ->*MB_tCustomGUIDs{"Egg Carrier"}
+		"a0335e05-9dea-40e9-9748-798cebcd57c4" ->*MB_tCustomGUIDs{"Skimmer Pain"}
 		
 		"8222113b-e77d-4bb4-8995-db5e2be77a3c" ->*MB_tCustomGUIDs{"Friend Box"}
 		"84555524-9060-4de3-8db1-ce1769cfe715" ->*MB_tCustomGUIDs{"Mystery Box"}
@@ -20,13 +21,18 @@
 		"e3e9fba7-30e3-4de3-b68c-6440ae8f0796" ->*MB_tCustomGUIDs{"Unit Capsule 3x3"}
 		"1be3f343-9bb3-40cc-92d7-05227ef04932" ->*MB_tCustomGUIDs{"Unit Capsule 7x7"}
 		
-		"f028eb66-8215-461f-bfee-95039386e950" ->*MB_tCustomGUIDs{"Airship"}
-		"a38e8b23-88a3-4ba2-9b81-516c2073e86b" ->*MB_tCustomGUIDs{"Bertha"}
-		"f20014e7-fb81-4f13-8780-230358321022" ->*MB_tCustomGUIDs{"Sweeper"}
-		"7aecbd59-910a-4242-9fe6-37e0a7506f83" ->*MB_tCustomGUIDs{"Wallis"}
-		"a9ad2e49-1bd1-486b-9afa-f33b65c11fbb" ->*MB_tCustomGUIDs{"ERNMaker"}
-		"60e2f17f-5487-4108-866f-e9e6fc6596a3" ->*MB_tCustomGUIDs{"Flare"}
-		"746e142d-5e17-481d-8cb7-79cda5116c66" ->*MB_tCustomGUIDs{"Splitmitter"}
+		"972cde70-8401-4654-a21b-c52e593f9300" ->*MB_tCustomGUIDs{"Airship"}
+		"e83b5d63-9c3c-4e14-a6a2-cdec643e8793" ->*MB_tCustomGUIDs{"Airship Shot"}
+		"ba6da806-4a7b-4317-92d1-6f9e86720e4d" ->*MB_tCustomGUIDs{"Bertha"}
+		"3d512053-9b47-4d24-85e9-548f3fe40802" ->*MB_tCustomGUIDs{"Bertha Shot"}
+		"a9fc2232-ce15-4099-b047-69ab70320509" ->*MB_tCustomGUIDs{"Sweeper"}
+		"b94aca06-1be1-4cc6-be6e-5fdccd36ae5f" ->*MB_tCustomGUIDs{"Wallis"}
+		"a18bdc10-0152-4ae7-950a-08baf44935b6" ->*MB_tCustomGUIDs{"Wallis Bomb"}
+		"05c7311f-2111-457d-b43b-eb50b20054d7" ->*MB_tCustomGUIDs{"ERNMaker"}
+		"a4c0320c-9bb6-4979-8c4b-807139ff8e6c" ->*MB_tCustomGUIDs{"Flare"}
+		"a920cbef-72c7-40ff-bd58-029ff5dad011" ->*MB_tCustomGUIDs{"Flare Rocket"}
+		"10d70983-50b9-42fe-a848-6bc43dd9feaa" ->*MB_tCustomGUIDs{"Splitmitter"}
+		"91f65344-934c-42e9-a3c5-cd76ac614149" ->*MB_tCustomGUIDs{"AC Bomb"}
 		
 		
 		#Do not edit this table
@@ -38,10 +44,5 @@
 	endonce
 :once
 	@awake
-# _DATA -
-# Description: MSG coming in from MB CPACK addons. Lets us know that it is contained in the project, so we know that we can use it.
-# Arguments: 
-# Result: 
-:OnCPACKUnitRegister
-	"Registered custom unit " <-_DATA concat Debug
-	TRUE ->*MB_tsRegisteredCPACKUnits{<-_DATA}
+:OnUnitCapsuleSpecialPlaced
+	<-_DATA{"type"} <-_DATA{"x"} <-_DATA{"z"} <-_DATA{"opts"} CreateUnitOnTerrain

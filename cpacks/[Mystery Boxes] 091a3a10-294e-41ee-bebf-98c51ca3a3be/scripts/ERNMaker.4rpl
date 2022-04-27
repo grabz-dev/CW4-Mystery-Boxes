@@ -1,4 +1,9 @@
 # --ERNMaker-- 10/15/2020 11:08:32 AM
+
+Self GetUnitConstructing Self GetUnitStunCount 0 gt or if
+	return
+endif
+
 if (GetUnitAmmo(self) GetUnitMaxAmmo(self) gte)
 	@MakeERN
 	SetUnitAmmo(self, 0)
@@ -8,10 +13,6 @@ endif
 	CreateUnit("ern", GetUnitPosition(self) V3(0 3 0) + , 0)
 	
 :Awake	
-	SetUnitPopupEnabled(self, true)
-	SetUnitPopupText0(self, "ERN Forge")
-	SetUnitPopupText1(self, "Makes ERNs")
-	
 	once
 		SetUnitPacketRequestRate(Self 7) 
 	endonce

@@ -98,7 +98,7 @@ endif
 	SetBeamVisible(<-beam3 <-active)
 	
 	if (<-active)
-		PlaySoundLoop("hum4" 0.6 self)
+		PlaySoundLoop("hum4" 0.3 self)
 	else
 		StopSoundLoop(self)
 	endif
