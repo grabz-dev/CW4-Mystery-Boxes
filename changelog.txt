@@ -5,6 +5,7 @@ Note: Interim versions not included as they had not been released.
   - Numerous changes to spawns of things in various difficulties.
   - Several new box outcomes.
   - Added AC Bomb. A more efficient AC generator.
+  - Resources have been mostly moved out of the Friend/Mystery box. Recycler costs for resources have been rebalanced to make up for this.
   - Now seeding random locations for blobs and spores.
 
 Mystery Boxes 6 dev5.cpack
