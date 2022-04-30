@@ -1,0 +1,30 @@
+# --TitanFakeout-- 4/29/2022 11:48:57 PM
+$radius:10
+
+GetTimer0 eq0 if
+	Self GetUnitCell ->cellZ ->cellX 
+	Self GetUnitPosition ->pos
+	
+	GetMversePlayerNum 0 lte if
+		<-cellZ <-radius add 1 add <-cellZ <-radius sub do
+			<-cellX <-radius add 1 add <-cellX <-radius sub do
+				I J <-cellX <-cellZ DistanceCell <-radius lte if
+					I J 0 FALSE SetCreeper
+				endif
+			loop
+		loop
+		
+		<-*MB_tCustomGUIDs{"Titan Box"} <-cellX <-cellZ 0 CreateUnitOnTerrain ->unit
+		<-unit 99999 ConstructUnit
+		<-unit FALSE SetUnitSelectable
+	endif
+	
+	<-*MB_tCustomGUIDs{"Floating Text"} <-pos.x <-pos.y 7 add <-pos.z V3 "text"
+"Whoops! Sorry,
+wrong one..." "lifetime" 60	"speed" 3 "size" 30 4 TableN CreateUnit
+
+	Self TRUE FALSE TRUE DestroyUnit
+endif
+
+:once
+	130 SetTimer0

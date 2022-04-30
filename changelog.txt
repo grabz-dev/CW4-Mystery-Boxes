@@ -1,3 +1,20 @@
+Mystery Boxes 7.6
+  - Added a couple new Titan outcomes
+  - Lowered chance of Bertha Titan outcome
+  - All Titan units are now invulnerable to damage
+  - AC Bomb can no longer overflow
+  - Fixed Bertha auto aiming at -1,-1. Flare and Bertha will no longer target super close to map edge.
+  - ERN Bertha now fires 6 shots (up from 3)
+  - Airship main gun interval now 30 (up from 60)
+  - Wallis ammo per shot now 5 (down from 10)
+  - Wallis max bombs now 15 (up from 10)
+  - Wallis bomb damage doubled.
+  - Wallis bombs lifetime halved (this means Wallis throws more bombs). To make up for this, AC payload now -250 (down from -500)
+  - Unit capsules now have a toggle that makes them auto deploy when they land
+  - Fixed boxes not having a correct height that corresponds to their size
+  
+  
+  
 Mystery Boxes 7.5
 Note: Interim versions not included as they had not been released.
   - Removed CPACK addons. All addons have been merged into the main CPACK.

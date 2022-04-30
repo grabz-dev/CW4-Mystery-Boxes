@@ -3,15 +3,14 @@
 $$MAX_SPEED:0.8
 $$ACCELERATION:0.01
 $$GRAVITY:0.012
-$$DAMAGE_DIST:7
-$$DAMAGE_DEPTH:10
-$$Lifetime:1800
+$$DAMAGE_DIST:9
+$$DAMAGE_DEPTH:20
+$$Lifetime:900
 
 GetUnitPosition(self) ->position
 
 <-Lifetime 1 sub ->Lifetime
 <-Lifetime 0 lt if
-	<-position.x <-position.z -500 AddCreeper
 	DamageUnit(self 2.0)
 endif 
 
@@ -62,6 +61,7 @@ endif
 	CreateEffect("explosion4" GetUnitPosition(self) V3(0.7 0.7 0.7))
 
 :Destroyed
+	<-position.x <-position.z -250 AddCreeper
 	if (<-base neq0)
 		GetScript1Var(<-base, "wallisCount") ->patrolCount
 		SetScript1Var(<-base, "wallisCount", <-patrolCount 1 -)

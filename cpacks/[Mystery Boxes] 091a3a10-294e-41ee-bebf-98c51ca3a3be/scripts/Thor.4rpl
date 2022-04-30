@@ -9,7 +9,7 @@ $maintainHeight:1
 $minHeight:15
 
 $gunFireCost:1
-$gunFireDelay:60
+$gunFireDelay:30
 
 $missileFireCost:1
 $missileFireDelay:15

@@ -1,7 +1,7 @@
 # --Wallis-- 8/4/2020 10:33:55 AM
 
-$$MAX_WALLIS:10
-$$AMMO_USE:10
+$$MAX_WALLIS:15
+$$AMMO_USE:5
 $$FIRE_TIME:60
 
 Self GetUnitConstructing Self GetUnitStunCount 0 gt or if

@@ -10,8 +10,13 @@ $miniRechargeTime:10.0 #frames between shots, makes sure it is a float
 $DAMAGE_MESH:0.35
 $DAMAGE_DIST:7 #presumably the radius of the damage
 $DAMAGE_DEPTH:4 #presumably the depth from point of impact. Think of it as the Y radius
+$autotarget_border_offset:6
 
 Self GetUnitConstructing Self GetUnitStunCount 0 gt or if
+	return
+endif
+
+GetTimer0 neq0 if
 	return
 endif
 
@@ -76,14 +81,33 @@ Self GetUnitEnabled Self GetUnitArmed and if
 				endif
 			else @CanFire if
 				Self TRUE 0 FindUnitEnemy ->autoTargetZ ->autoTargetX
+				
+				<-autoTargetX -1 eq if
+					Self ClearUnitSpecifiedTarget
+					30 SetTimer0
+					return
+				endif
+				
+				GetMapSize ->mapSizeZ ->mapSizeX 
+				#Prevent firing too close to map border
+				<-autoTargetX <-autotarget_border_offset lt if
+					<-autotarget_border_offset ->autoTargetX
+				endif
+				<-autoTargetZ <-autotarget_border_offset lt if
+					<-autotarget_border_offset ->autoTargetZ
+				endif
+				<-autoTargetX <-mapSizeX <-autotarget_border_offset 1 add sub gt if
+					<-mapSizeX <-autotarget_border_offset sub 1 sub ->autoTargetX
+				endif
+				<-autoTargetZ <-mapSizeZ <-autotarget_border_offset 1 add sub gt if
+					<-mapSizeZ <-autotarget_border_offset sub 1 sub ->autoTargetZ
+				endif
+				
 				Self <-autoTargetX, <-autoTargetX <-autoTargetZ FALSE GetExactTerrain, <-autoTargetZ V3 SetUnitSpecifiedTarget
 				Self <-autoTargetX <-autoTargetZ <-DAMAGE_DIST <-DAMAGE_DEPTH 1000000 mul 4 mul FALSE ApplyToDamageMap
 
 				Self FALSE SetUnitSpecifiedTargetShowPath
 				Self GetUnitSpecifiedTarget ->target
-				<-target.x gte0 not if
-					Self ClearUnitSpecifiedTarget
-				endif
 				Self GetUnitPosition ->currentPos
 			endif endif
 		endif	

@@ -43,7 +43,11 @@ endif
 	Self GetUnitPosition ToCell ->z ->x
 	<-z 2 add <-z 1 sub do
 		<-x 2 add <-x 1 sub do
-			I J <-payload neg AddCreeper
+			I J GetCreeper <-payload sub -2000 lte if
+				I J -2000 TRUE SetCreeper
+			else
+				I J <-payload neg AddCreeper
+			endif
 		loop
 	loop
 	Self 0 SetUnitAmmo
