@@ -1,3 +1,6 @@
+Mystery Boxes 7.7a
+  - Nerf Wallis device damage. It was way too powerful.
+
 Mystery Boxes 7.7
   - The interval of the fakeout box is now random. How exciting.
   - Fixed recycler doors being aligned wrong when opening.

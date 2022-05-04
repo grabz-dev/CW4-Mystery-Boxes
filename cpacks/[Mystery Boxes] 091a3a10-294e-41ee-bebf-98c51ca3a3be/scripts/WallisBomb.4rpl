@@ -4,7 +4,7 @@ $$MAX_SPEED:0.8
 $$ACCELERATION:0.01
 $$GRAVITY:0.012
 $$DAMAGE_DIST:9
-$$DAMAGE_DEPTH:20
+$$DAMAGE_DEPTH:12
 $$Lifetime:900
 
 GetUnitPosition(self) ->position
