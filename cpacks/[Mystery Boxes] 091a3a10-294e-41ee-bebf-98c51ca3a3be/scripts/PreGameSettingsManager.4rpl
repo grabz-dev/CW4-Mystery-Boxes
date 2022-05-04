@@ -99,18 +99,24 @@ endif
 	once
 		--*MB_OptionDifficulty
 		--*MB_TitanGuaranteedBadCount
+		--*MB_MysteryBoxesOpened
+		
+		0 FALSE "" 0 0 0 0 V4 null null SetMSGButton
+		1 FALSE "" 0 0 0 0 V4 null null SetMSGButton
+		2 FALSE "" 0 0 0 0 V4 null null SetMSGButton
 		
 		5 TRUE SetMissionObjectiveEnabled
-		"Hard Difficulty" SetCustomObjectiveText
+		"Nightmare" SetCustomObjectiveText
 		
 		"MB_MverseDifficultySelected" "OnMverseDifficultySelected" RegisterForMsg
 	
-		"hard"   "name" "Hard"   "desc" "Higher chance of bad outcomes.
-A formidable challenge." 2 TableN
-		"normal" "name" "Normal" "desc" "Regular chance of bad outcomes." 2 TableN
+		"hard"   "name" "Nightmare"   "desc" "High chance of truly bad outcomes.
+A formidable challenge.
+You have been warned." "color" 1.0 0.3 0.3 1.0 V4 3 TableN
+		"normal" "name" "Normal" "desc" "Regular chance of bad outcomes." "color" 1.0 0.55 0.4 1.0 V4 3 TableN
 		"easy"   "name" "Easy"   "desc" "Lower chance of bad outcomes.
-Some bad outcomes disabled." 2 TableN
-		"peace"  "name" "Peaceful" "desc" "No bad outcomes. Peace and quiet." 2 TableN
+Some bad outcomes disabled." "color" 0.6 1.0 0.6 1.0 V4 3 TableN
+		"peace"  "name" "Peaceful" "desc" "No bad outcomes. Peace and quiet." "color" 0.7 0.9 1.0 1.0 V4 3 TableN
 		4 TableN ->G_tsDifficulties
 	endonce
 :once
@@ -125,15 +131,20 @@ Some bad outcomes disabled." 2 TableN
 :SetDifficultyContext
 	GetEditMode not if
 		<-*MB_OptionDifficulty "hard" neq if
-			"Hard Difficulty <color=red>(Failed)</color>" SetCustomObjectiveText
+			"Nightmare <color=red>(Failed)</color>" SetCustomObjectiveText
 		else
-			"Hard Difficulty <color=green>(Chosen)</color>" SetCustomObjectiveText
+			"Nightmare <color=green>(Chosen)</color>" SetCustomObjectiveText
 		endif
 	endif
 	
 	<-*MB_OptionDifficulty "hard" eq if
 		#If you increase this you also have to increase the amount of stuff in the EvilTitan list in RNGManager
 		3 ->*MB_TitanGuaranteedBadCount
+	endif
+	
+	0 ->*MB_MysteryBoxesOpened
+	GetEditMode not if
+		0 TRUE <-G_tsDifficulties{<-*MB_OptionDifficulty}{"name"} <-G_tsDifficulties{<-*MB_OptionDifficulty}{"color"} null null SetMSGButton
 	endif
 :SetDifficultyText
 	<-G_tsDifficulties GetTableValues ->SDT_lValues

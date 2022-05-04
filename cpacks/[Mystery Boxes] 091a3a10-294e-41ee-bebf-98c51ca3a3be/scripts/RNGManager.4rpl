@@ -1,4 +1,5 @@
 # --RNGManager-- 8/16/2021 11:05:48 PM
+$EvilMultiplierIncreasePerBox:0.005
 
 #This script RUNS while paused
 
@@ -6,6 +7,10 @@
 -?*MB_OptionDifficulty not if
 	return
 endif
+
+once
+	@UpdateEvilMultiplierButton
+endonce
 
 #Frame 1 code
 GetGameUpdateCount 1 gte if
@@ -105,6 +110,7 @@ endif
 		"MB_MysteryBoxOpened" "OnMysteryBoxOpened" RegisterForMsg
 		"MB_MverseMysteryBoxOpened" "OnMverseMysteryBoxOpened" RegisterForMsg
 		"MB_MverseSyncedUnitDestroyed" "OnMverseSyncedUnitDestroyed" RegisterForMsg
+		@UpdateMysteryBoxOpenedButton
 	endonce
 :once
 	@awake
@@ -128,7 +134,8 @@ endif
 	<-*MB_tCustomGUIDs{"Wallis"} 1
 	<-*MB_tCustomGUIDs{"ERNMaker"} 1
 	<-*MB_tCustomGUIDs{"Flare"} 1 
-	<-*MB_tCustomGUIDs{"AC Bomb"} 1 
+	<-*MB_tCustomGUIDs{"AC Bomb"} 1
+	<-*MB_tCustomGUIDs{"Visual Orbital Giver"} 1
 	"tower" 1 "pylon" 1 "miner" 1 "greenarrefinery" 1 "terp" 1 "porter" 1
 	"cannon" 1 "mortar" 1 "sprayer" 1 "sniper" 1 "missilelauncher" 1 "nullifier" 1
 	"runway" 1 "acbomberpad" 1 "bomberpad" 1 "rocketpad" 1 "platform" 1
@@ -226,7 +233,8 @@ endif
 	<-IC_diff "easy" neq if
 		#Normal and Hard difficulty
 		"WEIGHT" 25.0,	"TYPE" <-*MB_tCustomGUIDs{"Egg Carrier"}, "SETTINGS" TableN("Type" "spore", "CarrierData" TableN("Target" 2, "Payload" 200, 2), "EggData" TableN("payload" 800, "showpathline" TRUE, "showpathlinecolor" 0.3 0.3 0.7 1 V4 , 3), "Count" 30, "Height" 25, 5), "SPECIAL" TableN("Seed" TRUE, "Effect" "boom2" 2) 4 TableN 
-		"WEIGHT" 25.0	"STYPE" "creeper", "SPECIAL" TableN("Payload" 50000, "Effect" "boom1", "Fakeout" TRUE 3)	3 TableN
+		"WEIGHT" 20.0	"STYPE" "creeper", "SPECIAL" TableN("Payload" 50000, "Effect" "boom1", "Fakeout" TRUE 3)	3 TableN
+		"WEIGHT" 5.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 100000, "Effect" "boom2", "Fakeout" TRUE 3)	3 TableN
 		
 		<-IC_diff "normal" neq if
 			#Hard difficulty
@@ -301,22 +309,12 @@ endif
 	# <Currency> outcomes start here
 	"WEIGHT" 50.0,	"STYPE" "miner_res", 		"SPECIAL" TableN("Coverage" 75.0, "SpawnTwo" TRUE, 2) 3 TableN
 	"WEIGHT" 50.0,	"TYPE" "ern",				"SPECIAL" TableN("CountMin" 1, "CountMax" 2, 2) 3 TableN
-	
-	#"WEIGHT" 15.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 25, 1), 	3 TableN
-	#"WEIGHT" 10.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 20, 1), 	3 TableN
-	#"WEIGHT" 5.0,	"TYPE" "resourcered",	"SETTINGS" TableN("Interval" 15,  1), 	3 TableN
-	
-	#"WEIGHT" 15.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 25, 1), 	3 TableN
-	#"WEIGHT" 10.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 20, 1), 	3 TableN
-	#"WEIGHT" 5.0,	"TYPE" "resourceblue",	"SETTINGS" TableN("Interval" 15,  1), 	3 TableN
-	
-	#"WEIGHT" 15.0,	"TYPE" "greenarmother",	"SETTINGS" TableN("Interval" 400, 1), 	3 TableN
-	#"WEIGHT" 10.0,	"TYPE" "greenarmother",	"SETTINGS" TableN("Interval" 320, 1), 	3 TableN
-	#"WEIGHT" 5.0,	"TYPE" "greenarmother",	"SETTINGS" TableN("Interval" 240, 1), 	3 TableN
 		<-G_tttltConf{"REGULAR_MYSTERY_BOX"}{"Types"}{"Currency"} AppendStackToList
 	
 	#########
 	# <Good> outcomes start here
+	
+	#All difficulties
 	"WEIGHT" 160.0,	"TYPE" "mortar",			"SPECIAL" TableN("CountMin" 1, "CountMax" 4, 2) 3 TableN
 	"WEIGHT" 140.0,	"TYPE" "cannon",			"SPECIAL" TableN("CountMin" 1, "CountMax" 4, 2) 3 TableN
 	"WEIGHT" 100.0,	"TYPE" "sniper",			"SPECIAL" TableN("CountMin" 1, "CountMax" 2, 2) 3 TableN
@@ -337,7 +335,6 @@ endif
 	
 	#-----------
 	
-	"WEIGHT" 50.0,	"TYPE" "rocketpad",			2 TableN
 	"WEIGHT" 40.0,	"TYPE" "microrift",			2 TableN
 	"WEIGHT" 40.0,	"TYPE" "ultrac",			2 TableN
 	
@@ -351,11 +348,24 @@ endif
 	
 	#-----------
 	
-	"WEIGHT" 125.0,	"TYPE" <-*MB_tCustomGUIDs{"Mystery Box"},		"SPECIAL" TableN("Count" 4, "Unselectable" TRUE 2), 	3 TableN
-	"WEIGHT" 5.0,	"TYPE" "emitter",		"SETTINGS" TableN("Start" 0, 	"Interval" 15, 	"Payload" -10, 3), 	3 TableN
+	"WEIGHT" 100.0,	"TYPE" <-*MB_tCustomGUIDs{"Mystery Box"},		"SPECIAL" TableN("Count" 4, "Unselectable" TRUE 2), 	3 TableN
+	"WEIGHT" 20.0,	"TYPE" <-*MB_tCustomGUIDs{"Mystery Box"},		"SPECIAL" TableN("Count" 8, "Unselectable" TRUE, "Effect" "boom1",  3), 	3 TableN
+	"WEIGHT" 5.0,	"TYPE" <-*MB_tCustomGUIDs{"Mystery Box"},		"SPECIAL" TableN("Count" 12, "Unselectable" TRUE, "Effect" "boom2", 3), 	3 TableN
+	"WEIGHT" 5.0,	"TYPE" "emitter",		"SETTINGS" TableN("Start" 0, 	"Interval" 15, 	"Payload" -20, 3), 	3 TableN
 	"WEIGHT" 200.0,	"STYPE" "creeper", 		"SPECIAL" TableN("Payload" -1000, 1),	3 TableN
 	"WEIGHT" 150.0,	"STYPE" "creeper", 		"SPECIAL" TableN("Payload" -1500, 1),	3 TableN
 	"WEIGHT" 100.0,	"STYPE" "creeper", 		"SPECIAL" TableN("Payload" -2000, 1),	3 TableN
+	
+	<-IC_diff "hard" neq if
+		#Peaceful, Easy and Normal difficulty
+	
+		"WEIGHT" 50.0,	"TYPE" "rocketpad",			2 TableN
+	else
+		#Hard difficulty
+		
+		"WEIGHT" 50.0,	"TYPE" <-*MB_tCustomGUIDs{"Visual Orbital Giver"},	"SETTINGS" TableN("Orbitals" 2, 1),		3 TableN
+	endif
+	
 		<-G_tttltConf{"REGULAR_MYSTERY_BOX"}{"Types"}{"Good"} AppendStackToList
 	
 	
@@ -374,27 +384,27 @@ endif
 		
 		<-IC_diff "normal" neq if
 			#Hard difficulty
-			"WEIGHT" 75.0,	"TYPE" "blob",		"SETTINGS" 	TableN("Target" 0, "Payload" 150, 2), 	"SPECIAL" TableN("CountMin" 4, "CountMax" 6, "Height" 0, 3)	4 TableN
-			"WEIGHT" 25.0,	"TYPE" "blob",		"SETTINGS" 	TableN("Target" 0, "Payload" 200, 2), 	"SPECIAL" TableN("CountMin" 6, "CountMax" 8, "Height" 0, 3)	4 TableN
-			"WEIGHT" 5.0,	"TYPE" "blob",		"SETTINGS" 	TableN("Target" 0, "Payload" 200, 2),	"SPECIAL" TableN("CountMin" 13, "CountMax" 20, "Height" 0, "Effect" "boom1", 4)	4 TableN
-			"WEIGHT" 75.0,	"TYPE" "skimmer",	"SETTINGS" TableN("Target" 0, 	"Payload" 0, 	"LifeTime" 30, 3),	"SPECIAL" TableN("CountMin" 2, "CountMax" 4, 	"Height" 7, 3), 	4 TableN
-			"WEIGHT" 25.0,	"TYPE" "skimmer",	"SETTINGS" TableN("Target" 0, 	"Payload" 0, 	"LifeTime" 30, 3), 	"SPECIAL" TableN("CountMin" 5, "CountMax" 8, 	"Height" 14, 3), 	4 TableN
-			"WEIGHT" 5.0,	"TYPE" "skimmer",	"SETTINGS" TableN("Target" 0, 	"Payload" 0, 	"LifeTime" 210, 3), "SPECIAL" TableN("CountMin" 12, "CountMax" 36, 	"Height" 400, "Effect" "boom1" 4), 	4 TableN
-			"WEIGHT" 75.0,	"TYPE" "airsac",	"SETTINGS" TableN("Target" 0, 	"Payload" 20, 2),	"SPECIAL" TableN("Count" 1, 	"Height" 37, 2), 	4 TableN
-			"WEIGHT" 25.0,	"TYPE" "airsac",	"SETTINGS" TableN("Target" 0, 	"Payload" 75, 2),	"SPECIAL" TableN("Count" 2, 	"Height" 37, 2), 	4 TableN
-			"WEIGHT" 5.0,	"TYPE" "airsac",	"SETTINGS" TableN("Target" 0, 	"Payload" 150, 2),	"SPECIAL" TableN("Count" 3, 	"Height" 37, "Effect" "boom1", 3), 	4 TableN
-			"WEIGHT" 50.0,	"TYPE" "emitter",	"SETTINGS" 	TableN("Start" 300, 	"Interval" 60, 	"Payload" 50, 3), 	3 TableN
-			"WEIGHT" 17.5,	"TYPE" "emitter",	"SETTINGS" 	TableN("Start" 300, 	"Interval" 60, 	"Payload" 100, 3), 	3 TableN
-			"WEIGHT" 2.5,	"TYPE" "emitter",	"SETTINGS" 	TableN("Start" 300, 	"Interval" 60, 	"Payload" 200, 3), "SPECIAL" TableN("Effect" "boom1", 1) 	4 TableN
-			"WEIGHT" 75.0,	"TYPE" "spore",		"SETTINGS" 	TableN("Target" 0, "Payload" 200, 2), 	"SPECIAL" TableN("CountMin" 4, "CountMax" 8, "Height" 0, 3)	4 TableN
-			"WEIGHT" 25.0,	"TYPE" "spore",		"SETTINGS" 	TableN("Target" 0, "Payload" 500, 2), 	"SPECIAL" TableN("CountMin" 8, "CountMax" 12, "Height" 0, 3)	4 TableN
-			"WEIGHT" 5.0,	"TYPE" "spore",		"SETTINGS" 	TableN("Target" 0, "Payload" 1500, 2), 	"SPECIAL" TableN("CountMin" 12, "CountMax" 20, "Height" 0, "Effect" "boom1", 4)	4 TableN
-			"WEIGHT" 75.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 1500, 1)	3 TableN
-			"WEIGHT" 25.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 2000, 1)	3 TableN
-			"WEIGHT" 5.0,	"STYPE" "creeper", 	"SPECIAL" TableN("Payload" 3000, "Effect" "boom1", 2)	3 TableN
-			GetMVersePlayerNum lt0 if "WEIGHT" 75.0,	"TYPE" "forb",		"SPECIAL" TableN("CountMin" 2, "CountMax" 4, "Height" 0, 3)	3 TableN endif
-			GetMVersePlayerNum lt0 if "WEIGHT" 25.0,	"TYPE" "forb",		"SPECIAL" TableN("CountMin" 5, "CountMax" 7, "Height" 0, 3)	3 TableN endif
-			GetMVersePlayerNum lt0 if "WEIGHT" 5.0,	"TYPE" "forb",		"SPECIAL" TableN("CountMin" 10, "CountMax" 14, "Height" 0, "Effect" "boom1", 4)	3 TableN endif
+			"WEIGHT" 75.0,	"TYPE" "blob",		"SETTINGS" 	TableN("Target" 0,  "Payload" 150,  2), 					"SPECIAL" TableN("CountMin" 4,  "CountMax" 6,  "Height" 0,   "ScaleHard" 1.0,    4),	4 TableN
+			"WEIGHT" 25.0,	"TYPE" "blob",		"SETTINGS" 	TableN("Target" 0,  "Payload" 200,  2), 					"SPECIAL" TableN("CountMin" 6,  "CountMax" 8,  "Height" 0,   "ScaleHard" 1.0,    4),	4 TableN
+			"WEIGHT" 5.0,	"TYPE" "blob",		"SETTINGS" 	TableN("Target" 0,  "Payload" 200,  2),						"SPECIAL" TableN("CountMin" 13, "CountMax" 20, "Height" 0,   "ScaleHard" 1.0, "Effect" "boom1",   5)	4 TableN
+			"WEIGHT" 75.0,	"TYPE" "skimmer",	"SETTINGS"  TableN("Target" 0,  "Payload" 0, 	"LifeTime" 30,  3),		"SPECIAL" TableN("CountMin" 2,  "CountMax" 4,  "Height" 7,   "ScaleHard" 1.0,    4), 	4 TableN
+			"WEIGHT" 25.0,	"TYPE" "skimmer",	"SETTINGS"  TableN("Target" 0,  "Payload" 0, 	"LifeTime" 30,  3), 	"SPECIAL" TableN("CountMin" 5,  "CountMax" 8,  "Height" 14,  "ScaleHard" 1.0,    4), 	4 TableN
+			"WEIGHT" 5.0,	"TYPE" "skimmer",	"SETTINGS"  TableN("Target" 0,  "Payload" 0, 	"LifeTime" 210, 3), 	"SPECIAL" TableN("CountMin" 12, "CountMax" 36, "Height" 400, "ScaleHard" 1.0, "Effect" "boom1"    5), 	4 TableN
+			"WEIGHT" 75.0,	"TYPE" "airsac",	"SETTINGS"  TableN("Target" 0,  "Payload" 20,   2),						"SPECIAL" TableN("Count" 1, 	               "Height" 37,  "ScaleHard" 2.0,    3), 	4 TableN
+			"WEIGHT" 25.0,	"TYPE" "airsac",	"SETTINGS"  TableN("Target" 0,  "Payload" 75,   2),						"SPECIAL" TableN("Count" 2, 	               "Height" 37,  "ScaleHard" 2.0,    3), 	4 TableN
+			"WEIGHT" 5.0,	"TYPE" "airsac",	"SETTINGS"  TableN("Target" 0,  "Payload" 150,  2),						"SPECIAL" TableN("Count" 3, 	               "Height" 37,  "ScaleHard" 2.0, "Effect" "boom1",   4), 	4 TableN
+			"WEIGHT" 50.0,	"TYPE" "emitter",	"SETTINGS" 	TableN("Start" 300, "Payload" 50,	"Interval" 60, 	 3),  	"SPECIAL" TableN(											 "ScaleHard" 2.0, 1),	4 TableN
+			"WEIGHT" 17.5,	"TYPE" "emitter",	"SETTINGS" 	TableN("Start" 300, "Payload" 100,	"Interval" 60, 	 3), 	"SPECIAL" TableN(											 "ScaleHard" 2.0, 1),	4 TableN
+			"WEIGHT" 2.5,	"TYPE" "emitter",	"SETTINGS" 	TableN("Start" 300, "Payload" 200,	"Interval" 60, 	 3), 	"SPECIAL" TableN(											 "ScaleHard" 2.0, "Effect" "boom1",   2) 	4 TableN
+			"WEIGHT" 75.0,	"TYPE" "spore",		"SETTINGS" 	TableN("Target" 0,  "Payload" 200,  2), 					"SPECIAL" TableN("CountMin" 4,  "CountMax" 8,  "Height" 0,   "ScaleHard" 1.0, 4)	4 TableN
+			"WEIGHT" 25.0,	"TYPE" "spore",		"SETTINGS" 	TableN("Target" 0,  "Payload" 500,  2), 					"SPECIAL" TableN("CountMin" 8,  "CountMax" 12, "Height" 0,   "ScaleHard" 1.0, 4)	4 TableN
+			"WEIGHT" 5.0,	"TYPE" "spore",		"SETTINGS" 	TableN("Target" 0,  "Payload" 1500, 2), 					"SPECIAL" TableN("CountMin" 12, "CountMax" 20, "Height" 0,   "ScaleHard" 1.0, "Effect" "boom1",   5)	4 TableN
+			"WEIGHT" 75.0,	"STYPE" "creeper", 																			"SPECIAL" TableN("Payload" 1500, 							 "ScaleHard" 1.5, 2)	3 TableN
+			"WEIGHT" 25.0,	"STYPE" "creeper", 																			"SPECIAL" TableN("Payload" 2000, 							 "ScaleHard" 1.5, 2)	3 TableN
+			"WEIGHT" 5.0,	"STYPE" "creeper", 																			"SPECIAL" TableN("Payload" 3000,  							 "ScaleHard" 1.5, "Effect" "boom1",   3)	3 TableN
+			GetMVersePlayerNum lt0 if "WEIGHT" 75.0,	"TYPE" "forb",													"SPECIAL" TableN("CountMin" 2, "CountMax" 4, "Height" 0, 	 "ScaleHard" 1.0, 4)	3 TableN endif
+			GetMVersePlayerNum lt0 if "WEIGHT" 25.0,	"TYPE" "forb",													"SPECIAL" TableN("CountMin" 5, "CountMax" 7, "Height" 0, 	 "ScaleHard" 1.0, 4)	3 TableN endif
+			GetMVersePlayerNum lt0 if "WEIGHT" 5.0,		"TYPE" "forb",													"SPECIAL" TableN("CountMin" 10, "CountMax" 14, "Height" 0, 	 "ScaleHard" 1.0, "Effect" "boom1",   5)	3 TableN endif
 		else
 			#Normal difficulty
 			"WEIGHT" 75.0,	"TYPE" "blob",		"SETTINGS" 	TableN("Target" 0, "Payload" 100, 2), 	"SPECIAL" TableN("CountMin" 4, "CountMax" 6, "Height" 0, 3)	4 TableN
@@ -575,7 +585,7 @@ endif
 # Arguments: 
 # Result: 
 :OnMysteryBoxOpened
-	<-_DATA{"sType"} <-_DATA{"v3fPos"} FALSE @_OnMysteryBoxOpened
+	<-_DATA{"sType"} <-_DATA{"v3fPos"} FALSE FALSE @_OnMysteryBoxOpened
 
 # _DATA -
 # Description: Mverse MSG event handler for a mystery box opening event from another player.
@@ -591,7 +601,7 @@ endif
 	<-_DATA{"Seed"} ->MMB_ttltConfRoot{"Seed"}
 	
 	#Open box
-	<-MMB_sType <-_DATA{"v3fPos"} TRUE @_OnMysteryBoxOpened
+	<-MMB_sType <-_DATA{"v3fPos"} <-_DATA{"CounterOnly"} TRUE @_OnMysteryBoxOpened
 	
 	#Put back our seed
 	<-MMB_iSeedBackup ->MMB_ttltConfRoot{"Seed"}
@@ -601,9 +611,21 @@ endif
 # Arguments: Box name, 3D position of the event, bool TRUE if event came from another player in mverse FALSE otherwise
 # Result: 
 :_OnMysteryBoxOpened
-	->MBO_bIsFromMverse ->MBO_v3fPos ->MBO_sType
+	->MBO_bIsFromMverse ->MBO_bIsCounterOnly ->MBO_v3fPos ->MBO_sType
+	
+	#Add to counter
+	<-MBO_sType "REGULAR_MYSTERY_BOX" eq if
+		<-*MB_MysteryBoxesOpened 1 add ->*MB_MysteryBoxesOpened
+		@UpdateMysteryBoxOpenedButton
+		@UpdateEvilMultiplierButton
+	endif
+	
+	<-MBO_bIsCounterOnly if
+		return
+	endif
 	
 	NULL ->MBO_tChosenEntry #reference to selected loot object
+	0 ->MBO_iStaggerFrames
 	
 	#####
 	# Now things get fun
@@ -653,6 +675,7 @@ endif
 	endif endif
 	
 	#Mverse stuff
+	FALSE ->MBO_bMverseMessageSent
 	GetMVersePlayerNum 0 gte if
 		#Combine TYPE and STYPE
 		<-MBO_sUnitType ->MBO_sMverseUnitType
@@ -663,6 +686,7 @@ endif
 		<-G_tbMversePlayerUnits{<-MBO_sMverseUnitType} not if
 			<-MBO_bIsFromMverse not if
 				"MB_MverseMysteryBoxOpened" "sType" <-MBO_sType "v3fPos" <-MBO_v3fPos "Seed" <-MBO_iSeedUsed 3 TableN SendMVerseMsg
+				TRUE ->MBO_bMverseMessageSent
 				
 				<-G_tbMverseTypesSpawnForEveryone{<-MBO_sMverseUnitType} not if
 					GetMVersePlayerNum 0 neq if return endif
@@ -674,6 +698,11 @@ endif
 				endif
 			endif
 		endif
+		<-MBO_bIsFromMverse not if
+			<-MBO_bMverseMessageSent not if
+				"MB_MverseMysteryBoxOpened" "sType" <-MBO_sType "v3fPos" <-MBO_v3fPos "Seed" <-MBO_iSeedUsed "CounterOnly" TRUE 4 TableN SendMVerseMsg
+			endif
+		endif
 	endif
 	
 	<-MBO_tSpecial{"Count"} ->MBO_iCount
@@ -682,6 +711,21 @@ endif
 	<-MBO_tSpecial{"CountMax"} ->MBO_iCountMax
 	<-MBO_tSpecial{"Unselectable"} ->MBO_bUnselectable
 	<-MBO_tSpecial{"Seed"} ->MBO_bSeed
+	
+	#If no count variables are present, amplify payloads
+	<-MBO_sType "REGULAR_MYSTERY_BOX" eq if
+		<-MBO_tSpecial{"ScaleHard"} IsNull not if
+			<-MBO_tSpecial{"Count"} IsNull <-MBO_tSpecial{"CountMin"} IsNull and <-MBO_tSpecial{"CountMax"} IsNull and if
+				<-*MB_MysteryBoxesOpened <-EvilMultiplierIncreasePerBox mul <-MBO_tSpecial{"ScaleHard"} mul 1 add ->MBO_fMult
+			
+				<-MBO_tChosenEntry{"SETTINGS"}{"Payload"} IsNull not if
+					<-MBO_tChosenEntry{"SETTINGS"} "Payload" <-MBO_tChosenEntry{"SETTINGS"}{"Payload"} <-MBO_fMult mul 2000 min SetTableElement
+				else <-MBO_tChosenEntry{"SPECIAL"}{"Payload"} IsNull not if
+					<-MBO_tChosenEntry{"SPECIAL"} "Payload" <-MBO_tChosenEntry{"SPECIAL"}{"Payload"} <-MBO_fMult mul SetTableElement
+				endif endif
+			endif
+		endif
+	endif
 	
 	#Process special event behaviors.
 	<-MBO_sType <-MBO_tChosenEntry <-MBO_v3fPos <-MBO_bIsFromMverse @ProcessSpecialBoxSpawnBehaviors
@@ -704,6 +748,19 @@ endif
 	<-MBO_iCount IsNull <-MBO_iCount 0 lte or if
 		1 ->MBO_iCount
 	endif
+	
+	#Amplify by scale
+	<-MBO_sType "REGULAR_MYSTERY_BOX" eq if
+		<-MBO_tSpecial{"ScaleHard"} IsNull not if
+			<-*MB_MysteryBoxesOpened <-EvilMultiplierIncreasePerBox mul <-MBO_tSpecial{"ScaleHard"} mul 1 add ->MBO_fMult
+		
+			<-MBO_tSpecial{"Count"} IsNull not
+			<-MBO_tSpecial{"CountMin"} IsNull not <-MBO_tSpecial{"CountMax"} IsNull not and or if
+				<-MBO_fMult <-MBO_iCount mul asint ->MBO_iCount
+			endif
+		endif
+	endif
+	
 	
 	#Generate a list of positions to create the units that are to be spawned.
 	CreateList ->MBO_lfSpawnPositions
@@ -763,6 +820,14 @@ endif
 			<-MBO_tSeededSettingsTable ->MBO_tSettingsTable
 		else
 			<-MBO_tChosenEntry{"SETTINGS"} ->MBO_tSettingsTable
+		endif
+		<-MBO_tSettingsTable IsNull if
+			CreateTable ->MBO_tSettingsTable
+		endif
+		
+		<-MBO_sUnitType <-*MB_tCustomGUIDs{"Mystery Box"} eq if
+			<-MBO_iStaggerFrames 5 add ->MBO_iStaggerFrames
+			<-MBO_tSettingsTable "StaggerFrames" <-MBO_iStaggerFrames SetTableElement
 		endif
 		
 		<-MBO_iHeight IsNull if
@@ -861,7 +926,8 @@ endif
 	
 	<-PS_tEntry{"TYPE"} ->PS_s
 	
-	<-PS_s <-*MB_tCustomGUIDs{"Airship"} eq
+	<-PS_s "shield" eq
+	<-PS_s <-*MB_tCustomGUIDs{"Airship"} eq or
 	<-PS_s <-*MB_tCustomGUIDs{"Sweeper"} eq or 
 	<-PS_s <-*MB_tCustomGUIDs{"Wallis"} eq or
 	<-PS_s <-*MB_tCustomGUIDs{"ERNMaker"} eq or if
@@ -949,7 +1015,7 @@ endif
 		endif
 		
 		<-PS_bFakeout if
-			<-*MB_tCustomGUIDs{"Titan Fake-Out"} <-PS_v3fPos 0 CreateUnit
+			<-*MB_tCustomGUIDs{"Titan Fake-Out"} <-PS_v3fPos "Seed" <-PS_sType 0 10000000 @RandIntSeeded, 1 TableN CreateUnit
 		endif
 	else <-PS_s "u_wall" eq if
 		<-PS_tEntry{"SPECIAL"}{"Type"} ->PS_sWallType
@@ -1208,15 +1274,11 @@ endif
 	loop
 	
 	<-RDF_iDivFactor 1 max asfloat
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+:UpdateMysteryBoxOpenedButton
+	1 TRUE "Mystery Boxes Opened: " <-*MB_MysteryBoxesOpened concat 1 0.8 0.05 1.0 V4 null null SetMSGButton
+:UpdateEvilMultiplierButton
+	<-*MB_OptionDifficulty "hard" eq if
+		2 TRUE "Evil Multiplier:
+" <-*MB_MysteryBoxesOpened <-EvilMultiplierIncreasePerBox mul 1 add concat 1.0 0.3 0.3 1.0 V4 null null SetMSGButton
+	endif
 	

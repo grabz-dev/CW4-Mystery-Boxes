@@ -27,4 +27,17 @@ wrong one..." "lifetime" 60	"speed" 3 "size" 30 4 TableN CreateUnit
 endif
 
 :once
-	130 SetTimer0
+	90 240 @RandIntSeeded SetTimer0
+# i1 i2 - i3
+:RandIntSeeded
+	->RIS_iMaxExcl
+	->RIS_iMinIncl
+	@RandFloatSeeded ->RIS_iRand
+	
+	<-RIS_iMaxExcl <-RIS_iMinIncl sub <-RIS_iRand mul floor <-RIS_iMinIncl add
+# - f1
+:RandFloatSeeded
+	<-Seed sin 10000.0 mul ->RFS_fVal
+	<-Seed 1 add ->Seed
+	
+	<-RFS_fVal <-RFS_fVal floor sub

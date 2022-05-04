@@ -1,0 +1,27 @@
+# --TempRocket-- 5/4/2022 4:27:29 PM
+$Orbitals:2
+$$stagger:30
+
+once
+	<-stagger SetTimer0
+endonce
+
+GetTimer0 <-stagger eq if
+	Self GetUnitCell ->cellZ ->cellX
+	"rocketpad" <-cellX <-cellZ 0 CreateUnitOnTerrain ->rocket
+	<-rocket FALSE SetUnitSelectable
+	<-rocket 9999 ConstructUnit
+	<-rocket <-rocket GetUnitMaxAmmo SetUnitAmmo
+endif
+
+GetTimer0 1 eq if
+	<-rocket TRUE FALSE TRUE DestroyUnit
+endif
+
+GetTimer0 eq0 if
+	<-stagger 1 add SetTimer0
+	<-Orbitals 1 sub ->Orbitals
+	<-Orbitals 0 lte if
+		Self TRUE FALSE TRUE DestroyUnit
+	endif
+endif

@@ -2,12 +2,23 @@
 
 #Used in RNGManager
 $RNG_Manager_Type:"REGULAR_MYSTERY_BOX"
+$StaggerFrames:0
 $$Explosion_Scale:0.6
 
 ##############
 # State engine
 <-G_sState "CONSTRUCTING" eq if
 	Self GetUnitConstructing not if
+		<-StaggerFrames gt0 if
+			"STAGGERED" @SetState
+		else
+			"SHRINKING" @SetState
+		endif
+	endif
+else <-G_sState "STAGGERED" eq if
+	Self "script_root" 1.0 <-StaggerFrames 0.02 mul sub 0.1 max dup dup V3 SetObjScale
+	<-StaggerFrames 1 sub ->StaggerFrames
+	<-StaggerFrames 0 lte if
 		"SHRINKING" @SetState
 	endif
 else <-G_sState "SHRINKING" eq if
@@ -36,7 +47,7 @@ else <-G_sState "DECAYING" eq if
 	<-iDecayFrames 0 lte if
 		"FINISHED" @SetState
 	endif
-endif endif endif endif endif
+endif endif endif endif endif endif
 
 
 
@@ -44,6 +55,10 @@ endif endif endif endif endif
 	once
 		"MB_SetBoxStateFromMsg" "OnSetBoxStateFromMsg" RegisterForMsg
 		"CONSTRUCTING" @SetState
+		
+		<-StaggerFrames gt0 if
+			Self "script_root" 1.0 <-StaggerFrames 0.02 mul sub 0.1 max dup dup V3 SetObjScale
+		endif
 	endonce
 :once
 	@awake
@@ -55,7 +70,9 @@ endif endif endif endif endif
 :SetState
 	->SST_sNewState
 	
-	<-SST_sNewState "SHRINKING" eq if
+	<-SST_sNewState "STAGGERED" eq if
+		
+	else <-SST_sNewState "SHRINKING" eq if
 		0.75 ->fShrinkToScale
 		1.0 ->fCurrentScale
 	else <-SST_sNewState "EXPANDING" eq if
@@ -82,7 +99,7 @@ endif endif endif endif endif
 		<-iDecayFramesTotal ->iDecayFrames
 	else <-SST_sNewState "FINISHED" eq if
 		Self TRUE TRUE TRUE DestroyUnit
-	endif endif endif endif endif
+	endif endif endif endif endif endif
 	
 	<-SST_sNewState ->G_sState
 

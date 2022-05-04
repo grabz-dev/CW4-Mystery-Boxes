@@ -1,3 +1,14 @@
+Mystery Boxes 7.7
+  - The interval of the fakeout box is now random. How exciting.
+  - Fixed recycler doors being aligned wrong when opening.
+  - Added buttons for displaying certain information (new in CW4)
+  - Renamed Hard difficulty to Nightmare difficulty.
+  - Rocket no longer spawns on Nightmare difficulty. Instead, you get two orbitals.
+  - Nightmare difficulty now scales bad Mystery Box outcomes with the total amount of Mystery Boxes opened. Hypnotic22's pain sustains me.
+  - Buffed AC emitter outcome.
+  - Outcomes that spawn multiple Mystery Boxes now make them open in a slight sequence as opposed to all at once.
+  - Shields no longer spawn with full ammo (to prevent the Shield dome left behind after death glitch).
+
 Mystery Boxes 7.6
   - Added a couple new Titan outcomes
   - Lowered chance of Bertha Titan outcome
@@ -12,8 +23,6 @@ Mystery Boxes 7.6
   - Wallis bombs lifetime halved (this means Wallis throws more bombs). To make up for this, AC payload now -250 (down from -500)
   - Unit capsules now have a toggle that makes them auto deploy when they land
   - Fixed boxes not having a correct height that corresponds to their size
-  
-  
   
 Mystery Boxes 7.5
 Note: Interim versions not included as they had not been released.
