@@ -1,3 +1,10 @@
+Mystery Boxes 7.9
+  - Nerfed skimmer fortress on Normal and Nightmare
+  - Miners from Friend Box now have 100% coverage
+  - Removed Miners from Mystery Box
+  - Changed AC outcomes in Friend Box to be less frequent but have better payload
+  - Removed Microrift and multiple Crystal outcomes from Mystery Box
+
 Mystery Boxes 7.8
   - Fixed incorrectly set up payload scaling for creeper and emitter outcomes on Nightmare (scaling was accidentally exponential. whoops)
 
