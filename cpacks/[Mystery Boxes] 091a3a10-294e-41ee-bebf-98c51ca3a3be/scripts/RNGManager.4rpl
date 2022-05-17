@@ -311,6 +311,24 @@ endif
 	# <Good> outcomes start here
 	
 	#All difficulties
+	"WEIGHT" 40.0,	"TYPE" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"},	"SETTINGS" TableN("UnitType" "microrift", "Name" "MICRORIFT", "Color" 1 0.075 0.075 1 V4 3)		3 TableN
+	"WEIGHT" 80.0,	"TYPE" <-*MB_tCustomGUIDs{"Unit Capsule 5x5"},	"SETTINGS" TableN("UnitType" "porter", "Name" "PORTER", "Color" 0.1 0.1 0.1 1 V4 3)		3 TableN
+	GetMversePlayerNum -1 eq if
+		"WEIGHT" 50.0,	"TYPE" <-*MB_tCustomGUIDs{"Unit Capsule 5x5"},	"SETTINGS" TableN("UnitType" "greenarrefinery", "Name" "REFINERY", "Color" 0 0.9 0 1 V4, 3)		3 TableN
+		"WEIGHT" 60.0,	"TYPE" <-*MB_tCustomGUIDs{"Unit Capsule 5x5"},	"SETTINGS" TableN("UnitType" "solar_farm", "Name" "SOLAR FARM", "Color" 0.7 0.7 0 1 V4, "Rim" 0.38 0.68 0.58 1 V4, 4)		3 TableN
+		"WEIGHT" 30.0,	"TYPE" <-*MB_tCustomGUIDs{"Unit Capsule 5x5"},	"SETTINGS" TableN("UnitType" "ultrac", "Name" "ULTRA CAP", "Color" 0.0 0.9 0.0 1 V4, "Rim" 1.0 0.79 0.13 1 V4, 4)		3 TableN
+		"WEIGHT" 5.0,	"TYPE" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"},	"SETTINGS" TableN("UnitType" "emitter", "Name" "AC EMITTER", "Color" 0.05 0.15 1 1 V4, "Rim" 0.3 1 1 1 V4, "UnitOpts" TableN("Start" 0, 	"Interval" 15, 	"Payload" -20, 3), 5)		3 TableN
+		"WEIGHT" 10.0,	"TYPE" <-*MB_tCustomGUIDs{"Unit Capsule 5x5"},	"SETTINGS" TableN("UnitType" "u_wall", "Name" "WALL FENCE", "Color" 0.1 0.1 0.1 1 V4, "Rim" 0.4 1.0 1.0 1 V4, 4)		3 TableN
+		"WEIGHT" 30.0,	"TYPE" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"},	"SETTINGS" TableN("UnitType" <-*MB_tCustomGUIDs{"AC Bertha"}, "Name" "AC BERTHA", "Color" 0.05 0.15 1 1 V4, "Rim" 0.6 0.6 0.075 1 V4, 4)		3 TableN
+	else
+		"WEIGHT" 100.0,	"TYPE" "greenarrefinery", 	"SPECIAL" TableN("CountMin" 1, "CountMax" 2, 2) 3 TableN
+		"WEIGHT" 60.0 <-IC_rdf div,	"STYPE" "solar_farm",	2 TableN
+		"WEIGHT" 30.0,	"TYPE" "ultrac",			2 TableN
+		"WEIGHT" 5.0,	"TYPE" "emitter",		"SETTINGS" TableN("Start" 0, 	"Interval" 15, 	"Payload" -20, 3), 	3 TableN
+		"WEIGHT" 10.0,	"STYPE" "u_wall",		"SPECIAL" TableN("Type" "wall", 1) 3 TableN
+		"WEIGHT" 30.0,	"TYPE" <-*MB_tCustomGUIDs{"AC Bertha"},		2 TableN
+	endif
+	
 	"WEIGHT" 160.0,	"TYPE" "mortar",			"SPECIAL" TableN("CountMin" 1, "CountMax" 4, 2) 3 TableN
 	"WEIGHT" 140.0,	"TYPE" "cannon",			"SPECIAL" TableN("CountMin" 1, "CountMax" 4, 2) 3 TableN
 	"WEIGHT" 100.0,	"TYPE" "sniper",			"SPECIAL" TableN("CountMin" 1, "CountMax" 2, 2) 3 TableN
@@ -323,39 +341,21 @@ endif
 	"WEIGHT" 7.5,	"TYPE" <-*MB_tCustomGUIDs{"AC Bomb"},   "SPECIAL" TableN("Count" 2, 1) 3 TableN
 	"WEIGHT" 40.0,	"TYPE" <-*MB_tCustomGUIDs{"Flare"},  "SPECIAL" TableN("Seed" TRUE, "Count" 1, 2) 3 TableN
 	"WEIGHT" 10.0,	"TYPE" <-*MB_tCustomGUIDs{"Flare"},  "SPECIAL" TableN("Seed" TRUE, "Count" 2, 2) 3 TableN
-	
-	#-----------
-	
-	"WEIGHT" 125.0,	"TYPE" "greenarrefinery", 	"SPECIAL" TableN("CountMin" 1, "CountMax" 2, 2) 3 TableN
-	"WEIGHT" 75.0 <-IC_rdf div,	"STYPE" "solar_farm",	2 TableN
-	
-	#-----------
-	
-	#"WEIGHT" 40.0,	"TYPE" "microrift",			2 TableN
-	"WEIGHT" 40.0,	"TYPE" "ultrac",			2 TableN
-	
-	#-----------
-	
 	"WEIGHT" 20.0,	"TYPE" "pterosaur",			"SPECIAL" TableN("CountMin" 1, "CountMax" 3, 2) 3 TableN
-	
-	#-----------
-	
-	"WEIGHT" 10.0,	"STYPE" "u_wall",		"SPECIAL" TableN("Type" "wall", 1) 3 TableN
-	
-	#-----------
-	
 	"WEIGHT" 100.0,	"TYPE" <-*MB_tCustomGUIDs{"Mystery Box"},		"SPECIAL" TableN("Count" 4, "Unselectable" TRUE 2), 	3 TableN
 	"WEIGHT" 20.0,	"TYPE" <-*MB_tCustomGUIDs{"Mystery Box"},		"SPECIAL" TableN("Count" 8, "Unselectable" TRUE, "Effect" "boom1",  3), 	3 TableN
 	"WEIGHT" 5.0,	"TYPE" <-*MB_tCustomGUIDs{"Mystery Box"},		"SPECIAL" TableN("Count" 12, "Unselectable" TRUE, "Effect" "boom2", 3), 	3 TableN
-	"WEIGHT" 5.0,	"TYPE" "emitter",		"SETTINGS" TableN("Start" 0, 	"Interval" 15, 	"Payload" -20, 3), 	3 TableN
 	"WEIGHT" 200.0,	"STYPE" "creeper", 		"SPECIAL" TableN("Payload" -1000, 1),	3 TableN
 	"WEIGHT" 150.0,	"STYPE" "creeper", 		"SPECIAL" TableN("Payload" -1500, 1),	3 TableN
 	"WEIGHT" 100.0,	"STYPE" "creeper", 		"SPECIAL" TableN("Payload" -2000, 1),	3 TableN
 	
 	<-IC_diff "hard" neq if
 		#Peaceful, Easy and Normal difficulty
-	
-		"WEIGHT" 50.0,	"TYPE" "rocketpad",			2 TableN
+		GetMversePlayerNum -1 eq if
+			"WEIGHT" 50.0,	"TYPE" <-*MB_tCustomGUIDs{"Unit Capsule 7x7"},	"SETTINGS" TableN("UnitType" "rocketpad" "Name" "ROCKET" "Color" 0 0.9 0 1 V4 3)		3 TableN
+		else
+			"WEIGHT" 50.0,	"TYPE" "rocketpad",			2 TableN
+		endif
 	else
 		#Hard difficulty
 		
@@ -1023,19 +1023,14 @@ endif
 	else <-PS_s "u_wall" eq if
 		<-PS_tEntry{"SPECIAL"}{"Type"} ->PS_sWallType
 	
-		<-PS_v3fPos.z 3 add ->PS_iZTop
-		<-PS_v3fPos.z 3 sub ->PS_iZBottom
-		<-PS_v3fPos.x 3 add ->PS_iXRight
-		<-PS_v3fPos.x 3 sub ->PS_iXLeft
-	
-		<-PS_sType 0 4 @RandIntSeeded ->PS_iEmptySide
+		<-PS_v3fPos.z 4 add ->PS_iZTop
+		<-PS_v3fPos.z 4 sub ->PS_iZBottom
+		<-PS_v3fPos.x 4 add ->PS_iXRight
+		<-PS_v3fPos.x 4 sub ->PS_iXLeft
 		
 		<-PS_iZTop 1 add <-PS_iZBottom do
 			<-PS_iXRight 1 add <-PS_iXLeft do
-				<-PS_iEmptySide 0 eq J <-PS_iZTop eq J <-PS_iZBottom eq I <-PS_iXRight eq or or and 
-				<-PS_iEmptySide 1 eq J <-PS_iZTop eq J <-PS_iZBottom eq I <-PS_iXLeft eq or or and or
-				<-PS_iEmptySide 2 eq I <-PS_iXLeft eq I <-PS_iXRight eq J <-PS_iZTop eq or or and or
-				<-PS_iEmptySide 3 eq I <-PS_iXLeft eq I <-PS_iXRight eq J <-PS_iZBottom eq or or and or if
+				J <-PS_iZTop eq J <-PS_iZBottom eq or I <-PS_iXRight eq or I <-PS_iXLeft eq or if
 					<-PS_sWallType I J NULL CreateUnitOnTerrain pop
 				endif
 			loop

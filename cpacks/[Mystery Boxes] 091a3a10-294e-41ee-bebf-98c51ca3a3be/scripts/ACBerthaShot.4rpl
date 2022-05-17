@@ -1,0 +1,42 @@
+# --BerthaShot-- 11/22/2019 1:46:15 PM
+
+<-counter 1 + ->counter
+if (<-gravity eq0)
+	@Kaboom
+	return
+endif
+
+BallisticArcPos(<-startPos <-fireVel <-gravity <-counter <-speedMultiple *) ->newPos
+GetUnitPosition(self) ->currentPos
+SetUnitForward(self <-newPos <-currentPos -)
+
+GetExactTerrain(<-newPos.X <-newPos.Z false) ->exactTerrainHeight
+
+#Calculate the minimum distance between the target point and the line made from the last and the current position.
+#This is used to make sure the shot doesn't go through the target when the target is at the edge of a cliff
+#At the edge of a cliff the shot might never collide with the terrain
+DistancePointLine(<-target <-currentPos <-newPos) ->distanceToTarget
+
+if (<-newPos.Y <-exactTerrainHeight lt <-distanceToTarget 0.1 lt ||)
+	SetUnitPosition(self V3(<-newPos.X <-exactTerrainHeight <-newPos.Z))
+	@Kaboom
+else
+	SetUnitPosition(self <-newPos)
+endif
+
+
+:Kaboom
+	<-newPos.x 0 <-newPos.z V3 ToCell ->z ->x
+	<-z 2 add <-z 1 sub do
+		<-x 2 add <-x 1 sub do
+			I J <-ACPayload 9.0 div neg AddCreeper
+		loop
+	loop
+	DestroyUnit(self false false true)
+
+:Once
+	GetUnitPosition(self) ->startPos
+	CreateTrail(self "" 1 1)
+:destroyed
+	Self GetUnitPosition ->pos
+	"radial2" <-pos.x <-pos.y 1 add <-pos.z V3 0.3 0.3 0.3 V3 CreateEffect

@@ -223,28 +223,35 @@ endwhile
 	"terp"				3
 	<-*MB_tCustomGUIDs{"Flare"} 8
 	<-*MB_tCustomGUIDs{"AC Bomb"} 8
+	<-*MB_tCustomGUIDs{"Unit Capsule 3x3"} 2
+	<-*MB_tCustomGUIDs{"Unit Capsule 5x5"} 4
+	<-*MB_tCustomGUIDs{"Unit Capsule 7x7"} 6
 	Table ->*G_tItemScrapValues
 	
 	CreateList ->*G_ltRecyclerConfig
 
 	ClearStack
-	"Name" "Rocket"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 7x7"}	"Cost" 35	"ModeFour" FALSE "Opts" TableN("UnitType" "rocketpad" "Name" "ROCKET" "Color" 0 1 0 1 V4 3)		5 TableN
-	"Name" "ACBomb"		"UnitType" <-*MB_tCustomGUIDs{"AC Bomb"}		"Cost" 30 "ModeFour" TRUE	4 TableN
-	"Name" "Flare"		"UnitType" <-*MB_tCustomGUIDs{"Flare"}		"Cost" 20 "ModeFour" TRUE	4 TableN
-	"Name" "Refinery"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 20	"ModeFour" TRUE "Opts" TableN("UnitType" "greenarrefinery" "Name" "REFINERY" "Color" 0.6 0.2 0.075 1 V4 3)		5 TableN
+	"Name" "Rocket"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 7x7"}	"Cost" 40	"ModeFour" FALSE "Opts" TableN("UnitType" "rocketpad" "Name" "ROCKET" "Color" 0 0.9 0 1 V4 3)		5 TableN
+	"Name" "Refinery"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 5x5"}	"Cost" 20	"ModeFour" FALSE "Opts" TableN("UnitType" "greenarrefinery" "Name" "REFINERY" "Color" 0 0.9 0 1 V4 3)		5 TableN
+	"Name" "Terp"		"UnitType" "terp"							"Cost" 20 "ModeFour" TRUE		4 TableN
+	"Name" "ACBomb"		"UnitType" <-*MB_tCustomGUIDs{"AC Bomb"}		"Cost" 20 "ModeFour" TRUE	4 TableN
+	"Name" "ACBerth."	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}		"Cost" 15 "ModeFour" TRUE "Opts" TableN("UnitType" <-*MB_tCustomGUIDs{"AC Bertha"}, "Name" "AC BERTHA", "Color" 0.05 0.15 1 1 V4, "Rim" 0.6 0.6 0.075 1 V4, 4)	5 TableN
+	"Name" "Flare"		"UnitType" <-*MB_tCustomGUIDs{"Flare"}		"Cost" 15 "ModeFour" TRUE	4 TableN
 	"Name" "Beacon"		"UnitType" "beacon"							"Cost" 15 "ModeFour" TRUE		4 TableN
-	"Name" "Terp"		"UnitType" "terp"							"Cost" 15 "ModeFour" TRUE		4 TableN
+	"Name" "Microrift"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 10  "ModeFour" TRUE		"Opts" TableN("UnitType" "microrift", "Name" "MICRORIFT", "Color" 1 0.075 0.075 1 V4 3)		5 TableN
+	"Name" "Porter"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 5x5"}	"Cost" 10  "ModeFour" FALSE		"Opts" TableN("UnitType" "porter", "Name" "PORTER", "Color" 0.1 0.1 0.1 1 V4 3)		5 TableN
 	"Name" "Missile"	"UnitType" "missilelauncher"				"Cost" 10  "ModeFour" TRUE		4 TableN
 	"Name" "Sniper"		"UnitType" "sniper"							"Cost" 10  "ModeFour" TRUE		4 TableN
-	"Name" "Sprayer"	"UnitType" "sprayer"						"Cost" 10  "ModeFour" TRUE		4 TableN
-	"Name" "Shield"		"UnitType" "shield"							"Cost" 10  "ModeFour" TRUE		4 TableN
+	"Name" "Sprayer"	"UnitType" "sprayer"						"Cost" 8  "ModeFour" TRUE		4 TableN
+	"Name" "Shield"		"UnitType" "shield"							"Cost" 8  "ModeFour" TRUE		4 TableN
 	"Name" "Mortar" 	"UnitType" "mortar" 						"Cost" 5  "ModeFour" TRUE		4 TableN
-	"Name" "Green+"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 30 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "greenarmother" "Name" "GREENAR MOTHER" "Color" 0 0.9 0 1 V4 "UnitOpts" TableN("Interval" 240 1) 4)		5 TableN
-	"Name" "Redon+"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 15 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "resourcered" "Name" "REDON CRYSTAL" "Color" 1 0.075 0.075 1 V4 "UnitOpts" TableN("Interval" 30 1) 4)		5 TableN
-	"Name" "Bluite+"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 15 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "resourceblue" "Name" "BLUITE CRYSTAL" "Color" 0.05 0.15 1 1 V4 "UnitOpts" TableN("Interval" 30 1) 4)		5 TableN
-	"Name" "Greenar"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 10 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "greenarmother" "Name" "GREENAR MOTHER" "Color" 0 0.9 0 1 V4 "UnitOpts" TableN("Interval" 800 1) 4)		5 TableN
-	"Name" "Redon"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 5 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "resourcered" "Name" "REDON CRYSTAL" "Color" 1 0.075 0.075 1 V4 "UnitOpts" TableN("Interval" 100 1) 4)		5 TableN
-	"Name" "Bluite"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 5 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "resourceblue" "Name" "BLUITE CRYSTAL" "Color" 0.05 0.15 1 1 V4 "UnitOpts" TableN("Interval" 100 1) 4)		5 TableN
+	"Name" "Cannon" 	"UnitType" "cannon" 						"Cost" 3  "ModeFour" TRUE		4 TableN
+	"Name" "Green.+"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 30 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "greenarmother" "Name" "GREENAR MOTHER" "Color" 0 0.9 0 1 V4 "Rim" 0.3 0.7 0.3 1 V4 "UnitOpts" TableN("Interval" 240 1) 5)		5 TableN
+	"Name" "Greenar"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 10 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "greenarmother" "Name" "GREENAR MOTHER" "Color" 0 0.9 0 1 V4 "Rim" 0.3 0.7 0.3 1 V4 "UnitOpts" TableN("Interval" 800 1) 5)		5 TableN
+	"Name" "Redon+"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 15 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "resourcered" 	"Name" "REDON CRYSTAL" "Color" 1 0.075 0.075 1 V4 "Rim" 0.7 0.3 0.3 1 V4 "UnitOpts" TableN("Interval" 30 1) 5)		5 TableN
+	"Name" "Redon"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 5 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "resourcered" "Name" "REDON CRYSTAL" "Color" 1 0.075 0.075 1 V4 "Rim" 0.7 0.3 0.3 1 V4 "UnitOpts" TableN("Interval" 100 1) 5)		5 TableN
+	"Name" "Bluite+"	"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 15 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "resourceblue" "Name" "BLUITE CRYSTAL" "Color" 0.05 0.15 1 1 V4 "Rim" 0.3 0.3 0.7 1 V4 "UnitOpts" TableN("Interval" 30 1) 5)		5 TableN
+	"Name" "Bluite"		"UnitType" <-*MB_tCustomGUIDs{"Unit Capsule 3x3"}	"Cost" 5 @ResDivFactor mul	"ModeFour" TRUE "Opts" TableN("UnitType" "resourceblue" "Name" "BLUITE CRYSTAL" "Color" 0.05 0.15 1 1 V4 "Rim" 0.3 0.3 0.7 1 V4 "UnitOpts" TableN("Interval" 100 1) 5)		5 TableN
 	<-*G_ltRecyclerConfig AppendStackToList
 
 	CreateList ->IR_lOptions
@@ -279,14 +286,8 @@ endwhile
 				<-G_iScrap <-UI_tConf{"Cost"} @GetCostFromDifficulty sub ->G_iScrap
 				@UpdateScrapText
 				
-				#Send special options if the unit being created is a capsule
-				<-UI_tConf{"UnitType"} <-*MB_tCustomGUIDs{"Unit Capsule 3x3"} eq 
-				<-UI_tConf{"UnitType"} <-*MB_tCustomGUIDs{"Unit Capsule 7x7"} eq or if
-					<-UI_tConf{"UnitType"} <-UI_tConf{"Opts"} <-UI_tConf{"ModeFour"} @SpawnUnitAtFreePosition ->UI_iUID
-				else
-					<-UI_tConf{"UnitType"} 0 <-UI_tConf{"ModeFour"} @SpawnUnitAtFreePosition ->UI_iUID
-					<-UI_iUID 9999 ConstructUnit
-				endif
+				<-UI_tConf{"UnitType"} <-UI_tConf{"Opts"} <-UI_tConf{"ModeFour"} @SpawnUnitAtFreePosition ->UI_iUID
+				<-UI_iUID 9999 ConstructUnit
 				
 				"text" <-UI_tConf{"Name"} " built" concat "color" 0.58 0.58 1 1 V4 2 TableN @SpawnFloatingText
 			else

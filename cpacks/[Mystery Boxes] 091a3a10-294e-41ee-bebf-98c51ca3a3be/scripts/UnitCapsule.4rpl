@@ -26,6 +26,10 @@ endif
 		Self 1 <-Name SetUnitUIText
 		-1 ->moving
 		-1 ->lastMoving
+		
+		-?Rim if
+			Self "rim" <-Rim SetObjColor
+		ENDIF
 	endonce
 :once
 	@awake
@@ -49,22 +53,48 @@ endif
 			"text" "Too close to Recycler to deploy" "lifetime" 30 "color" 1 0.58 0.58 1 V4 3 TableN @SpawnFloatingText
 		else
 			Self GetUnitCell ->iZ ->iX
-		
-			<-UnitType "resourcered" eq
+			
+			<-UnitType "ultrac" eq
+			<-UnitType "emitter" eq or
+			<-UnitType "resourcered" eq or
 			<-UnitType "resourceblue" eq or
 			<-UnitType "greenarmother" eq or if
 				"MB_UnitCapsuleSpecialPlaced" "type" <-UnitType "x" <-iX "z" <-iZ "opts" <-UnitOpts 4 TableN SendMVerseMsg
 			endif
 		
-			<-UnitType <-iX <-iZ <-UnitOpts CreateUnitOnTerrain ->iUnit
-			#Do not construct the unit if we're playing Mverse and this is a shared unit
-			GetMversePlayerNum 0 gte <-*MB_tbMverseSharedUnits{<-UnitType} and if
-			
+			<-UnitType "solar_farm" eq if
+				@BuildSingleplayerSolarFarm
+			else <-UnitType "u_wall" eq if
+				@BuildSingleplayerWall
 			else
-				<-iUnit 9999 ConstructUnit
-			endif
+				<-UnitType <-iX <-iZ <-UnitOpts CreateUnitOnTerrain ->iUnit
+				#Do not construct the unit if we're playing Mverse and this is a shared unit
+				GetMversePlayerNum 0 gte <-*MB_tbMverseSharedUnits{<-UnitType} and if
+				
+				else
+					<-iUnit 9999 ConstructUnit
+				endif
+			endif endif
+			
 			
 			Self 1 1 1 DestroyUnit
 		endif
 	endif
+:BuildSingleplayerSolarFarm
+	6 0 do
+		"collectorpanel5" <-iX <-iZ NULL CreateUnitOnTerrain pop
+	loop
+	"collectorpanel3" <-iX 1 sub <-iZ 2 sub NULL CreateUnitOnTerrain pop
+:BuildSingleplayerWall
+	<-iZ 4 add ->BSW_iZTop
+	<-iZ 4 sub ->BSW_iZBottom
+	<-iX 4 add ->BSW_iXRight
+	<-iX 4 sub ->BSW_iXLeft
 	
+	<-BSW_iZTop 1 add <-BSW_iZBottom do
+		<-BSW_iXRight 1 add <-BSW_iXLeft do
+			J <-BSW_iZTop eq J <-BSW_iZBottom eq or I <-BSW_iXRight eq or I <-BSW_iXLeft eq or if
+				"wall" I J NULL CreateUnitOnTerrain pop
+			endif
+		loop
+	loop

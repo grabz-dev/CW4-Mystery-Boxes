@@ -1,3 +1,15 @@
+2022-05-17
+Mystery Boxes 7.10
+  - Added AC Bertha Jr. as a rare Mystery Box outcome.
+  - Slightly buffed AC Bomb payload (11/13 to 12/14). AC Bomb now drops AC on death.
+  - Recycler can now recycle unit capsules (2 scrap for 3x3, 4 for 5x5, 6 for 7x7).
+  - Added Porter, Microrift, AC Bertha Jr. purchasable in Recycler as capsules.
+  - Changed Recycler costs (Rocket slightly up, Terp slightly up, everything else slightly down).
+  - When playing in singleplayer, all stationary units now spawn as capsules that can be moved before deploying.
+  - Microrift and Porter now spawn as capsules in all modes.
+  - The wall outcome now spawns a square wall that can fit a Mystery Box inside.
+
+2022-05-16
 Mystery Boxes 7.9
   - Nerfed skimmer fortress on Normal and Nightmare
   - Miners from Friend Box now have 100% coverage

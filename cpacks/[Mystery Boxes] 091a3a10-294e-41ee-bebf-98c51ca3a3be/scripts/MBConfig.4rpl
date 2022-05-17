@@ -21,12 +21,15 @@
 		"d28c2039-dbe9-4d0e-8a04-ea008511f0ff" ->*MB_tCustomGUIDs{"Titan Box"}
 		"e18fe3ff-1957-40af-8527-76ed74f62ae0" ->*MB_tCustomGUIDs{"Recycler"}
 		"e3e9fba7-30e3-4de3-b68c-6440ae8f0796" ->*MB_tCustomGUIDs{"Unit Capsule 3x3"}
+		"b6bbb357-1fac-4954-97c9-7ded0ab412a4" ->*MB_tCustomGUIDs{"Unit Capsule 5x5"}
 		"1be3f343-9bb3-40cc-92d7-05227ef04932" ->*MB_tCustomGUIDs{"Unit Capsule 7x7"}
 		
 		"972cde70-8401-4654-a21b-c52e593f9300" ->*MB_tCustomGUIDs{"Airship"}
 		"e83b5d63-9c3c-4e14-a6a2-cdec643e8793" ->*MB_tCustomGUIDs{"Airship Shot"}
 		"ba6da806-4a7b-4317-92d1-6f9e86720e4d" ->*MB_tCustomGUIDs{"Bertha"}
 		"3d512053-9b47-4d24-85e9-548f3fe40802" ->*MB_tCustomGUIDs{"Bertha Shot"}
+		"47281742-b463-4578-873e-6241f44d34c4" ->*MB_tCustomGUIDs{"AC Bertha"}
+		"731984f3-8fd9-4099-9fae-1208575f8bdf" ->*MB_tCustomGUIDs{"AC Bertha Shot"}
 		"a9fc2232-ce15-4099-b047-69ab70320509" ->*MB_tCustomGUIDs{"Sweeper"}
 		"b94aca06-1be1-4cc6-be6e-5fdccd36ae5f" ->*MB_tCustomGUIDs{"Wallis"}
 		"a18bdc10-0152-4ae7-950a-08baf44935b6" ->*MB_tCustomGUIDs{"Wallis Bomb"}

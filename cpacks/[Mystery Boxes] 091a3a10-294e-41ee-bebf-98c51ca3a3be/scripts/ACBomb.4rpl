@@ -1,7 +1,7 @@
 # --ACBomb-- 4/20/2022 5:17:35 PM
 
-$ACPerPacket:11
-$ACPerPackerWithERN:13
+$ACPerPacket:12
+$ACPerPacketWithERN:14
 
 Self GetUnitConstructing Self GetUnitStunCount 0 gt or if
 	return
@@ -28,6 +28,8 @@ endif
 	@UpdateUI
 :Once
 	@Awake
+:destroyed
+	@Detonate
 :_UICALLBACK
 	Self GetUnitConstructing Self GetUnitStunCount 0 gt or if
 		return
@@ -39,7 +41,7 @@ endif
 		endif
 	endif
 :Detonate
-	Self GetUnitAmmo Self GetUnitERNState if <-ACPerPackerWithERN else <-ACPerPacket endif mul 9.0 div ->payload
+	Self GetUnitAmmo Self GetUnitERNState if <-ACPerPacketWithERN else <-ACPerPacket endif mul 9.0 div ->payload
 	Self GetUnitPosition ToCell ->z ->x
 	<-z 2 add <-z 1 sub do
 		<-x 2 add <-x 1 sub do
@@ -51,8 +53,8 @@ endif
 		loop
 	loop
 	Self 0 SetUnitAmmo
-	"Sci Fi Explosion 04" 8 PlaySound
+	"Sci Fi Explosion 04" 8 Self GetUnitPosition PlaySoundAtPosition
 	"radial" Self GetUnitPosition 2 2 2 V3 CreateEffect
 :UpdateUI
-	Self 6 "Deposits " Self GetUnitERNState if <-ACPerPackerWithERN else <-ACPerPacket endif " AC" concat3 SetUnitUIText
+	Self 6 "Deposits " Self GetUnitERNState if <-ACPerPacketWithERN else <-ACPerPacket endif " AC" concat3 SetUnitUIText
 	Self 7 "per ammo packet" SetUnitUIText

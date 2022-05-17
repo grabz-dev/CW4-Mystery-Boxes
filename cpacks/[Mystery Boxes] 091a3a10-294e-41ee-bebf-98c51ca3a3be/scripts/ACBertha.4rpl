@@ -1,0 +1,160 @@
+# --Bertha-- 11/19/2019 1:20:01 PM
+
+$projSpeed:1.5
+$projMaxHeight:50
+$rotSpeed:1
+$fireCost:20
+$rechargeTime:180
+$autotarget_border_offset:3
+$ACPerPacket:9
+$ACPerPacketWithERN:11
+
+#UI 0: Flip; Auto Fire Mode (0=manual 1 = auto)
+
+Self GetUnitConstructing Self GetUnitStunCount 0 gt or if
+	return
+endif
+
+Self GetUnitERNState ->curERNState
+<-curERNState <-lastERNState neq if
+	<-curERNState if
+		Self 10 SetUnitPacketRequestRate
+	else
+		Self 15 SetUnitPacketRequestRate
+	endif
+	@UpdateUI
+	<-curERNState ->lastERNState
+endif
+
+GetTimer0 neq0 if
+	return
+endif
+
+GetUnitUIState(self 0) ->autoFireMode
+if (<-autoFireMode <-autoTargetX lt0 && @CanAutoAim &&)
+	GetMinCreeperCellWithDamage ->autoTargetZ ->autoTargetX
+	<-autoTargetX -1 eq if
+		Self ClearUnitSpecifiedTarget
+		30 SetTimer0
+		return
+	endif
+	
+	GetMapSize ->mapSizeZ ->mapSizeX 
+	#Prevent firing too close to map border
+	<-autoTargetX <-autotarget_border_offset lt if
+		<-autotarget_border_offset ->autoTargetX
+	endif
+	<-autoTargetZ <-autotarget_border_offset lt if
+		<-autotarget_border_offset ->autoTargetZ
+	endif
+	<-autoTargetX <-mapSizeX <-autotarget_border_offset 1 add sub gt if
+		<-mapSizeX <-autotarget_border_offset sub 1 sub ->autoTargetX
+	endif
+	<-autoTargetZ <-mapSizeZ <-autotarget_border_offset 1 add sub gt if
+		<-mapSizeZ <-autotarget_border_offset sub 1 sub ->autoTargetZ
+	endif
+	
+	SetUnitSpecifiedTarget(self V3(<-autoTargetX 0 <-autoTargetZ))
+	SetUnitSpecifiedTargetShowPath(self true)
+	
+	30 ->fadeTime
+else	
+	if (GetUnitSelected(self))
+		SetUnitSpecifiedTargetShowPath(self true)
+	else
+		if (<-fadeTime lte0)
+			SetUnitSpecifiedTargetShowPath(self false)
+		endif	
+	endif
+	if (<-fadeTime gt0)
+		<-fadeTime 1 - ->fadeTime
+	endif
+endif
+
+
+GetUnitSpecifiedTarget(self) ->target
+if (<-target <-lastTarget neq)
+	<-target ->lastTarget
+	GetObjPosition(self "Arm" true) ->armPos
+	
+	@CalculateBallistics
+endif
+
+if (<-target.x gte0)
+	RotateObjTowardsCell(self "Arm" <-nearPos.X <-nearPos.Z <-rotSpeed)
+	GetObjForward(self "Arm") ->for
+	<-nearPos.Y <-armPos.Y - <-nearDist / <-armPos.Y + ->tY
+	<-for <-armPos + ->rPos
+	<-tY ->rPos.y
+	RotateObjTowards(self "Arm" <-rPos 99999)
+	GetObjFacingAngleCell(self "Arm" <-nearPos.X <-nearPos.Z) ->facingAngle
+	if (<-facingAngle 1 lt)
+		@Fire
+	endif
+endif
+
+if (<-fireCount gt0)
+	<-fireCount 1 - ->fireCount
+endif
+
+:CalculateBallistics
+	BallisticArcLateral(<-armPos <-projSpeed <-target <-projMaxHeight) ->travelTime ->gravity ->fireVel
+	BallisticArcPos(<-armPos <-fireVel <-gravity 0.1) ->nearPos
+	Magnitude(<-nearPos <-armPos -) ->nearDist
+	
+	#Calculate a speed adjuster.  The lateral ballistic arc assumes a constant lateral travel speed.  Makes a nice arc, but means that a shot made near the unit
+	#will arc up and down really fast (since the lateral distance is so small). So we calculate a speed multiplier that will slow things down when close.
+	#It is based on the idea that the projectile approximately travels a triangle's distance, not just the lateral distance.  So for near shots that factors in the 
+	#up and down the projectile must travel.
+	magnitude(<-target <-armPos -) ->d
+	<-d 2 / ->halfTT
+	<-projMaxHeight <-projMaxHeight * <-halfTT <-halfTT * + sqrt 2 * ->speedDivisor
+	<-d <-speedDivisor / ->speedMultiple
+
+:CanFire
+	<-fireCount eq0 GetUnitAmmo(self) <-fireCost gte && GetUnitArmed(self) &&
+
+:CanAutoAim
+	<-fireCount eq0 GetUnitAmmo(self) 3 + <-fireCost gte &&
+
+:Fire
+	if (@CanFire)
+		<-rechargeTime ->fireCount
+		CreateTable ->initParams
+
+		@FireProjectile
+
+		SetUnitAmmo(self GetUnitAmmo(self) <-fireCost - )
+		
+		-1 ->autoTargetX
+		-1 ->autoTargetZ
+		
+		PlaySoundAtPosition("BerthaFire" 1 GetUnitPosition(self))		
+	endif
+	
+:FireProjectile	
+	<-fireVel ->initParams{"fireVel"}
+	<-gravity ->initParams{"gravity"}
+	<-speedMultiple ->initParams{"speedMultiple"}
+	<-target ->initParams{"TARGET"}
+	Self GetUnitERNState if <-ACPerPacketWithERN else <-ACPerPacket endif <-fireCost mul ->initParams{"ACPayload"}
+
+	CreateUnit(<-*MB_tCustomGUIDs{"AC Bertha Shot"} <-armPos <-initParams) ->shotUnit
+:_UICALLBACK
+	<-_DATA ->uiSlot
+	if (<-uiSlot 1 eq)
+		#Clear Target
+		ClearUnitSpecifiedTarget(self)
+	endif
+:Awake
+	@UpdateUI
+:Once
+	#Gets called once and only once when unit is created
+	GetObjPosition(self "Arm" false) ->armPos
+	SetUnitSpecifiedTargetPathSourceOffset(self <-armPos)
+	SetUnitSpecifiedTargetPathHeight(self <-projMaxHeight)
+	-1 ->autoTargetX
+	@Awake
+:UpdateUI
+	Self 6 "Deposits " Self GetUnitERNState if <-ACPerPacketWithERN else <-ACPerPacket endif " AC" concat3 SetUnitUIText
+	Self 7 "per ammo packet" SetUnitUIText
