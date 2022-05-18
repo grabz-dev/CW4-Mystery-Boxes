@@ -1,3 +1,7 @@
+2022-05-18
+Mystery Boxes 7.11
+  - Nerfed capsule recycling costs from 2/4/6 to 1/2/3
+
 2022-05-17
 Mystery Boxes 7.10
   - Added AC Bertha Jr. as a rare Mystery Box outcome.

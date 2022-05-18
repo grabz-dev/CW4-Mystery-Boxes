@@ -223,9 +223,9 @@ endwhile
 	"terp"				3
 	<-*MB_tCustomGUIDs{"Flare"} 8
 	<-*MB_tCustomGUIDs{"AC Bomb"} 8
-	<-*MB_tCustomGUIDs{"Unit Capsule 3x3"} 2
-	<-*MB_tCustomGUIDs{"Unit Capsule 5x5"} 4
-	<-*MB_tCustomGUIDs{"Unit Capsule 7x7"} 6
+	<-*MB_tCustomGUIDs{"Unit Capsule 3x3"} 1
+	<-*MB_tCustomGUIDs{"Unit Capsule 5x5"} 2
+	<-*MB_tCustomGUIDs{"Unit Capsule 7x7"} 3
 	Table ->*G_tItemScrapValues
 	
 	CreateList ->*G_ltRecyclerConfig
