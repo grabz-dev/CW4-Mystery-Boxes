@@ -2,8 +2,9 @@
 #Created by Alophox
 #Refurbished by Grabz
 
+$isBigFlare:0
 $projSpeed:.4 #total speed
-$rotSpeed:1 #radians per second
+$rotSpeed:1.0 #radians per second
 $fireCost:10
 $rechargeTime:180 #frames between bursts
 $miniRechargeTime:10.0 #frames between shots, makes sure it is a float
@@ -32,14 +33,23 @@ endif
 	<-burstCounter <-miniRechargeTime mod 0 eq if
 		<-burstCounter <-miniRechargeTime div 3 mod ->barrel
 		
-		<-barrel 0 eq if
-			0.5 <-launchAngle HALFPI add cos mul, 0.45, 0.5 <-launchAngle HALFPI add sin mul V3 ->offset
-		else <-barrel 1 eq if
-			0.0, 0.45, 0.0 V3 ->offset
-		else <-barrel 2 eq if
-			0.5 <-launchAngle HALFPI sub cos mul, 0.45, 0.5 <-launchAngle HALFPI sub sin mul V3 ->offset
-		endif endif endif
-	
+		<-isBigFlare if
+			<-barrel 0 eq if
+				1.0 <-launchAngle HALFPI add cos mul, 0.45, 1.0 <-launchAngle HALFPI add sin mul V3 ->offset
+			else <-barrel 1 eq if
+				0.0, 0.45, 0.0 V3 ->offset
+			else <-barrel 2 eq if
+				1.0 <-launchAngle HALFPI sub cos mul, 0.45, 1.0 <-launchAngle HALFPI sub sin mul V3 ->offset
+			endif endif endif
+		else
+			<-barrel 0 eq if
+				0.5 <-launchAngle HALFPI add cos mul, 0.45, 0.5 <-launchAngle HALFPI add sin mul V3 ->offset
+			else <-barrel 1 eq if
+				0.0, 0.45, 0.0 V3 ->offset
+			else <-barrel 2 eq if
+				0.5 <-launchAngle HALFPI sub cos mul, 0.45, 0.5 <-launchAngle HALFPI sub sin mul V3 ->offset
+			endif endif endif
+		endif
 		
 		<-offset @FireProjectile
 		
@@ -80,7 +90,12 @@ Self GetUnitEnabled Self GetUnitArmed and if
 					@Fire
 				endif
 			else @CanFire if
-				Self TRUE 0 FindUnitEnemy ->autoTargetZ ->autoTargetX
+				<-isBigFlare if
+					GetMaxCreeperCellWithDamage ->autoTargetZ ->autoTargetX
+				else
+					Self TRUE 0 FindUnitEnemy ->autoTargetZ ->autoTargetX
+				endif
+				
 				
 				<-autoTargetX -1 eq if
 					Self ClearUnitSpecifiedTarget
@@ -155,13 +170,16 @@ endif
 		CreateTable ->initParams
 		-0.5 <-launchAngle HALFPI add cos mul, .45, -0.5 <-launchAngle HALFPI add sin mul V3 ->offset
 		
-		Self GetUnitERNState if
+		<-isBigFlare if
+			5.0 ->miniRechargeTime
+			<-miniRechargeTime 14 mul ->burstCounter
+		else Self GetUnitERNState if
 			8.0 ->miniRechargeTime
 			<-miniRechargeTime 4 mul ->burstCounter
 		else
 			10.0 ->miniRechargeTime
 			<-miniRechargeTime 2 mul ->burstCounter
-		endif
+		endif endif
 	endif
 
 #creates projectils when firing
@@ -173,6 +191,7 @@ endif
 	<-DAMAGE_MESH ->initParams{"DAMAGE_MESH"}
 	<-DAMAGE_DIST ->initParams{"DAMAGE_DIST"}
 	<-DAMAGE_DEPTH ->initParams{"DAMAGE_DEPTH"}
+	<-isBigFlare ->initParams{"isBigFlare"}
 	<-target ->initParams{"TARGET"}
 	1 10000000 @RandIntSeeded ->initParams{"Seed"}
 	1 ->initParams{"targeting"}

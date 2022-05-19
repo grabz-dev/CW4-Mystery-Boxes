@@ -90,13 +90,17 @@ endif
 
 	#offset, cause who wants perfectly accurate rockets
 	Self GetUnitPosition ->currentPos
-	<-target -4 5 @RandIntSeeded, 0, -4 5 @RandIntSeeded V3 add ->target
+	<-isBigFlare if
+		<-target -9 10 @RandIntSeeded, 0, -9 10 @RandIntSeeded V3 add ->target
+	else
+		<-target -4 5 @RandIntSeeded, 0, -4 5 @RandIntSeeded V3 add ->target
+	endif
 	<-target.z <-currentPos.z sub <-target.x <-currentPos.x sub atan2 ->launchAngle
 	
 	#add damage map info
 	Self <-target.x <-target.z <-DAMAGE_DIST <-DAMAGE_DEPTH 1000000 mul FALSE ApplyToDamageMap
 	
-	Self "" 1 4 CreateTrail
+	Self "" 1 <-isBigFlare if 2 else 4 endif CreateTrail
 	
 	#if above target, immediately go down
 	<-currentPos.y <-target.y sub <-projSpeed 15 mul add, <-currentPos.x <-target.x sub 2 pow <-currentPos.z <-target.z sub 2 pow add sqrt gte if

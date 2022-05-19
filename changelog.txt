@@ -1,3 +1,11 @@
+2022-05-19
+Mystery Boxes 7.12
+  - Added Big Flare as a Titan reward
+  - ERN Maker average ammo request rate changed from 7 to 14, max ammo changed from 500 to 250. This effectively halves ammo use.
+  - Wallis device ammo use reduced from 5 to 4
+  - Orbital factory no longer spawns refineries, but now spawns 3 Rockets
+  - Fixed Flare having incorrect height for its model
+
 2022-05-18
 Mystery Boxes 7.11
   - Nerfed capsule recycling costs from 2/4/6 to 1/2/3

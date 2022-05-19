@@ -14,7 +14,7 @@ endif
 	
 :Awake	
 	once
-		SetUnitPacketRequestRate(Self 7) 
+		SetUnitPacketRequestRate(Self 14) 
 	endonce
 :Once
 	@Awake
