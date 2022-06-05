@@ -1,0 +1,44 @@
+# --FiveOrbitalsAndCreeper-- 6/5/2022 5:20:55 PM
+
+once
+	Self GetUnitCell ->cellZ ->cellX
+	"rocketpad" <-cellX <-cellZ 3 add 0 CreateUnitOnTerrain
+	"rocketpad" <-cellX 3 sub <-cellZ 1 add 0 CreateUnitOnTerrain
+	"rocketpad" <-cellX 3 add <-cellZ 1 add 0 CreateUnitOnTerrain
+	"rocketpad" <-cellX 2 sub <-cellZ 2 sub 0 CreateUnitOnTerrain
+	"rocketpad" <-cellX 2 add <-cellZ 2 sub 0 CreateUnitOnTerrain
+	List ->rockets
+	
+	<-rockets 0 do
+		<-rockets[I] FALSE SetUnitDamagedByCreeper
+		<-rockets[I] FALSE SetUnitConnectable
+		<-rockets[I] FALSE SetUnitSelectable
+		<-rockets[I] 9999 ConstructUnit
+		<-rockets[I] dup GetUnitMaxAmmo SetUnitAmmo
+	loop
+	
+	Self GetUnitPosition ->pos
+	
+	<-*MB_tCustomGUIDs{"Floating Text"} <-pos.x <-pos.y 5 add <-pos.z V3 "text" "Watch out!
+It's coming from underground!" "lifetime" 280 "speed" 1.5 "size" 26 "synchronize" TRUE 5 TableN CreateUnit
+	
+	280 SetTimer0
+endonce
+
+GetTimer0 30 eq if
+	<-*MB_tCustomGUIDs{"Floating Text"} <-pos.x <-pos.y 7 add <-pos.z V3 "text" "AAHHHHHHHHHHH!" "lifetime" 90 "speed" 3.5 "size" 35 "synchronize" TRUE 5 TableN CreateUnit
+endif
+
+GetTimer0 eq0 if
+	<-rockets 0 do
+		<-rockets[I] TRUE FALSE TRUE DestroyUnit
+	loop
+	
+	<-cellZ 4 add <-cellZ 3 sub do
+		<-cellX 4 add <-cellX 3 sub do
+			I J 2000 TRUE SetCreeper
+		loop
+	loop
+	
+	Self TRUE FALSE TRUE DestroyUnit
+endif

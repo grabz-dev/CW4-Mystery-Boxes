@@ -15,6 +15,10 @@ $size:18
 		Self "text" <-text SetObjText
 		Self "text" <-size SetObjTextFontSize
 		Self "text" <-color SetObjTextColor
+		
+		<-synchronize if
+			"MB_CreateFloatingText" "pos" Self GetUnitPosition "text" <-text "lifetime" <-lifetime "speed" <-speed "size" <-size 5 TableN SendMverseMsg
+		endif
 	endonce
 :once
 	@awake

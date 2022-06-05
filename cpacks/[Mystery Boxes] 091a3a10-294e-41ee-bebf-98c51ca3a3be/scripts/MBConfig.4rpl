@@ -15,6 +15,7 @@
 		"a0335e05-9dea-40e9-9748-798cebcd57c4" ->*MB_tCustomGUIDs{"Skimmer Pain"}
 		"8dca7c58-0f33-4e19-bb5b-e6415f285814" ->*MB_tCustomGUIDs{"Titan Fake-Out"}
 		"fbb50557-f7db-4da5-a837-3afd5b12872a" ->*MB_tCustomGUIDs{"Visual Orbital Giver"}
+		"e3f1b3ff-89c7-486a-83b9-9df4fc0c3e42" ->*MB_tCustomGUIDs{"Creeper and Five Orbitals"}
 		
 		"8222113b-e77d-4bb4-8995-db5e2be77a3c" ->*MB_tCustomGUIDs{"Friend Box"}
 		"84555524-9060-4de3-8db1-ce1769cfe715" ->*MB_tCustomGUIDs{"Mystery Box"}
@@ -39,7 +40,7 @@
 		"a920cbef-72c7-40ff-bd58-029ff5dad011" ->*MB_tCustomGUIDs{"Flare Rocket"}
 		"10d70983-50b9-42fe-a848-6bc43dd9feaa" ->*MB_tCustomGUIDs{"Splitmitter"}
 		"91f65344-934c-42e9-a3c5-cd76ac614149" ->*MB_tCustomGUIDs{"AC Bomb"}
-		
+		"a0c56797-7f56-4c05-ad0f-4d99c5329ec3" ->*MB_tCustomGUIDs{"Nexus Orb"}
 		
 		#Do not edit this table
 		#This is a list of built in SHARED UNITS.

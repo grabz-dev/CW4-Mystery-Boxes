@@ -1,3 +1,10 @@
+2022-06-05
+Mystery Boxes 7.13
+  - Doubled AC Bertha appearance chance
+  - Added a new evil Titan box outcome (thanks Fire)
+  - Added a new good Titan box outcome that creates 5 orbitals and 100K creeper
+  - Splitmitter is now capped by Creeper Cutoff
+
 2022-05-19
 Mystery Boxes 7.12
   - Added Big Flare as a Titan reward

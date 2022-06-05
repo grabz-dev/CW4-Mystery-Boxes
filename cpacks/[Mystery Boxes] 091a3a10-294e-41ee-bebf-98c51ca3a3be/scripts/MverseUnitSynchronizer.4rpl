@@ -1,0 +1,26 @@
+# --MverseSynchronizer-- 8/28/2021 3:00:17 PM
+
+:awake
+	once
+		"MB_SplitmitterCreated" "OnSplitmitterCreated" RegisterForMsg
+		"MB_NexusOrbCreated" "OnNexusOrbCreated" RegisterForMsg
+		"MB_CreateFloatingText" "OnCreateFloatingText" RegisterForMsg
+	endonce
+:once
+	@awake
+
+
+:OnSplitmitterCreated
+	<-_DATA Copy ->OSC_tInitParams
+	<-OSC_tInitParams "HostUID" <-_DATA{"UID"} SetTableElement
+	<-*MB_tCustomGUIDs{"Splitmitter"} <-_DATA{"InitialPosition"} <-OSC_tInitParams CreateUnit pop
+:OnNexusOrbCreated
+	<-_DATA Copy ->OSC_tInitParams
+	<-OSC_tInitParams "HostUID" <-_DATA{"UID"} SetTableElement
+	<-*MB_tCustomGUIDs{"Nexus Orb"} <-_DATA{"InitialPosition"} <-OSC_tInitParams CreateUnit pop
+:OnCreateFloatingText
+	<-*MB_tCustomGUIDs{"Floating Text"} <-_DATA{"pos"} 
+				"text" <-_DATA{"text"} 
+				"lifetime" <-_DATA{"lifetime"} 
+				"speed" <-_DATA{"speed"} 
+				"size" <-_DATA{"size"} 4 TableN CreateUnit

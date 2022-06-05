@@ -1,0 +1,122 @@
+# --NexusOrb-- 6/3/2022 5:08:36 PM
+
+#If we are client.
+-?HostUID if
+	Self GetUnitHealth ->fCurHealth
+	
+	<-fCurHealth <-fLastCurHealth lt if
+		"MB_NexusOrbDamaged" "HostUID" <-HostUID "Damage" <-fLastCurHealth <-fCurHealth sub 2 TableN SendMVerseMsg
+	endif
+	
+	<-fCurHealth ->fLastCurHealth
+else
+	GetTimer0 eq0 if
+		90 SetTimer0
+		
+		"MB_NexusOrbHealthDisplay" Self GetUnitHealth SendMVerseMsg
+		Self GetUnitHealth @UpdateHealthText
+	endif
+endif
+
+:destroyed
+	<-Emitters 0 do
+		<-Emitters[I] FALSE FALSE FALSE DestroyUnit
+	loop
+
+	#If we are client, do nothing more.
+	-?HostUID if
+		return
+	endif
+
+	#If we are host, send a message to others that this guy is destroyed.
+	-?HostUID not if
+		"MB_NexusOrbDestroyed" Self SendMVerseMsg
+	endif
+:awake
+	once
+		"MB_NexusOrbDestroyed" "OnNexusOrbDestroyed" RegisterForMsg
+		"MB_NexusOrbDamaged" "OnNexusOrbDamaged" RegisterForMsg
+		"MB_NexusOrbHealthDisplay" "OnNexusOrbHealthDisplay" RegisterForMsg
+		Self FALSE SetMVerseCreatesUnitGhost
+		
+		#If we are client, make sure this unit doesn't heal. Only host unit should heal. Also give it more health to prevent the unit dying accidentally.
+		-?HostUID if
+			Self 0 SetUnitHealRate
+			Self 10000 SetUnitMaxHealth
+			Self 10000 SetUnitHealth
+		else
+			<-HardDiff if
+				Self 60 SetUnitMaxHealth
+				Self 60 SetUnitHealth
+			else
+				Self 30 SetUnitMaxHealth
+				Self 30 SetUnitHealth
+			endif
+		endif
+		
+		#If we are host, send a message to others to create a clone
+		-?HostUID not if
+			"UID" Self
+			"InitialPosition" Self GetUnitPosition
+			"HardDiff" <-HardDiff
+				3 TableN ->tInitParams
+			"MB_NexusOrbCreated" <-tInitParams SendMVerseMsg
+		endif
+		
+		Self GetUnitPosition ->pos
+		<-pos.x <-pos.z GetTerrain ->terrain
+		<-terrain 15 add ->pos.y
+		Self <-pos SetUnitPosition
+		list(V3(2 2 2) V3(2 2 -2) V3(2 -2 2) V3(2 -2 -2) V3(-2 2 2) V3(-2 2 -2) V3(-2 -2 2) V3(-2 -2 -2) V3(3.236 1.236 0) V3(3.236 -1.236 0) V3(-3.236 1.236 0) V3(-3.236 -1.236 0) V3(0 3.236 1.236) V3(0 3.236 -1.236) V3(0 -3.236 1.236) V3(0 -3.236 -1.236) V3(1.236 0 3.236) V3(1.236 0 -3.236) V3(-1.236 0 3.236) V3(-1.236 0 -3.236)) ->Positions
+		list(V3(1.647 2.342 0) V3(1.647 -2.342 0) V3(-1.647 2.342 0) V3(-1.647 -2.342 0) V3(0 1.647 2.342) V3(0 1.647 -2.342) V3(0 -1.647 2.342) V3(0 -1.647 -2.342) V3(2.342 0 1.647) V3(2.342 0 -1.647) V3(-2.342 0 1.647) V3(-2.342 0 -1.647)) ->PositionsB
+		CreateList ->Emitters
+		<-HardDiff if
+			do(20 0)
+				CreateUnit("emitter" <-Positions[i] <-pos add TableN("Start" 0, "Interval" 30, "Payload" 20, 3)) ->emitter
+				<-emitter FALSE SetUnitOccupiesLand
+				AppendToList(<-Emitters <-emitter)
+			loop
+			do(12 0)
+				CreateUnit("sporelauncher" <-PositionsB[i] <-pos add
+				TableN("Start" 0, "Interval" 300, "Payload" 300, "Count" 1, "Target" 1, "DisableMiniMapWarn" TRUE, "EggStart" 0, "EggInterval" 300, "EggCount" 1, "EggDefenseRatio" 0.5, "EggOnlyDuringCutoff" FALSE,  11)) ->spore
+				<-spore FALSE SetUnitOccupiesLand
+				AppendToList(<-Emitters <-spore)
+			loop
+		else
+			do(20 0)
+				CreateUnit("emitter" <-Positions[i] <-pos add TableN("Start" 0, "Interval" 30, "Payload" 10, 3)) ->emitter
+				<-emitter FALSE SetUnitOccupiesLand
+				AppendToList(<-Emitters <-emitter)
+			loop
+			do(12 0)
+				CreateUnit("sporelauncher" <-PositionsB[i] <-pos add
+				TableN("Start" 0, "Interval" 300, "Payload" 300, "Count" 1, "Target" 1, "DisableMiniMapWarn" TRUE, "EggStart" 0, "EggInterval" 300, "EggCount" 0, "EggDefenseRatio" 0.5, "EggOnlyDuringCutoff" FALSE,  11)) ->spore
+				<-spore FALSE SetUnitOccupiesLand
+				AppendToList(<-Emitters <-spore)
+			loop
+		endif
+		do(32 0)
+			RotateUnitTowards(<-Emitters[i] <-pos 200)
+			SetUnitRotation(<-Emitters[i] GetUnitRotation(<-Emitters[i]) V3(-90 0 0) add)
+		loop
+	endonce
+:once
+	@awake
+	Self GetUnitMaxHealth ->fLastCurHealth
+:OnNexusOrbDestroyed
+	#If we are client and the signature matches Host's unit, destroy our clone.
+	<-_DATA <-HostUID eq if
+		Self 0 0 0 DestroyUnit
+	endif
+:OnNexusOrbDamaged
+	#If we are host and the signature matches our unit, damage it.
+	-?HostUID not <-_DATA{"HostUID"} Self eq and if
+		Self <-_DATA{"Damage"} DamageUnit
+	endif
+:OnNexusOrbHealthDisplay
+	<-_DATA @UpdateHealthText
+:UpdateHealthText
+	->UHT_f
+	Self "text" "Health
+" <-UHT_f ceil concat SetObjText
+	

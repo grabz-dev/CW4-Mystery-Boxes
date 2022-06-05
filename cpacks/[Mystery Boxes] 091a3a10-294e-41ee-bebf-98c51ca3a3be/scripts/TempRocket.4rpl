@@ -9,7 +9,9 @@ endonce
 GetTimer0 <-stagger eq if
 	Self GetUnitCell ->cellZ ->cellX
 	"rocketpad" <-cellX <-cellZ 0 CreateUnitOnTerrain ->rocket
+	<-rocket FALSE SetUnitDamagedByCreeper
 	<-rocket FALSE SetUnitSelectable
+	<-rocket FALSE SetUnitConnectable
 	<-rocket 9999 ConstructUnit
 	<-rocket <-rocket GetUnitMaxAmmo SetUnitAmmo
 endif
