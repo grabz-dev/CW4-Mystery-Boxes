@@ -1,3 +1,11 @@
+2022-11-20
+Mystery Boxes 7.14
+  - Removed creeper cover titan outcome
+  - Lowered the amount of mystery box spawns from Titan outcome on Nightmare (down to 20 from 50)
+  - Halved the amount of mystery box quad spawns on Nightmare (down to 2/4/6 from 4/8/12)
+  - Boxes are no longer destroyed on uneven terrain. This prevents multi mystery box spawn outcomes from being cut short by the terrain smiley face outcome
+  - Fixed Splitmitter interval not being passed on to its clones
+
 2022-06-05
 Mystery Boxes 7.13
   - Doubled AC Bertha appearance chance

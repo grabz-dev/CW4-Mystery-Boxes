@@ -87,8 +87,9 @@ Self "script_root" <-fRotation dup dup V3 FALSE SetObjRotation
 			"InitialPosition" <-position
 			"Payload" <-Payload 0.75 mul
 			"IsClone" TRUE 
+			"Interval" <-Interval
 			"Seed" 1 10000000 @RandIntSeeded
-				6 TableN ->tInitParams
+				7 TableN ->tInitParams
 			
 			<-SPLITMITTER_GUID <-position <-tInitParams CreateUnit ->unitUID
 			
@@ -126,7 +127,8 @@ Self "script_root" <-fRotation dup dup V3 FALSE SetObjRotation
 			"SplitHealth" <-SplitHealth, 
 			"InitialPosition" Self GetUnitPosition
 			"Payload" <-Payload
-				4 TableN ->tInitParams
+			"Interval" <-Interval
+				5 TableN ->tInitParams
 			"MB_SplitmitterCreated" <-tInitParams SendMVerseMsg
 		endif
 	endonce
