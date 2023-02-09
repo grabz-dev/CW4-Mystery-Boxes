@@ -1,3 +1,7 @@
+2023-02-09
+Mystery Boxes 7.15
+  - Mystery box spawns from Titan and Quad no longer count towards the Evil multiplier
+
 2022-11-20
 Mystery Boxes 7.14
   - Removed creeper cover titan outcome
