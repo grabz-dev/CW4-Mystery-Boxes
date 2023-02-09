@@ -1,5 +1,6 @@
 # --RNGManager-- 8/16/2021 11:05:48 PM
 $EvilMultiplierIncreasePerBox:0.005
+$CountBoxesNotBuiltByPlayer:1
 
 #This script RUNS while paused
 
@@ -840,7 +841,7 @@ endif
 		<-MBO_sUnitType <-*MB_tCustomGUIDs{"Mystery Box"} eq if
 			<-MBO_iStaggerFrames 5 add ->MBO_iStaggerFrames
 			<-MBO_tSettingsTable "StaggerFrames" <-MBO_iStaggerFrames SetTableElement
-			<-MBO_tSettingsTable "NoCounterIncrease" TRUE SetTableElement
+			<-MBO_tSettingsTable "NoCounterIncrease" <-CountBoxesNotBuiltByPlayer not SetTableElement
 		endif
 		
 		<-MBO_fSettingsPayload IsNull not if

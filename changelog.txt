@@ -1,4 +1,8 @@
 2023-02-09
+Mystery Boxes 7.16
+  - Mystery box spawns not built by player (from Titan/Quad) counting towards the Evil multiplier is now a modifiable input option in RNGManager, enabled by default meaning they will count
+
+2023-02-09
 Mystery Boxes 7.15
   - Mystery box spawns from Titan and Quad no longer count towards the Evil multiplier
 
