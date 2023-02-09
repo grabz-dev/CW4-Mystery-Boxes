@@ -591,7 +591,7 @@ endif
 # Arguments: 
 # Result: 
 :OnMysteryBoxOpened
-	<-_DATA{"sType"} <-_DATA{"v3fPos"} FALSE FALSE @_OnMysteryBoxOpened
+	<-_DATA{"sType"} <-_DATA{"v3fPos"} <-_DATA{"bNoCounterIncrease"} FALSE FALSE @_OnMysteryBoxOpened
 
 # _DATA -
 # Description: Mverse MSG event handler for a mystery box opening event from another player.
@@ -607,7 +607,7 @@ endif
 	<-_DATA{"Seed"} ->MMB_ttltConfRoot{"Seed"}
 	
 	#Open box
-	<-MMB_sType <-_DATA{"v3fPos"} <-_DATA{"CounterOnly"} TRUE @_OnMysteryBoxOpened
+	<-MMB_sType <-_DATA{"v3fPos"} <-_DATA{"bNoCounterIncrease"} <-_DATA{"CounterOnly"} TRUE @_OnMysteryBoxOpened
 	
 	#Put back our seed
 	<-MMB_iSeedBackup ->MMB_ttltConfRoot{"Seed"}
@@ -617,13 +617,15 @@ endif
 # Arguments: Box name, 3D position of the event, bool TRUE if event came from another player in mverse FALSE otherwise
 # Result: 
 :_OnMysteryBoxOpened
-	->MBO_bIsFromMverse ->MBO_bIsCounterOnly ->MBO_v3fPos ->MBO_sType
+	->MBO_bIsFromMverse ->MBO_bIsCounterOnly ->MBO_bNoCounterIncrease ->MBO_v3fPos ->MBO_sType
 	
 	#Add to counter
 	<-MBO_sType "REGULAR_MYSTERY_BOX" eq if
-		<-*MB_MysteryBoxesOpened 1 add ->*MB_MysteryBoxesOpened
-		@UpdateMysteryBoxOpenedButton
-		@UpdateEvilMultiplierButton
+		<-MBO_bNoCounterIncrease not if
+			<-*MB_MysteryBoxesOpened 1 add ->*MB_MysteryBoxesOpened
+			@UpdateMysteryBoxOpenedButton
+			@UpdateEvilMultiplierButton
+		endif
 	endif
 	
 	<-MBO_bIsCounterOnly if
@@ -692,7 +694,7 @@ endif
 		
 		<-G_tbMversePlayerUnits{<-MBO_sMverseUnitType} not if
 			<-MBO_bIsFromMverse not if
-				"MB_MverseMysteryBoxOpened" "sType" <-MBO_sType "v3fPos" <-MBO_v3fPos "Seed" <-MBO_iSeedUsed 3 TableN SendMVerseMsg
+				"MB_MverseMysteryBoxOpened" "sType" <-MBO_sType "v3fPos" <-MBO_v3fPos "Seed" <-MBO_iSeedUsed "bNoCounterIncrease" <-MBO_bNoCounterIncrease 4 TableN SendMVerseMsg
 				TRUE ->MBO_bMverseMessageSent
 				
 				<-G_tbMverseTypesSpawnForEveryone{<-MBO_sMverseUnitType} not if
@@ -707,7 +709,7 @@ endif
 		endif
 		<-MBO_bIsFromMverse not if
 			<-MBO_bMverseMessageSent not if
-				"MB_MverseMysteryBoxOpened" "sType" <-MBO_sType "v3fPos" <-MBO_v3fPos "Seed" <-MBO_iSeedUsed "CounterOnly" TRUE 4 TableN SendMVerseMsg
+				"MB_MverseMysteryBoxOpened" "sType" <-MBO_sType "v3fPos" <-MBO_v3fPos "Seed" <-MBO_iSeedUsed "CounterOnly" TRUE "bNoCounterIncrease" <-MBO_bNoCounterIncrease 5 TableN SendMVerseMsg
 			endif
 		endif
 	endif
@@ -838,6 +840,7 @@ endif
 		<-MBO_sUnitType <-*MB_tCustomGUIDs{"Mystery Box"} eq if
 			<-MBO_iStaggerFrames 5 add ->MBO_iStaggerFrames
 			<-MBO_tSettingsTable "StaggerFrames" <-MBO_iStaggerFrames SetTableElement
+			<-MBO_tSettingsTable "NoCounterIncrease" TRUE SetTableElement
 		endif
 		
 		<-MBO_fSettingsPayload IsNull not if

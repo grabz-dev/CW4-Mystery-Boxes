@@ -3,6 +3,7 @@
 #Used in RNGManager
 $RNG_Manager_Type:"REGULAR_MYSTERY_BOX"
 $StaggerFrames:0
+$NoCounterIncrease:0
 $$Explosion_Scale:0.6
 
 ##############
@@ -91,7 +92,7 @@ endif endif endif endif endif endif
 		80.0 ->fAnimFaceMaxRotation
 		
 		#Tell RNGManager to spawn a unit here.
-		ClearStack "MB_MysteryBoxOpened" "sType" <-RNG_Manager_Type "v3fPos" Self GetUnitPosition "iSelf" Self 3 TableN SendMsg
+		ClearStack "MB_MysteryBoxOpened" "sType" <-RNG_Manager_Type "v3fPos" Self GetUnitPosition "iSelf" Self "bNoCounterIncrease" <-NoCounterIncrease 4 TableN SendMsg
 
 	else <-SST_sNewState "DECAYING" eq if
 		Self FALSE SetUnitOccupiesLand
