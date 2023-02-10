@@ -104,7 +104,15 @@ endif
 	<-d <-speedDivisor / ->speedMultiple
 
 :CanFire
-	<-fireCount eq0 GetUnitAmmo(self) <-fireCost gte && GetUnitArmed(self) &&
+	<-fireCount eq0 
+	GetUnitAmmo(self) <-fireCost gte 
+		&& 
+	GetUnitArmed(self) 
+		&& 
+	<-autoFireMode 
+	<-target.x <-target.z GetCreeper gt0 <-autoFireMode not && 
+		or
+			&&
 
 :CanAutoAim
 	<-fireCount eq0 GetUnitAmmo(self) 3 + <-fireCost gte &&
